@@ -184,7 +184,6 @@
                 <option value="#047857">Green Ink</option>
             </select>
         </div>
-        <!-- NEW ADDITION: SHAPE CLASSIFICATION SYSTEM ACCESSIBILITY MATRIX -->
         <div class="input-group">
             <label>Stamp Design Profile</label>
             <select id="stampShape">
@@ -199,7 +198,7 @@
 </div>
 
 <div class="container">
-    <div class="header" style="text-align:center; margin-bottom:20px;">
+    <div class="header">
         <h1 style="color:var(--primary); margin:0;">UPI Pro Invoice</h1>
     </div>
     <div class="main-layout">
@@ -226,7 +225,6 @@
                     <label>Quantity</label>
                     <input type="number" id="prodQty" placeholder="1" value="1">
                 </div>
-
                 <button id="addProductBtn" class="btn btn-purple">➕ Add Product</button>
                 <div id="productPreviewArea" class="product-preview-list" style="display: none;"></div>
 
@@ -238,16 +236,15 @@
         </div>
         
         <div class="preview-area" id="dropzone">
-    <div id="workspace-scaler">
-        <iframe id="pdf-frame"></iframe>
-        <div id="click-overlay"></div>
-        <!-- ADD THIS ONE MISSING LINE RIGHT HERE: -->
-        <div id="click-overlay-stamp" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1005; display: none; background: rgba(0,0,0,0.01);"></div>
-        
-        <div id="qr-marker">
-            <div style="font-size:18px;">🎯</div>
-            <span>DRAG & RESIZE</span>
-        </div>
+            <div id="workspace-scaler">
+                <iframe id="pdf-frame"></iframe>
+                <img id="image-frame" alt="Invoice Preview Surface Substrate Layer">
+                <div id="click-overlay"></div>
+                <div id="click-overlay-stamp" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1005; display: none; background: rgba(0,0,0,0.01);"></div>
+                <div id="qr-marker">
+                    <div style="font-size:18px;">🎯</div>
+                    <span>DRAG & RESIZE</span>
+                </div>
                 
                 <div id="stamp-marker">
                     <span>STAMP PLACEHOLDER</span>
@@ -263,15 +260,15 @@
     </div>
 </div>
 
-<script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/easyqrcodejs@4.6.2/dist/easy.qrcode.min.js"></script>
-    
-    <script>
+<script src="https://unpkg.com"></script>
+<script src="https://jsdelivr.net"></script>
+<script>
     const gearIcon = document.getElementById('gearIcon');
     const settingsPanel = document.getElementById('settingsPanel');
     const stampOptionMenu = document.getElementById('digitalStampOptionMenu');
     const stampFormArea = document.getElementById('stampFormArea');
     const lockStampBtn = document.getElementById('lockStampBtn');
+
     let originalBytes, posX = 0, posY = 0;
     const marker = document.getElementById('qr-marker');
     const note = document.getElementById('on-screen-note');
@@ -287,7 +284,6 @@
     const zoomOutBtn = document.getElementById('zoomOutBtn');
     const zoomValueLabel = document.getElementById('zoomValueLabel');
 
-    // SYNC FORM CACHING PARAMETERS INCLUDING THE NEW DESIGN PATTERN ACCESSIBILITY VALUES
     window.onload = () => {
         ['payeeName', 'vpa', 'amount', 'stampCompany', 'stampApprover', 'stampDate', 'stampColor', 'stampShape'].forEach(id => {
             const targetInputElement = document.getElementById(id);
@@ -324,7 +320,6 @@
     zoomInBtn.onclick = () => applyZoomMatrixTransformation(0.1);
     zoomOutBtn.onclick = () => applyZoomMatrixTransformation(-0.1);
 
-    // Preview Logic handles manual file selection mappings
     document.getElementById('fileInput').onchange = async (e) => {
         const file = e.target.files[0];
         if (!file) return;
@@ -340,6 +335,7 @@
         
         setTimeout(() => { note.style.display = 'none'; }, 4000);
     };
+
     document.getElementById('click-overlay').onclick = (e) => {
         const rect = document.getElementById('workspace-scaler').getBoundingClientRect();
         posX = (e.clientX - rect.left) / currentZoomScale; 
@@ -353,7 +349,6 @@
         note.style.display = 'none';
     };
 
-    // Dragging/Resize Mechanics
     let isDragging = false;
     marker.onmousedown = (e) => { if(e.offsetX < marker.clientWidth - 15 && e.offsetY < marker.clientHeight - 15) isDragging = true; };
     window.onmousemove = (e) => {
@@ -376,7 +371,6 @@
         isStampDragging = false;
     };
 
-    // Download Compilation & QR Injection Matrix Engine
     document.getElementById('downloadBtn').onclick = async () => {
         try {
             const name = document.getElementById('payeeName').value;
@@ -407,11 +401,9 @@
                     height: finalQrHeight
                 });
                 
-                // MULTI-SHAPE RESIZABLE COMPONENT PLACEMENT ENGINE MODIFICATION BLOCK
                 if (isStampPlaced && stampImgDataUrl) {
                     const stampImageObject = await pdfDoc.embedPng(stampImgDataUrl);
                     
-                    // Maps localized dragging parameters to absolute PDF matrix points
                     const markerLeftPos = parseFloat(stampMarker.style.left) + (stampMarker.clientWidth / 2);
                     const markerTopPos = parseFloat(stampMarker.style.top) + (stampMarker.clientHeight / 2);
 
@@ -569,13 +561,6 @@
         } catch (err) { alert("Generation Core Failure: " + err.message); }
     };
 
-    // GEAR MENU CONFIGURATION FLYOUT OPERATIONS
-    const gearIcon = document.getElementById('gearIcon');
-    const settingsPanel = document.getElementById('settingsPanel');
-    const stampOptionMenu = document.getElementById('digitalStampOptionMenu');
-    const stampFormArea = document.getElementById('stampFormArea');
-    const lockStampBtn = document.getElementById('lockStampBtn');
-
     gearIcon.onclick = () => {
         settingsPanel.style.display = settingsPanel.style.display === 'block' ? 'none' : 'block';
     };
@@ -612,7 +597,6 @@
         bufferCtx.textAlign = 'center';
         bufferCtx.textBaseline = 'middle';
 
-        // GEOMETRIC RENDERING SWITCH VARIATIONS PIPELINE PASS
         if (selectedShape === 'circle') {
             bufferCtx.lineWidth = 8;
             bufferCtx.beginPath(); bufferCtx.arc(240, 240, 200, 0, Math.PI * 2); bufferCtx.stroke();
@@ -677,18 +661,9 @@
         ctx.drawImage(stampGraphicBufferCanvas, 0, 0);
         ctx.fillStyle = selectedInkColor;
         
-                        for (let idx = 0; idx < 1200; idx++) {
+        for (let idx = 0; idx < 1200; idx++) {
             const randomCoordX = Math.random() * 480;
             const randomCoordY = Math.random() * 480;
-            // FIXED: Added [3] to target the alpha pixel channel and restored the clearRect action
-            if (bufferCtx.getImageData(randomCoordX, randomCoordY, 1, 1).data[3] > 0) {
-                ctx.clearRect(randomCoordX, randomCoordY, Math.random() * 2 + 1, Math.random() * 2 + 1);
-            }
-        }
-               for (let idx = 0; idx < 1200; idx++) {
-            const randomCoordX = Math.random() * 480;
-            const randomCoordY = Math.random() * 480;
-            // FIXED: Added [3] to target the alpha pixel channel and restored the clearRect action
             if (bufferCtx.getImageData(randomCoordX, randomCoordY, 1, 1).data[3] > 0) {
                 ctx.clearRect(randomCoordX, randomCoordY, Math.random() * 2 + 1, Math.random() * 2 + 1);
             }
@@ -697,14 +672,11 @@
             const randomSpreadX = Math.random() * 480;
             const randomSpreadY = Math.random() * 480;
             if (bufferCtx.getImageData(randomSpreadX, randomSpreadY, 1, 1).data[3] === 0) {
-                // FIXED: Corrected spelling to globalAlpha to resolve the crash and filled the random pixels
                 ctx.globalAlpha = Math.random() * 0.4;
                 ctx.fillRect(randomSpreadX, randomSpreadY, 1.5, 1.5);
             }
         }
         ctx.globalAlpha = 1.0;
-
-        stampImgDataUrl = canvas.toDataURL('image/png');
 
         stampImgDataUrl = canvas.toDataURL('image/png');
 
@@ -733,7 +705,6 @@
 
     stampMarker.onmousedown = (e) => { if(e.offsetX < stampMarker.clientWidth - 15 && e.offsetY < stampMarker.clientHeight - 15) isStampDragging = true; };
 
-    // SCREENSHOT CLIPBOARD PASTE INTERCEPT ROUTINE FOR DIRECT SCREENSHOT INPUT INTO THE WORKSPACE BLANK
     document.addEventListener('paste', async (e) => {
         const clipboardItems = (e.clipboardData || e.originalEvent.clipboardData).items;
         for (let i = 0; i < clipboardItems.length; i++) {
@@ -749,7 +720,7 @@
         }
     });
 
-        async function handleIncomingDocumentBufferChannels(fileObj) {
+    async function handleIncomingDocumentBufferChannels(fileObj) {
         originalBytes = await fileObj.arrayBuffer();
         const generatedObjectUrl = URL.createObjectURL(new Blob([originalBytes], {type: fileObj.type}));
         
