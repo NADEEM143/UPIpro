@@ -388,7 +388,7 @@
             new QRCode(qrDiv, { text: upi, width: 400, height: 400 });
             
             setTimeout(async () => {
-                const qrImg = qrDiv.querySelector('canvas').toDataURL('image/png');
+                const qrImg = qrDiv.querySelector('img').src;
                 const pdfDoc = await PDFLib.PDFDocument.load(originalBytes);
                 const firstPage = pdfDoc.getPages()[0];
                 const qrImage = await pdfDoc.embedPng(qrImg);
