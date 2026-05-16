@@ -413,7 +413,7 @@
     };
 
         // COMPLETE BUG-FREE DOWNLOAD COMPILATION ENGINE
-        document.getElementById('downloadBtn').onclick = async () => {
+            document.getElementById('downloadBtn').onclick = async () => {
         try {
             const name = document.getElementById('payeeName').value;
             const vpa = document.getElementById('vpa').value;
@@ -432,17 +432,34 @@
             const qrImage = await pdfDoc.embedPng(qrImgDataUrl);
             
             const { width, height } = firstPage.getSize();
-            const preview = document.getElementById('workspace-scaler');
             
-            const pdfX = (posX / preview.offsetWidth) * width;
-            const pdfY = height - ((posY / preview.offsetHeight) * height);
+            // --- DETECT ACTIVE MEDIA LAYER SUBSTRATE ---
+            // Checks if an uploaded image or a compiled PDF is driving the preview scale height
+            const pdfFrameNode = document.getElementById('pdf-frame');
+            const imgFrameNode = document.getElementById('image-frame');
             
-            // --- FIXED MATHEMATICAL SIZING ENGINE ---
-            // Measures screen pixels and converts them evenly to match PDF dimension matrices
-            const computedWidth = (marker.clientWidth / preview.offsetWidth) * width;
-            const computedHeight = (marker.clientHeight / preview.offsetHeight) * height;
+            let sourceRenderWidth = 0;
+            let sourceRenderHeight = 0;
             
-            // Forces a balanced 1:1 square print scale matching your visual layout view
+            if (pdfFrameNode && pdfFrameNode.style.display === 'block') {
+                sourceRenderWidth = pdfFrameNode.offsetWidth;
+                sourceRenderHeight = pdfFrameNode.offsetHeight;
+            } else if (imgFrameNode && imgFrameNode.style.display === 'block') {
+                sourceRenderWidth = imgFrameNode.offsetWidth;
+                sourceRenderHeight = imgFrameNode.offsetHeight;
+            } else {
+                const previewWorkspace = document.getElementById('workspace-scaler');
+                sourceRenderWidth = previewWorkspace.offsetWidth;
+                sourceRenderHeight = previewWorkspace.offsetHeight;
+            }
+            
+            // --- PERFECTED POSITION SIZING MATRIX ---
+            // Maps the exact location relative to the visible invoice image boundary lines
+            const pdfX = (posX / sourceRenderWidth) * width;
+            const pdfY = height - ((posY / sourceRenderHeight) * height);
+            
+            const computedWidth = (marker.clientWidth / sourceRenderWidth) * width;
+            const computedHeight = (marker.clientHeight / sourceRenderHeight) * height;
             const finalSquareSize = Math.max(computedWidth, computedHeight);
             // ----------------------------------------
 
@@ -459,10 +476,10 @@
                 const markerLeftPos = parseFloat(stampMarker.style.left) + (stampMarker.clientWidth / 2);
                 const markerTopPos = parseFloat(stampMarker.style.top) + (stampMarker.clientHeight / 2);
 
-                const docStampX = (markerLeftPos / preview.offsetWidth) * width;
-                const docStampY = height - ((markerTopPos / preview.offsetHeight) * height);
-                const docStampW = (stampMarker.clientWidth / preview.offsetWidth) * width;
-                const docStampH = (stampMarker.clientHeight / preview.offsetHeight) * height;
+                const docStampX = (markerLeftPos / sourceRenderWidth) * width;
+                const docStampY = height - ((markerTopPos / sourceRenderHeight) * height);
+                const docStampW = (stampMarker.clientWidth / sourceRenderWidth) * width;
+                const docStampH = (stampMarker.clientHeight / sourceRenderHeight) * height;
                 
                 firstPage.drawImage(stampImageObject, {
                     x: docStampX - (docStampW / 2),
