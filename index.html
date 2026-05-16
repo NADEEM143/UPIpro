@@ -390,16 +390,14 @@
     };
 
     // Dragging/Resize Mechanics
-        // PERFECTED DRIFT-FREE DRAGGING MECHANICS WITH EVENT LOCKS
     let isDragging = false;
     let offsetX = 0, offsetY = 0;
     let stampOffsetX = 0, stampOffsetY = 0;
-    let isQrLocked = false; // Prevents shifting after pressing Enter
 
     marker.onmousedown = (e) => { 
-        if (isQrLocked) return; // Disables movement if locked
         if (e.offsetX < marker.clientWidth - 15 && e.offsetY < marker.clientHeight - 15) {
             isDragging = true; 
+            // Tracks exact mouse click offsets relative to the top-left marker edge
             offsetX = e.clientX - marker.getBoundingClientRect().left;
             offsetY = e.clientY - marker.getBoundingClientRect().top;
         }
@@ -415,7 +413,8 @@
 
     window.onmousemove = (e) => {
         const rect = document.getElementById('workspace-scaler').getBoundingClientRect();
-        if (isDragging && !isQrLocked) {
+        if (isDragging) {
+            // Calculates positions directly from the top-left boundary limits without shifting center offsets
             posX = (e.clientX - rect.left - offsetX) / currentZoomScale;
             posY = (e.clientY - rect.top - offsetY) / currentZoomScale;
             marker.style.left = posX + 'px';
@@ -434,28 +433,8 @@
         isStampDragging = false;
     };
 
-    // NEW KEY LISTENER ENGINE: PRESS ENTER TO FREEZE THE LOGIC IN PLACE
-    window.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-            if (!originalBytes) return;
-            
-            isQrLocked = true;
-            posX = parseFloat(marker.style.left || posX);
-            posY = parseFloat(marker.style.top || posY);
-            
-            // Visual green indicator feedback confirming the placement lock state
-            marker.style.borderColor = "#059669"; 
-            marker.style.cursor = "default";
-            
-            const toast = document.getElementById('on-screen-note');
-            toast.innerText = "🔒 QR Code Position Locked Perfectly! Ready to Download.";
-            toast.style.display = 'block';
-            setTimeout(() => { toast.style.display = 'none'; }, 3000);
-        }
-    });
-
-    // COMPLETE DRIFT-FREE DOWNLOAD COMPILATION ENGINE
-    document.getElementById('downloadBtn').onclick = async () => {
+        // COMPLETE BUG-FREE DOWNLOAD COMPILATION ENGINE
+            document.getElementById('downloadBtn').onclick = async () => {
         try {
             const name = document.getElementById('payeeName').value;
             const vpa = document.getElementById('vpa').value;
@@ -474,14 +453,14 @@
             const qrImage = await pdfDoc.embedPng(qrImgDataUrl);
             
             const { width, height } = firstPage.getSize();
-            const preview = document.getElementById('workspace-scaler');
             
             // --- DETECT ACTIVE MEDIA LAYER SUBSTRATE ---
+            // Checks if an uploaded image or a compiled PDF is driving the preview scale height
             const pdfFrameNode = document.getElementById('pdf-frame');
             const imgFrameNode = document.getElementById('image-frame');
             
-            let sourceRenderWidth = preview.offsetWidth;
-            let sourceRenderHeight = preview.offsetHeight;
+            let sourceRenderWidth = 0;
+            let sourceRenderHeight = 0;
             
             if (pdfFrameNode && pdfFrameNode.style.display === 'block') {
                 sourceRenderWidth = pdfFrameNode.offsetWidth;
@@ -489,53 +468,28 @@
             } else if (imgFrameNode && imgFrameNode.style.display === 'block') {
                 sourceRenderWidth = imgFrameNode.offsetWidth;
                 sourceRenderHeight = imgFrameNode.offsetHeight;
+            } else {
+                const previewWorkspace = document.getElementById('workspace-scaler');
+                sourceRenderWidth = previewWorkspace.offsetWidth;
+                sourceRenderHeight = previewWorkspace.offsetHeight;
             }
             
-            // Reads exact fixed coordinates relative to top-left edges
-            const finalLeftPos = isQrLocked ? posX : parseFloat(marker.style.left || posX);
-            const finalTopPos = isQrLocked ? posY : parseFloat(marker.style.top || posY);
-
-            const pdfX = (finalLeftPos / sourceRenderWidth) * width;
-            const pdfY = height - ((finalTopPos / sourceRenderHeight) * height);
+            // --- PERFECTED POSITION SIZING MATRIX ---
+            // Maps the exact location relative to the visible invoice image boundary lines
+            const pdfX = (posX / sourceRenderWidth) * width;
+            const pdfY = height - ((posY / sourceRenderHeight) * height);
             
-            const finalQrWidth = (marker.clientWidth / sourceRenderWidth) * width;
-            const finalQrHeight = (marker.clientHeight / sourceRenderHeight) * height;
-            const finalSquareSize = Math.max(finalQrWidth, finalQrHeight);
+            const computedWidth = (marker.clientWidth / sourceRenderWidth) * width;
+            const computedHeight = (marker.clientHeight / sourceRenderHeight) * height;
+            const finalSquareSize = Math.max(computedWidth, computedHeight);
+            // ----------------------------------------
 
             firstPage.drawImage(qrImage, {
-                x: pdfX,
-                y: pdfY - finalSquareSize,
+                x: pdfX - (finalSquareSize / 2),
+                y: pdfY - (finalSquareSize / 2),
                 width: finalSquareSize,
                 height: finalSquareSize
             });
-            
-            if (isStampPlaced && stampImgDataUrl) {
-                const stampImageObject = await pdfDoc.embedPng(stampImgDataUrl);
-                
-                const currentStampLeft = parseFloat(stampMarker.style.left || stampPosX);
-                const currentStampTop = parseFloat(stampMarker.style.top || stampPosY);
-
-                const docStampX = (currentStampLeft / sourceRenderWidth) * width;
-                const docStampY = height - ((currentStampTop / sourceRenderHeight) * height);
-                const docStampW = (stampMarker.clientWidth / sourceRenderWidth) * width;
-                const docStampH = (stampMarker.clientHeight / sourceRenderHeight) * height;
-                
-                firstPage.drawImage(stampImageObject, {
-                    x: docStampX,
-                    y: docStampY - docStampH,
-                    width: docStampW,
-                    height: docStampH
-                });
-            }
-
-            const pdfData = await pdfDoc.save();
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(new Blob([pdfData], { type: 'application/pdf' }));
-            link.download = `Invoice_${name || 'Branded'}.pdf`;
-            link.click();
-        } catch (e) { alert("Download Processing Failure: " + e.message); 
-    }
-    };
             
             if (isStampPlaced && stampImgDataUrl) {
                 const stampImageObject = await pdfDoc.embedPng(stampImgDataUrl);
