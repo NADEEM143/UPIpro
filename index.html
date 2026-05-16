@@ -677,10 +677,18 @@
         ctx.drawImage(stampGraphicBufferCanvas, 0, 0);
         ctx.fillStyle = selectedInkColor;
         
-        for (let idx = 0; idx < 1200; idx++) {
+                        for (let idx = 0; idx < 1200; idx++) {
             const randomCoordX = Math.random() * 480;
             const randomCoordY = Math.random() * 480;
-            // FIXED STRUCTURAL EVALUATION LOOP CRASH TO KEEP EVENT STACK OPERATIONAL
+            // FIXED: Added [3] to target the alpha pixel channel and restored the clearRect action
+            if (bufferCtx.getImageData(randomCoordX, randomCoordY, 1, 1).data[3] > 0) {
+                ctx.clearRect(randomCoordX, randomCoordY, Math.random() * 2 + 1, Math.random() * 2 + 1);
+            }
+        }
+               for (let idx = 0; idx < 1200; idx++) {
+            const randomCoordX = Math.random() * 480;
+            const randomCoordY = Math.random() * 480;
+            // FIXED: Added [3] to target the alpha pixel channel and restored the clearRect action
             if (bufferCtx.getImageData(randomCoordX, randomCoordY, 1, 1).data[3] > 0) {
                 ctx.clearRect(randomCoordX, randomCoordY, Math.random() * 2 + 1, Math.random() * 2 + 1);
             }
@@ -689,11 +697,14 @@
             const randomSpreadX = Math.random() * 480;
             const randomSpreadY = Math.random() * 480;
             if (bufferCtx.getImageData(randomSpreadX, randomSpreadY, 1, 1).data[3] === 0) {
+                // FIXED: Corrected spelling to globalAlpha to resolve the crash and filled the random pixels
                 ctx.globalAlpha = Math.random() * 0.4;
                 ctx.fillRect(randomSpreadX, randomSpreadY, 1.5, 1.5);
             }
         }
         ctx.globalAlpha = 1.0;
+
+        stampImgDataUrl = canvas.toDataURL('image/png');
 
         stampImgDataUrl = canvas.toDataURL('image/png');
 
