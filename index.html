@@ -390,88 +390,29 @@
     };
 
     // Dragging/Resize Mechanics
-       // PERFECTED DRIFT-FREE DRAGGING MECHANICS WITH TWIN ENTER-LOCKS
     let isDragging = false;
-    let offsetX = 0, offsetY = 0;
-    let stampOffsetX = 0, stampOffsetY = 0;
-    let isQrLocked = false; 
-    let isStampLocked = false; 
-
-    marker.onmousedown = (e) => { 
-        if (isQrLocked) return; 
-        if (e.offsetX < marker.clientWidth - 15 && e.offsetY < marker.clientHeight - 15) {
-            isDragging = true; 
-            offsetX = e.clientX - marker.getBoundingClientRect().left;
-            offsetY = e.clientY - marker.getBoundingClientRect().top;
-        }
-    };
-
-    stampMarker.onmousedown = (e) => { 
-        if (isStampLocked) return; 
-        if (e.offsetX < stampMarker.clientWidth - 15 && e.offsetY < stampMarker.clientHeight - 15) {
-            isStampDragging = true; 
-            stampOffsetX = e.clientX - stampMarker.getBoundingClientRect().left;
-            stampOffsetY = e.clientY - stampMarker.getBoundingClientRect().top;
-        }
-    };
-
+    marker.onmousedown = (e) => { if(e.offsetX < marker.clientWidth - 15 && e.offsetY < marker.clientHeight - 15) isDragging = true; };
     window.onmousemove = (e) => {
         const rect = document.getElementById('workspace-scaler').getBoundingClientRect();
-        if (isDragging && !isQrLocked) {
-            posX = (e.clientX - rect.left - offsetX) / currentZoomScale;
-            posY = (e.clientY - rect.top - offsetY) / currentZoomScale;
-            marker.style.left = posX + 'px';
-            marker.style.top = posY + 'px';
+        if (isDragging) {
+            posX = (e.clientX - rect.left) / currentZoomScale;
+            posY = (e.clientY - rect.top) / currentZoomScale;
+            marker.style.left = (posX - (marker.clientWidth/2)) + 'px';
+            marker.style.top = (posY - (marker.clientHeight/2)) + 'px';
         }
-        if (isStampDragging && !isStampLocked) { 
-            stampPosX = (e.clientX - rect.left - stampOffsetX) / currentZoomScale;
-            stampPosY = (e.clientY - rect.top - stampOffsetY) / currentZoomScale;
-            stampMarker.style.left = stampPosX + 'px';
-            stampMarker.style.top = stampPosY + 'px';
+        if (isStampDragging) {
+            stampPosX = (e.clientX - rect.left) / currentZoomScale;
+            stampPosY = (e.clientY - rect.top) / currentZoomScale;
+            stampMarker.style.left = (stampPosX - (stampMarker.clientWidth/2)) + 'px';
+            stampMarker.style.top = (stampPosY - (stampMarker.clientHeight/2)) + 'px';
         }
     };
-
     window.onmouseup = () => {
         isDragging = false;
         isStampDragging = false;
     };
 
-    // TWIN LOCK LISTENER FOR BOTH QR CODE AND STAMP LAYOUTS
-    window.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-            if (!originalBytes) return;
-            
-            let toastMessage = "";
-            
-            if (marker.style.display === 'flex' && !isQrLocked) {
-                isQrLocked = true;
-                posX = parseFloat(marker.style.left || posX);
-                posY = parseFloat(marker.style.top || posY);
-                marker.style.borderColor = "#059669"; 
-                marker.style.cursor = "default";
-                toastMessage += "🔒 QR Code Position Locked! ";
-            }
-            
-            if (stampMarker.style.display === 'flex' && !isStampLocked) {
-                isStampLocked = true;
-                stampPosX = parseFloat(stampMarker.style.left || stampPosX);
-                stampPosY = parseFloat(stampMarker.style.top || stampPosY);
-                stampMarker.style.borderStyle = "solid"; 
-                stampMarker.style.borderColor = "#059669"; 
-                stampMarker.style.cursor = "default";
-                toastMessage += "🏵️ Stamp Position Locked!";
-            }
-            
-            if (toastMessage !== "") {
-                const toast = document.getElementById('on-screen-note');
-                toast.innerText = toastMessage + " Ready to Download.";
-                toast.style.display = 'block';
-                setTimeout(() => { toast.style.display = 'none'; }, 3000);
-            }
-        }
-    });
-
-    // DRIFT-FREE MULTI-ELEMENT DOWNLOAD EXPORT MATRIX ENGINE
+        // COMPLETE BUG-FREE DOWNLOAD COMPILATION ENGINE
     document.getElementById('downloadBtn').onclick = async () => {
         try {
             const name = document.getElementById('payeeName').value;
@@ -482,6 +423,7 @@
             const liveQrContainer = document.getElementById('qr-graphic-target');
             if (!liveQrContainer) return alert("Please set your QR position first");
             
+            // Extracts the image from the live on-screen canvas container safely
             const liveCanvasElement = liveQrContainer.querySelector('canvas');
             if (!liveCanvasElement) return alert("QR Code graphic engine is missing. Re-place the position marker.");
             
@@ -493,62 +435,34 @@
             const { width, height } = firstPage.getSize();
             const preview = document.getElementById('workspace-scaler');
             
-            const pdfFrameNode = document.getElementById('pdf-frame');
-            const imgFrameNode = document.getElementById('image-frame');
-            
-            let sourceRenderWidth = preview.offsetWidth;
-            let sourceRenderHeight = preview.offsetHeight;
-            
-            if (pdfFrameNode && pdfFrameNode.style.display === 'block') {
-                sourceRenderWidth = pdfFrameNode.offsetWidth;
-                sourceRenderHeight = pdfFrameNode.offsetHeight;
-            } else if (imgFrameNode && imgFrameNode.style.display === 'block') {
-                sourceRenderWidth = imgFrameNode.offsetWidth;
-                sourceRenderHeight = imgFrameNode.offsetHeight;
-            }
-            
-            const finalLeftPos = isQrLocked ? posX : parseFloat(marker.style.left || posX);
-            const finalTopPos = isQrLocked ? posY : parseFloat(marker.style.top || posY);
-
-            const pdfX = (finalLeftPos / sourceRenderWidth) * width;
-            const pdfY = height - ((finalTopPos / sourceRenderHeight) * height);
-            
-            const finalQrWidth = (marker.clientWidth / sourceRenderWidth) * width;
-            const finalQrHeight = (marker.clientHeight / sourceRenderHeight) * height;
-            const finalSquareSize = Math.max(finalQrWidth, finalQrHeight);
+            // Compiles coordinates matching the live onscreen resizable boundary boxes
+            const pdfX = (posX / preview.offsetWidth) * width;
+            const pdfY = height - ((posY / preview.offsetHeight) * height);
+            const finalQrWidth = (marker.clientWidth / preview.offsetWidth) * width;
+            const finalQrHeight = (marker.clientHeight / preview.offsetHeight) * height;
 
             firstPage.drawImage(qrImage, {
-                x: pdfX,
-                y: pdfY - finalSquareSize,
-                width: finalSquareSize,
-                height: finalSquareSize
+                x: pdfX - (finalQrWidth / 2),
+                y: pdfY - (finalQrHeight / 2),
+                width: finalQrWidth,
+                height: finalQrHeight
             });
             
+            // Compiles the multi-shape digital stamp layer if placed inside the preview panel
             if (isStampPlaced && stampImgDataUrl) {
                 const stampImageObject = await pdfDoc.embedPng(stampImgDataUrl);
                 
-                const finalStampLeft = isStampLocked ? stampPosX : parseFloat(stampMarker.style.left || stampPosX);
-                const finalStampTop = isStampLocked ? stampPosY : parseFloat(stampMarker.style.top || stampPosY);
+                const markerLeftPos = parseFloat(stampMarker.style.left) + (stampMarker.clientWidth / 2);
+                const markerTopPos = parseFloat(stampMarker.style.top) + (stampMarker.clientHeight / 2);
 
-                const docStampX = (finalStampLeft / sourceRenderWidth) * width;
-                const docStampY = height - ((finalStampTop / sourceRenderHeight) * height);
-                const docStampW = (stampMarker.clientWidth / sourceRenderWidth) * width;
-                const docStampH = (stampMarker.clientHeight / sourceRenderHeight) * height;
-                
-                            if (isStampPlaced && stampImgDataUrl) {
-                const stampImageObject = await pdfDoc.embedPng(stampImgDataUrl);
-                
-                const finalStampLeft = isStampLocked ? stampPosX : parseFloat(stampMarker.style.left || stampPosX);
-                const finalStampTop = isStampLocked ? stampPosY : parseFloat(stampMarker.style.top || stampPosY);
-
-                const docStampX = (finalStampLeft / sourceRenderWidth) * width;
-                const docStampY = height - ((finalStampTop / sourceRenderHeight) * height);
-                const docStampW = (stampMarker.clientWidth / sourceRenderWidth) * width;
-                const docStampH = (stampMarker.clientHeight / sourceRenderHeight) * height;
+                const docStampX = (markerLeftPos / preview.offsetWidth) * width;
+                const docStampY = height - ((markerTopPos / preview.offsetHeight) * height);
+                const docStampW = (stampMarker.clientWidth / preview.offsetWidth) * width;
+                const docStampH = (stampMarker.clientHeight / preview.offsetHeight) * height;
                 
                 firstPage.drawImage(stampImageObject, {
-                    x: docStampX,
-                    y: docStampY - docStampH,
+                    x: docStampX - (docStampW / 2),
+                    y: docStampY - (docStampH / 2),
                     width: docStampW,
                     height: docStampH
                 });
@@ -559,14 +473,13 @@
             link.href = URL.createObjectURL(new Blob([pdfData], { type: 'application/pdf' }));
             link.download = `Invoice_${name || 'Branded'}.pdf`;
             link.click();
-        } catch (e) { 
-            alert("Download Processing Failure: " + e.message); 
-        }
+        } catch (e) { alert("Download Processing Failure: " + e.message); }
     };
 
     document.getElementById('prodName').oninput = (e) => {
         document.getElementById('charCounter').innerText = `${e.target.value.length}/35`;
     };
+
     const renderProductsPreviewWorkspace = () => {
         const previewBlock = document.getElementById('productPreviewArea');
         const clearBtn = document.getElementById('clearProductsBtn');
