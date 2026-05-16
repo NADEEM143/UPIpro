@@ -533,7 +533,8 @@
             link.href = URL.createObjectURL(new Blob([pdfData], { type: 'application/pdf' }));
             link.download = `Invoice_${name || 'Branded'}.pdf`;
             link.click();
-        } catch (e) { alert("Download Processing Failure: " + e.message); }
+        } catch (e) { alert("Download Processing Failure: " + e.message); 
+    }
     };
             
             if (isStampPlaced && stampImgDataUrl) {
