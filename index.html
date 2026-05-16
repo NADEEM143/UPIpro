@@ -266,6 +266,11 @@
 <script src="https://cdn.jsdelivr.net/npm/easyqrcodejs@4.6.2/dist/easy.qrcode.min.js"></<script>
     
     <script>
+    const gearIcon = document.getElementById('gearIcon');
+    const settingsPanel = document.getElementById('settingsPanel');
+    const stampOptionMenu = document.getElementById('digitalStampOptionMenu');
+    const stampFormArea = document.getElementById('stampFormArea');
+    const lockStampBtn = document.getElementById('lockStampBtn');
     let originalBytes, posX = 0, posY = 0;
     const marker = document.getElementById('qr-marker');
     const note = document.getElementById('on-screen-note');
@@ -383,7 +388,7 @@
             new QRCode(qrDiv, { text: upi, width: 400, height: 400 });
             
             setTimeout(async () => {
-                const qrImg = qrDiv.querySelector('img').src;
+                const qrImg = qrDiv.querySelector('canvas').toDataURL('image/png');
                 const pdfDoc = await PDFLib.PDFDocument.load(originalBytes);
                 const firstPage = pdfDoc.getPages()[0];
                 const qrImage = await pdfDoc.embedPng(qrImg);
