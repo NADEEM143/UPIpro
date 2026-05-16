@@ -391,50 +391,29 @@
 
     // Dragging/Resize Mechanics
     let isDragging = false;
-    let offsetX = 0, offsetY = 0;
-    let stampOffsetX = 0, stampOffsetY = 0;
-
-    marker.onmousedown = (e) => { 
-        if (e.offsetX < marker.clientWidth - 15 && e.offsetY < marker.clientHeight - 15) {
-            isDragging = true; 
-            // Tracks exact mouse click offsets relative to the top-left marker edge
-            offsetX = e.clientX - marker.getBoundingClientRect().left;
-            offsetY = e.clientY - marker.getBoundingClientRect().top;
-        }
-    };
-
-    stampMarker.onmousedown = (e) => { 
-        if (e.offsetX < stampMarker.clientWidth - 15 && e.offsetY < stampMarker.clientHeight - 15) {
-            isStampDragging = true; 
-            stampOffsetX = e.clientX - stampMarker.getBoundingClientRect().left;
-            stampOffsetY = e.clientY - stampMarker.getBoundingClientRect().top;
-        }
-    };
-
+    marker.onmousedown = (e) => { if(e.offsetX < marker.clientWidth - 15 && e.offsetY < marker.clientHeight - 15) isDragging = true; };
     window.onmousemove = (e) => {
         const rect = document.getElementById('workspace-scaler').getBoundingClientRect();
         if (isDragging) {
-            // Calculates positions directly from the top-left boundary limits without shifting center offsets
-            posX = (e.clientX - rect.left - offsetX) / currentZoomScale;
-            posY = (e.clientY - rect.top - offsetY) / currentZoomScale;
-            marker.style.left = posX + 'px';
-            marker.style.top = posY + 'px';
+            posX = (e.clientX - rect.left) / currentZoomScale;
+            posY = (e.clientY - rect.top) / currentZoomScale;
+            marker.style.left = (posX - (marker.clientWidth/2)) + 'px';
+            marker.style.top = (posY - (marker.clientHeight/2)) + 'px';
         }
         if (isStampDragging) {
-            stampPosX = (e.clientX - rect.left - stampOffsetX) / currentZoomScale;
-            stampPosY = (e.clientY - rect.top - stampOffsetY) / currentZoomScale;
-            stampMarker.style.left = stampPosX + 'px';
-            stampMarker.style.top = stampPosY + 'px';
+            stampPosX = (e.clientX - rect.left) / currentZoomScale;
+            stampPosY = (e.clientY - rect.top) / currentZoomScale;
+            stampMarker.style.left = (stampPosX - (stampMarker.clientWidth/2)) + 'px';
+            stampMarker.style.top = (stampPosY - (stampMarker.clientHeight/2)) + 'px';
         }
     };
-
     window.onmouseup = () => {
         isDragging = false;
         isStampDragging = false;
     };
 
         // COMPLETE BUG-FREE DOWNLOAD COMPILATION ENGINE
-            document.getElementById('downloadBtn').onclick = async () => {
+    document.getElementById('downloadBtn').onclick = async () => {
         try {
             const name = document.getElementById('payeeName').value;
             const vpa = document.getElementById('vpa').value;
@@ -444,6 +423,7 @@
             const liveQrContainer = document.getElementById('qr-graphic-target');
             if (!liveQrContainer) return alert("Please set your QR position first");
             
+            // Extracts the image from the live on-screen canvas container safely
             const liveCanvasElement = liveQrContainer.querySelector('canvas');
             if (!liveCanvasElement) return alert("QR Code graphic engine is missing. Re-place the position marker.");
             
@@ -453,54 +433,32 @@
             const qrImage = await pdfDoc.embedPng(qrImgDataUrl);
             
             const { width, height } = firstPage.getSize();
+            const preview = document.getElementById('workspace-scaler');
             
-            // --- DETECT ACTIVE MEDIA LAYER SUBSTRATE ---
-            // Checks if an uploaded image or a compiled PDF is driving the preview scale height
-            const pdfFrameNode = document.getElementById('pdf-frame');
-            const imgFrameNode = document.getElementById('image-frame');
-            
-            let sourceRenderWidth = 0;
-            let sourceRenderHeight = 0;
-            
-            if (pdfFrameNode && pdfFrameNode.style.display === 'block') {
-                sourceRenderWidth = pdfFrameNode.offsetWidth;
-                sourceRenderHeight = pdfFrameNode.offsetHeight;
-            } else if (imgFrameNode && imgFrameNode.style.display === 'block') {
-                sourceRenderWidth = imgFrameNode.offsetWidth;
-                sourceRenderHeight = imgFrameNode.offsetHeight;
-            } else {
-                const previewWorkspace = document.getElementById('workspace-scaler');
-                sourceRenderWidth = previewWorkspace.offsetWidth;
-                sourceRenderHeight = previewWorkspace.offsetHeight;
-            }
-            
-            // --- PERFECTED POSITION SIZING MATRIX ---
-            // Maps the exact location relative to the visible invoice image boundary lines
-            const pdfX = (posX / sourceRenderWidth) * width;
-            const pdfY = height - ((posY / sourceRenderHeight) * height);
-            
-            const computedWidth = (marker.clientWidth / sourceRenderWidth) * width;
-            const computedHeight = (marker.clientHeight / sourceRenderHeight) * height;
-            const finalSquareSize = Math.max(computedWidth, computedHeight);
-            // ----------------------------------------
+            // Compiles coordinates matching the live onscreen resizable boundary boxes
+            const pdfX = (posX / preview.offsetWidth) * width;
+            const pdfY = height - ((posY / preview.offsetHeight) * height);
+            const finalQrWidth = (marker.clientWidth / preview.offsetWidth) * width;
+            const finalQrHeight = (marker.clientHeight / preview.offsetHeight) * height;
 
             firstPage.drawImage(qrImage, {
-                x: pdfX - (finalSquareSize / 2),
-                y: pdfY - (finalSquareSize / 2),
-                width: finalSquareSize,
-                height: finalSquareSize
+                x: pdfX - (finalQrWidth / 2),
+                y: pdfY - (finalQrHeight / 2),
+                width: finalQrWidth,
+                height: finalQrHeight
             });
             
+            // Compiles the multi-shape digital stamp layer if placed inside the preview panel
             if (isStampPlaced && stampImgDataUrl) {
                 const stampImageObject = await pdfDoc.embedPng(stampImgDataUrl);
                 
                 const markerLeftPos = parseFloat(stampMarker.style.left) + (stampMarker.clientWidth / 2);
                 const markerTopPos = parseFloat(stampMarker.style.top) + (stampMarker.clientHeight / 2);
 
-                const docStampX = (markerLeftPos / sourceRenderWidth) * width;
-                const docStampY = height - ((markerTopPos / sourceRenderHeight) * height);
-                const docStampW = (stampMarker.clientWidth / sourceRenderWidth) * width;
-                const docStampH = (stampMarker.clientHeight / sourceRenderHeight) * height;
+                const docStampX = (markerLeftPos / preview.offsetWidth) * width;
+                const docStampY = height - ((markerTopPos / preview.offsetHeight) * height);
+                const docStampW = (stampMarker.clientWidth / preview.offsetWidth) * width;
+                const docStampH = (stampMarker.clientHeight / preview.offsetHeight) * height;
                 
                 firstPage.drawImage(stampImageObject, {
                     x: docStampX - (docStampW / 2),
