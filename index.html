@@ -391,22 +391,43 @@
 
     // Dragging/Resize Mechanics
     let isDragging = false;
-    marker.onmousedown = (e) => { if(e.offsetX < marker.clientWidth - 15 && e.offsetY < marker.clientHeight - 15) isDragging = true; };
+    let offsetX = 0, offsetY = 0;
+    let stampOffsetX = 0, stampOffsetY = 0;
+
+    marker.onmousedown = (e) => { 
+        if (e.offsetX < marker.clientWidth - 15 && e.offsetY < marker.clientHeight - 15) {
+            isDragging = true; 
+            // Tracks exact mouse click offsets relative to the top-left marker edge
+            offsetX = e.clientX - marker.getBoundingClientRect().left;
+            offsetY = e.clientY - marker.getBoundingClientRect().top;
+        }
+    };
+
+    stampMarker.onmousedown = (e) => { 
+        if (e.offsetX < stampMarker.clientWidth - 15 && e.offsetY < stampMarker.clientHeight - 15) {
+            isStampDragging = true; 
+            stampOffsetX = e.clientX - stampMarker.getBoundingClientRect().left;
+            stampOffsetY = e.clientY - stampMarker.getBoundingClientRect().top;
+        }
+    };
+
     window.onmousemove = (e) => {
         const rect = document.getElementById('workspace-scaler').getBoundingClientRect();
         if (isDragging) {
-            posX = (e.clientX - rect.left) / currentZoomScale;
-            posY = (e.clientY - rect.top) / currentZoomScale;
-            marker.style.left = (posX - (marker.clientWidth/2)) + 'px';
-            marker.style.top = (posY - (marker.clientHeight/2)) + 'px';
+            // Calculates positions directly from the top-left boundary limits without shifting center offsets
+            posX = (e.clientX - rect.left - offsetX) / currentZoomScale;
+            posY = (e.clientY - rect.top - offsetY) / currentZoomScale;
+            marker.style.left = posX + 'px';
+            marker.style.top = posY + 'px';
         }
         if (isStampDragging) {
-            stampPosX = (e.clientX - rect.left) / currentZoomScale;
-            stampPosY = (e.clientY - rect.top) / currentZoomScale;
-            stampMarker.style.left = (stampPosX - (stampMarker.clientWidth/2)) + 'px';
-            stampMarker.style.top = (stampPosY - (stampMarker.clientHeight/2)) + 'px';
+            stampPosX = (e.clientX - rect.left - stampOffsetX) / currentZoomScale;
+            stampPosY = (e.clientY - rect.top - stampOffsetY) / currentZoomScale;
+            stampMarker.style.left = stampPosX + 'px';
+            stampMarker.style.top = stampPosY + 'px';
         }
     };
+
     window.onmouseup = () => {
         isDragging = false;
         isStampDragging = false;
