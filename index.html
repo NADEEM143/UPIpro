@@ -413,7 +413,7 @@
     };
 
         // COMPLETE BUG-FREE DOWNLOAD COMPILATION ENGINE
-    document.getElementById('downloadBtn').onclick = async () => {
+        document.getElementById('downloadBtn').onclick = async () => {
         try {
             const name = document.getElementById('payeeName').value;
             const vpa = document.getElementById('vpa').value;
@@ -423,7 +423,6 @@
             const liveQrContainer = document.getElementById('qr-graphic-target');
             if (!liveQrContainer) return alert("Please set your QR position first");
             
-            // Extracts the image from the live on-screen canvas container safely
             const liveCanvasElement = liveQrContainer.querySelector('canvas');
             if (!liveCanvasElement) return alert("QR Code graphic engine is missing. Re-place the position marker.");
             
@@ -435,20 +434,25 @@
             const { width, height } = firstPage.getSize();
             const preview = document.getElementById('workspace-scaler');
             
-            // Compiles coordinates matching the live onscreen resizable boundary boxes
             const pdfX = (posX / preview.offsetWidth) * width;
             const pdfY = height - ((posY / preview.offsetHeight) * height);
-            const finalQrWidth = (marker.clientWidth / preview.offsetWidth) * width;
-            const finalQrHeight = (marker.clientHeight / preview.offsetHeight) * height;
+            
+            // --- FIXED MATHEMATICAL SIZING ENGINE ---
+            // Measures screen pixels and converts them evenly to match PDF dimension matrices
+            const computedWidth = (marker.clientWidth / preview.offsetWidth) * width;
+            const computedHeight = (marker.clientHeight / preview.offsetHeight) * height;
+            
+            // Forces a balanced 1:1 square print scale matching your visual layout view
+            const finalSquareSize = Math.max(computedWidth, computedHeight);
+            // ----------------------------------------
 
             firstPage.drawImage(qrImage, {
-                x: pdfX - (finalQrWidth / 2),
-                y: pdfY - (finalQrHeight / 2),
-                width: finalQrWidth,
-                height: finalQrHeight
+                x: pdfX - (finalSquareSize / 2),
+                y: pdfY - (finalSquareSize / 2),
+                width: finalSquareSize,
+                height: finalSquareSize
             });
             
-            // Compiles the multi-shape digital stamp layer if placed inside the preview panel
             if (isStampPlaced && stampImgDataUrl) {
                 const stampImageObject = await pdfDoc.embedPng(stampImgDataUrl);
                 
