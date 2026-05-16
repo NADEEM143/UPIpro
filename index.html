@@ -244,6 +244,7 @@
                 <div id="qr-marker">
                     <div style="font-size:18px;">🎯</div>
                     <span>DRAG & RESIZE</span>
+                    <div id="qr-graphic-target" style="width: 100%; height: 100%; position: absolute; top:0; left:0; background:white; display:none;"></div>
                 </div>
                 
                 <div id="stamp-marker">
@@ -317,10 +318,10 @@
         workspaceScaler.style.height = `${100 / currentZoomScale}%`;
     };
 
-    zoomInBtn.onclick = () => applyZoomMatrixTransformation(0.1);
+      zoomInBtn.onclick = () => applyZoomMatrixTransformation(0.1);
     zoomOutBtn.onclick = () => applyZoomMatrixTransformation(-0.1);
 
-    document.getElementById('fileInput').onchange = async (e) => {
+        document.getElementById('fileInput').onchange = async (e) => {
         const file = e.target.files[0];
         if (!file) return;
         await handleIncomingDocumentBufferChannels(file);
@@ -344,11 +345,25 @@
         marker.style.left = (posX - 40) + 'px'; marker.style.top = (posY - 40) + 'px';
         marker.style.display = 'flex';
         
+        // --- THIS PART INJECTS THE REAL LIVE QR ---
+        const name = document.getElementById('payeeName').value;
+        const vpa = document.getElementById('vpa').value;
+        const amt = document.getElementById('amount').value;
+        const upi = `upi://pay?pa=${vpa}&pn=${encodeURIComponent(name)}&cu=INR&am=${parseFloat(amt || 0).toFixed(2)}`;
+        
+        const liveTarget = document.getElementById('qr-graphic-target');
+        liveTarget.innerHTML = ""; 
+        liveTarget.style.display = "block"; 
+        
+        new QRCode(liveTarget, { text: upi, width: 120, height: 120 });
+        // ------------------------------------------
+
         document.getElementById('click-overlay').style.display = 'none';
         document.getElementById('downloadBtn').style.display = 'block';
         note.style.display = 'none';
     };
 
+    // Dragging/Resize Mechanics
     let isDragging = false;
     marker.onmousedown = (e) => { if(e.offsetX < marker.clientWidth - 15 && e.offsetY < marker.clientHeight - 15) isDragging = true; };
     window.onmousemove = (e) => {
