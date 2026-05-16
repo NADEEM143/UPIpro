@@ -331,7 +331,6 @@
         await handleIncomingDocumentBufferChannels(file);
     };
 
-    // SET POSITION WITH ON-SCREEN NOTIFICATION
     document.getElementById('lockBtn').onclick = () => {
         if(!originalBytes) return alert("Select or Generate PDF First");
         
@@ -739,8 +738,7 @@
         }
     });
 
-    // ISOLATED INCOMING BUFFER ASSET PROCESSING ARCHITECTURE ROUTINE
-    async function handleIncomingDocumentBufferChannels(fileObj) {
+        async function handleIncomingDocumentBufferChannels(fileObj) {
         originalBytes = await fileObj.arrayBuffer();
         const generatedObjectUrl = URL.createObjectURL(new Blob([originalBytes], {type: fileObj.type}));
         
