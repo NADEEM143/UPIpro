@@ -24,6 +24,9 @@
         }
         #pdf-frame { width: 100%; height: 100%; border: none; display: none; min-height: 640px; }
         
+        /* SECURE SURFACE NOTATION ELEMENT FOR RENDERING INCOMING JPEG ATTACHMENT STRATA */
+        #image-frame { width: 100%; height: auto; max-height: 100%; object-fit: contain; display: none; min-height: 640px; border: none; pointer-events: none; }
+        
         /* QR MARKER */
         #qr-marker { 
             position: absolute; width: 80px; height: 80px; 
@@ -201,7 +204,7 @@
     </div>
     <div class="main-layout">
         <div class="sidebar">
-            <div class="input-group"><label>1. Select PDF</label><input type="file" id="fileInput" accept="application/pdf"></div>
+            <div class="input-group"><label>1. Select PDF / Image</label><input type="file" id="fileInput" accept="application/pdf, image/jpeg, image/jpg, image/png"></div>
             <div class="input-group"><label>Name</label><input type="text" id="payeeName"></div>
             <div class="input-group"><label>UPI ID</label><input type="text" id="vpa"></div>
             <div class="input-group"><label>Amount</label><input type="number" id="amount"></div>
@@ -237,6 +240,7 @@
         <div class="preview-area" id="dropzone">
             <div id="workspace-scaler">
                 <iframe id="pdf-frame"></iframe>
+                <img id="image-frame" alt="Invoice Surface Substrate Preview Area Layer">
                 <div id="click-overlay"></div>
                 <div id="click-overlay-stamp"></div>
                 <div id="qr-marker">
@@ -258,8 +262,8 @@
     </div>
 </div>
 
-<script src="unpkg.com"></script>
-<script src="cloudflare.com"></script>
+<script src="https://unpkg.com"></script>
+<script src="https://cloudflare.com"></script>
 <script>
     let originalBytes, posX = 0, posY = 0;
     const marker = document.getElementById('qr-marker');
@@ -313,14 +317,11 @@
     zoomInBtn.onclick = () => applyZoomMatrixTransformation(0.1);
     zoomOutBtn.onclick = () => applyZoomMatrixTransformation(-0.1);
 
-    // Preview Logic
+    // Preview Logic handles manual file selection mappings
     document.getElementById('fileInput').onchange = async (e) => {
         const file = e.target.files[0];
         if (!file) return;
-        originalBytes = await file.arrayBuffer();
-        const url = URL.createObjectURL(new Blob([originalBytes], {type: 'application/pdf'}));
-        document.getElementById('pdf-frame').src = url;
-        document.getElementById('pdf-frame').style.display = 'block';
+        await handleIncomingDocumentBufferChannels(file);
     };
 
     // SET POSITION WITH ON-SCREEN NOTIFICATION
@@ -333,7 +334,6 @@
         
         setTimeout(() => { note.style.display = 'none'; }, 4000);
     };
-
     document.getElementById('click-overlay').onclick = (e) => {
         const rect = document.getElementById('workspace-scaler').getBoundingClientRect();
         posX = (e.clientX - rect.left) / currentZoomScale; 
@@ -347,7 +347,7 @@
         note.style.display = 'none';
     };
 
-    // Dragging/Resize
+    // Dragging/Resize Mechanics
     let isDragging = false;
     marker.onmousedown = (e) => { if(e.offsetX < marker.clientWidth - 15 && e.offsetY < marker.clientHeight - 15) isDragging = true; };
     window.onmousemove = (e) => {
@@ -370,7 +370,7 @@
         isStampDragging = false;
     };
 
-    // Download Logic
+    // Download Compilation & QR Injection Matrix Engine
     document.getElementById('downloadBtn').onclick = async () => {
         try {
             const name = document.getElementById('payeeName').value;
@@ -394,7 +394,12 @@
                 const finalQrWidth = (marker.clientWidth / preview.offsetWidth) * width;
                 const finalQrHeight = (marker.clientHeight / preview.offsetHeight) * height;
 
-                firstPage.drawImage(qrImage, { x: pdfX - (finalQrWidth/2), y: pdfY - (finalQrHeight/2), width: finalQrWidth, height: finalQrHeight });
+                firstPage.drawImage(qrImage, {
+                    x: pdfX - (finalQrWidth / 2),
+                    y: pdfY - (finalQrHeight / 2),
+                    width: finalQrWidth,
+                    height: finalQrHeight
+                });
                 
                 // MULTI-SHAPE RESIZABLE COMPONENT PLACEMENT ENGINE MODIFICATION BLOCK
                 if (isStampPlaced && stampImgDataUrl) {
@@ -420,9 +425,9 @@
                 const pdfData = await pdfDoc.save();
                 const link = document.createElement('a');
                 link.href = URL.createObjectURL(new Blob([pdfData], { type: 'application/pdf' }));
-                link.download = `Invoice_${name}.pdf`;
+                link.download = `Invoice_${name || 'Branded'}.pdf`;
                 link.click();
-            }, 300);
+            }, 500);
         } catch (e) { alert("Download Error: " + e.message); }
     };
 
@@ -533,7 +538,7 @@
 
             productsList.forEach((product, idx) => {
                 const rowCost = product.price * product.qty;
-                totalAggregatedBill += rowCost;
+                totalAggregatedBill = totalAggregatedBill + rowCost;
 
                 targetPage.drawText(`${idx + 1}. ${product.name} - ${product.qty} pcs @ INR ${product.price.toFixed(2)} = INR ${rowCost.toFixed(2)}`, {
                     x: 50,
@@ -552,12 +557,13 @@
 
             originalBytes = await docInstance.save();
 
+            document.getElementById('image-frame').style.display = 'none';
             document.getElementById('pdf-frame').src = URL.createObjectURL(new Blob([originalBytes], {type: 'application/pdf'}));
             document.getElementById('pdf-frame').style.display = 'block';
         } catch (err) { alert("Generation Core Failure: " + err.message); }
     };
 
-    // GEAR MENU OPERATIONS & MULTI-GEOMETRIC STAMP ENGINE
+    // GEAR MENU CONFIGURATION FLYOUT OPERATIONS
     const gearIcon = document.getElementById('gearIcon');
     const settingsPanel = document.getElementById('settingsPanel');
     const stampOptionMenu = document.getElementById('digitalStampOptionMenu');
@@ -580,7 +586,7 @@
         const dateV = document.getElementById('stampDate').value;
         const selectedInkColor = document.getElementById('stampColor').value;
         const selectedShape = document.getElementById('stampShape').value;
-
+        
         if (!comp || !appr || !dateV) return alert("Please fill all stamp info fields (Company Name, Approved By, Date)");
 
         const canvas = document.createElement('canvas');
@@ -598,10 +604,77 @@
         bufferCtx.strokeStyle = selectedInkColor;
         bufferCtx.fillStyle = selectedInkColor;
         bufferCtx.textAlign = 'center';
-        bufferCtx.textBaseline
+        bufferCtx.textBaseline = 'middle';
+
+        // GEOMETRIC RENDERING SWITCH VARIATIONS PIPELINE PASS
+        if (selectedShape === 'circle') {
+            bufferCtx.lineWidth = 8;
+            bufferCtx.beginPath(); bufferCtx.arc(240, 240, 200, 0, Math.PI * 2); bufferCtx.stroke();
+            bufferCtx.lineWidth = 3;
+            bufferCtx.beginPath(); bufferCtx.arc(240, 240, 184, 0, Math.PI * 2); bufferCtx.stroke();
+
+            bufferCtx.font = 'bold 26px "Courier New", monospace';
+            bufferCtx.fillText(comp.toUpperCase().substring(0, 22), 240, 150);
+            bufferCtx.font = '22px "Courier New", monospace';
+            bufferCtx.fillText("APPROVED BY:", 240, 220);
+            bufferCtx.font = 'bold 24px "Courier New", monospace';
+            bufferCtx.fillText(appr.substring(0, 18), 240, 260);
+            bufferCtx.font = 'bold 22px "Courier New", monospace';
+            bufferCtx.fillText(dateV, 240, 330);
+            stampMarker.style.borderRadius = '50%';
+        } 
+        else if (selectedShape === 'oval') {
+            bufferCtx.lineWidth = 8;
+            bufferCtx.beginPath(); bufferCtx.ellipse(240, 240, 220, 140, 0, 0, Math.PI * 2); bufferCtx.stroke();
+            bufferCtx.lineWidth = 3;
+            bufferCtx.beginPath(); bufferCtx.ellipse(240, 240, 206, 126, 0, 0, Math.PI * 2); bufferCtx.stroke();
+
+            bufferCtx.font = 'bold 26px "Courier New", monospace';
+            bufferCtx.fillText(comp.toUpperCase().substring(0, 24), 240, 170);
+            bufferCtx.font = '20px "Courier New", monospace';
+            bufferCtx.fillText("APPROVED BY: " + appr.substring(0, 14), 240, 230);
+            bufferCtx.font = 'bold 22px "Courier New", monospace';
+            bufferCtx.fillText(dateV, 240, 280);
+            stampMarker.style.borderRadius = '50%';
+        } 
+        else if (selectedShape === 'rectangular') {
+            bufferCtx.lineWidth = 8;
+            bufferCtx.strokeRect(30, 110, 420, 260);
+            bufferCtx.lineWidth = 3;
+            bufferCtx.strokeRect(42, 122, 396, 236);
+
+            bufferCtx.font = 'bold 28px "Courier New", monospace';
+            bufferCtx.fillText(comp.toUpperCase().substring(0, 26), 240, 180);
+            bufferCtx.font = '22px "Courier New", monospace';
+            bufferCtx.fillText("APPROVED BY: " + appr.substring(0, 16), 240, 240);
+            bufferCtx.font = 'bold 24px "Courier New", monospace';
+            bufferCtx.fillText(dateV, 240, 290);
+            stampMarker.style.borderRadius = '0px';
+        } 
+        else if (selectedShape === 'square') {
+            bufferCtx.lineWidth = 8;
+            bufferCtx.strokeRect(50, 50, 380, 380);
+            bufferCtx.lineWidth = 3;
+            bufferCtx.strokeRect(62, 62, 356, 356);
+
+            bufferCtx.font = 'bold 26px "Courier New", monospace';
+            bufferCtx.fillText(comp.toUpperCase().substring(0, 22), 240, 140);
+            bufferCtx.font = '22px "Courier New", monospace';
+            bufferCtx.fillText("APPROVED BY:", 240, 210);
+            bufferCtx.font = 'bold 24px "Courier New", monospace';
+            bufferCtx.fillText(appr.substring(0, 18), 240, 260);
+            bufferCtx.font = 'bold 22px "Courier New", monospace';
+            bufferCtx.fillText(dateV, 240, 330);
+            stampMarker.style.borderRadius = '8px';
+        }
+
+        ctx.drawImage(stampGraphicBufferCanvas, 0, 0);
+        ctx.fillStyle = selectedInkColor;
+        
         for (let idx = 0; idx < 1200; idx++) {
             const randomCoordX = Math.random() * 480;
             const randomCoordY = Math.random() * 480;
+            // FIXED STRUCTURAL EVALUATION LOOP CRASH TO KEEP EVENT STACK OPERATIONAL
             if (bufferCtx.getImageData(randomCoordX, randomCoordY, 1, 1).data[3] > 0) {
                 ctx.clearRect(randomCoordX, randomCoordY, Math.random() * 2 + 1, Math.random() * 2 + 1);
             }
@@ -642,6 +715,41 @@
     };
 
     stampMarker.onmousedown = (e) => { if(e.offsetX < stampMarker.clientWidth - 15 && e.offsetY < stampMarker.clientHeight - 15) isStampDragging = true; };
+
+    // SCREENSHOT CLIPBOARD PASTE INTERCEPT ROUTINE FOR DIRECT SCREENSHOT INPUT INTO THE WORKSPACE BLANK
+    document.addEventListener('paste', async (e) => {
+        const clipboardItems = (e.clipboardData || e.originalEvent.clipboardData).items;
+        for (let i = 0; i < clipboardItems.length; i++) {
+            if (clipboardItems[i].type.indexOf('image') !== -1) {
+                const capturedImageBlob = clipboardItems[i].getAsFile();
+                await handleIncomingDocumentBufferChannels(capturedImageBlob);
+                
+                const dataTransferInstance = new DataTransfer();
+                dataTransferInstance.items.add(capturedImageBlob);
+                document.getElementById('fileInput').files = dataTransferInstance.files;
+                break;
+            }
+        }
+    });
+
+    // ISOLATED INCOMING BUFFER ASSET PROCESSING ARCHITECTURE ROUTINE
+    async function handleIncomingDocumentBufferChannels(fileObj) {
+        originalBytes = await fileObj.arrayBuffer();
+        const generatedObjectUrl = URL.createObjectURL(new Blob([originalBytes], {type: fileObj.type}));
+        
+        if (fileObj.type === "application/pdf") {
+            document.getElementById('image-frame').style.display = 'none';
+            document.getElementById('image-frame').src = "";
+            document.getElementById('pdf-frame').src = generatedObjectUrl;
+            document.getElementById('pdf-frame').style.display = 'block';
+        } else if (fileObj.type.startsWith("image/")) {
+            document.getElementById('pdf-frame').style.display = 'none';
+            document.getElementById('pdf-frame').src = "";
+            document.getElementById('image-frame').src = generatedObjectUrl;
+            document.getElementById('image-frame').style.display = 'block';
+        }
+        document.getElementById('downloadBtn').style.display = 'block';
+    }
 </script>
 </body>
 </html>
