@@ -28,22 +28,21 @@
         #image-frame { width: 100%; height: auto; max-height: 100%; object-fit: contain; display: none; min-height: 640px; border: none; pointer-events: none; }
         
         /* QR MARKER */
-                               #qr-marker { 
+        #qr-marker { 
             position: absolute; width: 80px; height: 80px; 
             background: white; border: 2px solid var(--primary); 
             display: none; flex-direction: column; align-items: center; justify-content: center; 
             z-index: 2000; cursor: move; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.2);
             resize: both; 
-            /* CHANGED back to hidden to kill the scrollbars completely */
             overflow: hidden; 
+            /* NEW MATRIX ADDITION: Forces the bounding box to maintain a perfect square aspect ratio */
+            aspect-ratio: 1 / 1 !important;
         }
         
-        /* HIDES SCROLLBARS FOR CHROME, SAFARI AND OPERA NATIVELY */
         #qr-marker::-webkit-scrollbar {
             display: none;
         }
 
-        /* FORCE THE INNER PREVIEW CONTAINER TO MATCH THE EXACT DRAG BOUNDS WITHOUT SPAWNING MARGIN OVERFLOWS */
         #qr-graphic-target {
             width: 100% !important;
             height: 100% !important;
@@ -57,7 +56,8 @@
         #qr-graphic-target img {
             width: 100% !important;
             height: 100% !important;
-            object-fit: fill !important;
+            /* CHANGED back to contain to keep your pixel matrix scale high resolution and crisp */
+            object-fit: contain !important;
             display: block !important;
         }
 
