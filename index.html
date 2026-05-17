@@ -389,9 +389,8 @@
         note.style.display = 'none';
     };
 
-    // Dragging/Resize Mechanics
-       // PERFECTED DRIFT-FREE DRAGGING MECHANICS WITH TWIN ENTER-LOCKS
     let isDragging = false;
+    let isStampDragging = false; // NEW: Explicit tracking hook for stamp dragging
     let offsetX = 0, offsetY = 0;
     let stampOffsetX = 0, stampOffsetY = 0;
     let isQrLocked = false; 
@@ -409,7 +408,7 @@
     stampMarker.onmousedown = (e) => { 
         if (isStampLocked) return; 
         if (e.offsetX < stampMarker.clientWidth - 15 && e.offsetY < stampMarker.clientHeight - 15) {
-            isStampDragging = true; 
+            isStampDragging = true; // FIXED: Safely awakens the stamp dragging event chain
             stampOffsetX = e.clientX - stampMarker.getBoundingClientRect().left;
             stampOffsetY = e.clientY - stampMarker.getBoundingClientRect().top;
         }
@@ -433,7 +432,7 @@
 
     window.onmouseup = () => {
         isDragging = false;
-        isStampDragging = false;
+        isStampDragging = false; // FIXED: Safely terminates both drag sequences when mouse is released
     };
 
     // TWIN LOCK LISTENER FOR BOTH QR CODE AND STAMP LAYOUTS
