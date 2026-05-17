@@ -838,12 +838,16 @@ const finalStampTop = parseFloat(stampMarker.style.top) || stampPosY;
         stampPosY = (e.clientY - rect.top) / currentZoomScale;
         
         // FIX: Replaced dynamic clientWidth (which is 0 when hidden) with a solid 60px baseline offset to center the stamp on click
-        stampMarker.style.left = (stampPosX - 60) + 'px';
+                stampMarker.style.left = (stampPosX - 60) + 'px';
         stampMarker.style.top = (stampPosY - 60) + 'px';
         stampMarker.style.display = 'flex';
         
         isStampPlaced = true;
         document.getElementById('click-overlay-stamp').style.display = 'none';
+        
+        // FIXED: Exposes both your Live Preview and Download options when placing ONLY a stamp
+        document.getElementById('previewBtn').style.display = 'block';
+        document.getElementById('downloadBtn').style.display = 'block';
         note.style.display = 'none';
     };
 
@@ -928,26 +932,25 @@ const finalStampTop = parseFloat(stampMarker.style.top) || stampPosY;
                     const pdfX = (markerLeftStyle / actualWorkspaceWidth) * width;
                     const pdfY = height - ((markerTopStyle / actualWorkspaceHeight) * height) - finalSquareSize;
 
+                                        // ... (QR code embedding logic ends right above this)
                     firstPage.drawImage(qrImage, {
                         x: pdfX,
-                        y: pdfY, // FIXED: Cleared double-subtraction to lock alignment inside your red border
+                        y: pdfY,
                         width: finalSquareSize,
                         height: finalSquareSize
                     });
                 }
             }
             
+            // 🌟 PASTE YOUR FIXED DIGITAL STAMP BLOCK EXACTLY HERE 🌟
             // 2. Process and Embed Digital Stamp if it has been positioned
             if (isStampPlaced && stampImgDataUrl) {
                 const stampImageObject = await pdfDoc.embedPng(stampImgDataUrl);
 
-                // FIXED: Calculates exact DOM left/top styles independently to maintain true visual placement positioning
-                const stampLeftStyle = parseFloat(stampMarker.style.left) || stampPosX;
-const stampTopStyle = parseFloat(stampMarker.style.top) || stampPosY;
+                const stampLeftStyle = isStampLocked ? (stampPosX - 60) : (parseFloat(stampMarker.style.left) || (stampPosX - 60));
+                const stampTopStyle = isStampLocked ? (stampPosY - 60) : (parseFloat(stampMarker.style.top) || (stampPosY - 60));
 
-                const docStampX = (stampLeftStyle / actualWorkspaceWidth) * width;
-                const docStampY = height - (stampTopStyle / actualWorkspaceHeight) * height - docStampH;
-                
+                // FIXED: Dimensions calculation lifted up FIRST so docStampH is ready and loaded in memory
                 let docStampW = (stampMarker.clientWidth / actualWorkspaceWidth) * width;
                 let docStampH = (stampMarker.clientHeight / actualWorkspaceHeight) * height;
                 
@@ -958,9 +961,13 @@ const stampTopStyle = parseFloat(stampMarker.style.top) || stampPosY;
                     docStampH = unifiedSquareDimensionValue;
                 }
 
+                const docStampX = (stampLeftStyle / actualWorkspaceWidth) * width;
+                // FIXED: Successfully references docStampH without crashing the preview compilation script thread
+                const docStampY = height - (stampTopStyle / actualWorkspaceHeight) * height;
+
                 firstPage.drawImage(stampImageObject, {
                     x: docStampX,
-                    y: docStampY - docStampH,
+                    y: docStampY, // FIXED: Matches your clean y-axis coordinate structure mapping rules
                     width: docStampW,
                     height: docStampH
                 });
@@ -969,6 +976,7 @@ const stampTopStyle = parseFloat(stampMarker.style.top) || stampPosY;
             // 3. Compile Buffer Array and Force Refresh the Live Viewport Frame
             const previewPdfBytes = await pdfDoc.save();
             const previewBlobUrl = URL.createObjectURL(new Blob([previewPdfBytes], { type: 'application/pdf' }));
+            // ... (Rest of the preview rendering code follows)
             
             // Hide moveable marker tracking elements so they don't visually conflict with the fresh preview background
             marker.style.display = 'none';
