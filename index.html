@@ -369,7 +369,7 @@
         posX = (e.clientX - rect.left) / currentZoomScale; 
         posY = (e.clientY - rect.top) / currentZoomScale;
         
-        marker.style.left = (posX - 10) + 'px'; marker.style.top = (posY - 10) + 'px';
+        marker.style.left = (posX - 40) + 'px'; marker.style.top = (posY - 40) + 'px';
         marker.style.display = 'flex';
         
         // --- THIS PART INJECTS THE REAL LIVE QR ---
@@ -469,19 +469,24 @@
                 toastMessage += "🏵️ Stamp Position Locked!";
             }
             
-            if (toastMessage !== "") {
-                // FIXED: Automatically exposes the Preview option during an Enter-key lock transaction event
+                        if (toastMessage !== "") {
+                // Automatically exposes your layout actions buttons
                 document.getElementById('previewBtn').style.display = 'block';
                 document.getElementById('downloadBtn').style.display = 'block';
 
                 const toast = document.getElementById('on-screen-note');
-                toast.innerText = toastMessage + " Ready to Preview or Download.";
+                toast.innerText = toastMessage + " Compiling real-time canvas preview... 🚀";
                 toast.style.display = 'block';
                 setTimeout(() => { toast.style.display = 'none'; }, 3000);
+
+                // FIXED: Triggers the entire live preview engine automatically when Enter is pressed!
+                setTimeout(() => {
+                    const previewBtn = document.getElementById('previewBtn');
+                    if (previewBtn) previewBtn.click();
+                }, 50); // Small 50ms delay to guarantee tracking styles finish updating in memory first
             }
         }
     });
-
    
     document.getElementById('downloadBtn').onclick = async () => {
         try {
@@ -853,8 +858,8 @@
         stampPosY = (e.clientY - rect.top) / currentZoomScale;
         
         // FIX: Replaced dynamic clientWidth (which is 0 when hidden) with a solid 60px baseline offset to center the stamp on click
-                stampMarker.style.left = (stampPosX - 10) + 'px';
-        stampMarker.style.top = (stampPosY - 10) + 'px';
+                stampMarker.style.left = (stampPosX - 60) + 'px';
+        stampMarker.style.top = (stampPosY - 60) + 'px';
         stampMarker.style.display = 'flex';
         
         isStampPlaced = true;
