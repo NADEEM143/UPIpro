@@ -816,7 +816,7 @@
         document.getElementById('charCounter').innerText = "0/35";
     };
 
-        document.getElementById('makePdfBtn').onclick = async () => {
+            document.getElementById('makePdfBtn').onclick = async () => {
         if (productsList.length === 0) {
             const nameField = document.getElementById('prodName').value.trim();
             const priceField = parseFloat(document.getElementById('prodPrice').value || 0);
@@ -897,12 +897,20 @@
 
             originalBytes = await docInstance.save();
 
+            // 🌟 FIXED: Hides the visual guide layout prompt overlay instantly upon file creation
+            const initialPromptNode = document.getElementById('upload-placeholder-prompt');
+            if (initialPromptNode) initialPromptNode.style.display = 'none';
+
             document.getElementById('image-frame').style.display = 'none';
             document.getElementById('pdf-frame').src = URL.createObjectURL(new Blob([originalBytes], {type: 'application/pdf'}));
             document.getElementById('pdf-frame').style.display = 'block';
+
+            // Exposes matching action buttons automatically
+            document.getElementById('previewBtn').style.display = 'block';
+            document.getElementById('downloadBtn').style.display = 'block';
+            
         } catch (err) { alert("Generation Core Failure: " + err.message); }
     };
-
         gearIcon.onclick = () => {
         settingsPanel.style.display = settingsPanel.style.display === 'block' ? 'none' : 'block';
     };
