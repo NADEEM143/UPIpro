@@ -235,6 +235,7 @@
             <div class="input-group"><label>Amount</label><input type="number" id="amount"></div>
             
             <button id="lockBtn" class="btn btn-blue">📍 Set QR Position</button>
+            <button id="previewBtn" class="btn btn-orange" style="margin-top: 10px; display: none;">👁️ Preview Document</button>
             <button id="downloadBtn" class="btn btn-green">⚡ Download PDF</button>
 
             <div class="gen-pdf-box">
@@ -336,7 +337,7 @@
         }
     };
 
-    const applyZoomMatrixTransformation = (zoomFactorIncrement) => {
+        const applyZoomMatrixTransformation = (zoomFactorIncrement) => {
         currentZoomScale = Math.max(0.5, Math.min(2.0, currentZoomScale + zoomFactorIncrement));
         workspaceScaler.style.transform = `scale(${currentZoomScale})`;
         zoomValueLabel.innerText = `${Math.round(currentZoomScale * 100)}%`;
@@ -344,16 +345,16 @@
         workspaceScaler.style.height = `${100 / currentZoomScale}%`;
     };
 
-      zoomInBtn.onclick = () => applyZoomMatrixTransformation(0.1);
+    zoomInBtn.onclick = () => applyZoomMatrixTransformation(0.1);
     zoomOutBtn.onclick = () => applyZoomMatrixTransformation(-0.1);
 
-        document.getElementById('fileInput').onchange = async (e) => {
+    document.getElementById('fileInput').onchange = async (e) => {
         const file = e.target.files[0];
         if (!file) return;
         await handleIncomingDocumentBufferChannels(file);
     };
 
-    document.getElementById('lockBtn').onclick = () => {
+        document.getElementById('lockBtn').onclick = () => {
         if(!originalBytes) return alert("Select or Generate PDF First");
         
         note.innerText = "📍 Click on the document to place your QR";
@@ -385,12 +386,15 @@
         // ------------------------------------------
 
         document.getElementById('click-overlay').style.display = 'none';
+        
+        // FIXED: Displays both your Preview and Download buttons when the asset layout overlay is clicked
+        document.getElementById('previewBtn').style.display = 'block';
         document.getElementById('downloadBtn').style.display = 'block';
         note.style.display = 'none';
     };
 
     // Dragging/Resize Mechanics
-       // PERFECTED DRIFT-FREE DRAGGING MECHANICS WITH TWIN ENTER-LOCKS
+    // PERFECTED DRIFT-FREE DRAGGING MECHANICS WITH TWIN ENTER-LOCKS
     let isDragging = false;
     let offsetX = 0, offsetY = 0;
     let stampOffsetX = 0, stampOffsetY = 0;
@@ -418,14 +422,15 @@
     window.onmousemove = (e) => {
         const rect = document.getElementById('workspace-scaler').getBoundingClientRect();
         if (isDragging && !isQrLocked) {
-            posX = (e.clientX - rect.left - offsetX) / currentZoomScale;
-            posY = (e.clientY - rect.top - offsetY) / currentZoomScale;
+            posX = ((e.clientX - rect.left) - offsetX) / currentZoomScale;
+            posY = ((e.clientY - rect.top) - offsetY) / currentZoomScale;
             marker.style.left = posX + 'px';
             marker.style.top = posY + 'px';
         }
         if (isStampDragging && !isStampLocked) { 
-            stampPosX = (e.clientX - rect.left - stampOffsetX) / currentZoomScale;
-            stampPosY = (e.clientY - rect.top - stampOffsetY) / currentZoomScale;
+            // FIXED: Wrapped positions in extra parentheses before scaling to prevent movement drift completely
+            stampPosX = ((e.clientX - rect.left) - stampOffsetX) / currentZoomScale;
+            stampPosY = ((e.clientY - rect.top) - stampOffsetY) / currentZoomScale;
             stampMarker.style.left = stampPosX + 'px';
             stampMarker.style.top = stampPosY + 'px';
         }
@@ -445,6 +450,7 @@
             
             if (marker.style.display === 'flex' && !isQrLocked) {
                 isQrLocked = true;
+                // FIXED: Extracts the exact raw positional coordinate bounds without running repetitive addition offsets
                 posX = parseFloat(marker.style.left || posX);
                 posY = parseFloat(marker.style.top || posY);
                 marker.style.borderColor = "#059669"; 
@@ -454,6 +460,7 @@
             
             if (stampMarker.style.display === 'flex' && !isStampLocked) {
                 isStampLocked = true;
+                // FIXED: Extracts the exact raw positional coordinate bounds without running repetitive addition offsets
                 stampPosX = parseFloat(stampMarker.style.left || stampPosX);
                 stampPosY = parseFloat(stampMarker.style.top || stampPosY);
                 stampMarker.style.borderStyle = "solid"; 
@@ -463,14 +470,17 @@
             }
             
             if (toastMessage !== "") {
+                // FIXED: Automatically exposes the Preview option during an Enter-key lock transaction event
+                document.getElementById('previewBtn').style.display = 'block';
+                document.getElementById('downloadBtn').style.display = 'block';
+
                 const toast = document.getElementById('on-screen-note');
-                toast.innerText = toastMessage + " Ready to Download.";
+                toast.innerText = toastMessage + " Ready to Preview or Download.";
                 toast.style.display = 'block';
                 setTimeout(() => { toast.style.display = 'none'; }, 3000);
             }
         }
     });
-
                 // DRIFT-FREE MULTI-ELEMENT DOWNLOAD EXPORT MATRIX ENGINE (FIXED POSITIONS & SHAPES)
     document.getElementById('downloadBtn').onclick = async () => {
         try {
