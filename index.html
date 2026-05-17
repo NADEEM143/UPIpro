@@ -512,12 +512,13 @@
             const finalLeftPos = posX - 40;
             const finalTopPos = posY - 40;
 
-            const pdfX = (finalLeftPos / actualWorkspaceWidth) * width;
-            const pdfY = height - ((finalTopPos / actualWorkspaceHeight) * height) - finalSquareSize;
-            
-            const finalQrWidth = (marker.clientWidth / actualWorkspaceWidth) * width;
-            const finalQrHeight = (marker.clientHeight / actualWorkspaceHeight) * height;
-            const finalSquareSize = Math.max(finalQrWidth, finalQrHeight);
+            // Lifted size calculations up first
+const finalQrWidth = (marker.clientWidth / actualWorkspaceWidth) * width;
+const finalQrHeight = (marker.clientHeight / actualWorkspaceHeight) * height;
+const finalSquareSize = Math.max(finalQrWidth, finalQrHeight);
+
+const pdfX = (finalLeftPos / actualWorkspaceWidth) * width;
+const pdfY = height - ((finalTopPos / actualWorkspaceHeight) * height) - finalSquareSize; // 👍 Now it works perfectly!
 
             firstPage.drawImage(qrImage, {
                 x: pdfX,
@@ -913,12 +914,13 @@
                     const markerLeftStyle = parseFloat(marker.style.left) || (posX - 40);
                     const markerTopStyle = parseFloat(marker.style.top) || (posY - 40);
 
-                    const pdfX = (markerLeftStyle / actualWorkspaceWidth) * width;
-                    const pdfY = height - (markerTopStyle / actualWorkspaceHeight) * height - finalSquareSize;
-                    
-                    const finalQrWidth = (marker.clientWidth / actualWorkspaceWidth) * width;
-                    const finalQrHeight = (marker.clientHeight / actualWorkspaceHeight) * height;
-                    const finalSquareSize = Math.max(finalQrWidth, finalQrHeight);
+                    // Lifted size calculations up first
+const finalQrWidth = (marker.clientWidth / actualWorkspaceWidth) * width;
+const finalQrHeight = (marker.clientHeight / actualWorkspaceHeight) * height;
+const finalSquareSize = Math.max(finalQrWidth, finalQrHeight);
+
+const pdfX = (markerLeftStyle / actualWorkspaceWidth) * width;
+const pdfY = height - (markerTopStyle / actualWorkspaceHeight) * height - finalSquareSize; // 👍 Now it works perfectly!
 
                     firstPage.drawImage(qrImage, {
                         x: pdfX,
