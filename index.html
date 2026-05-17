@@ -27,38 +27,24 @@
         /* SECURE SURFACE NOTATION ELEMENT FOR RENDERING INCOMING JPEG ATTACHMENT STRATA */
         #image-frame { width: 100%; height: auto; max-height: 100%; object-fit: contain; display: none; min-height: 640px; border: none; pointer-events: none; }
         
-        /* QR MARKER */
+        /* QR MARKER STYLING CONFIGURATION WITH BUILT-IN AUTO SCALING COMPONENT ASPECT RATIOS */
         #qr-marker { 
             position: absolute; width: 80px; height: 80px; 
             background: white; border: 2px solid var(--primary); 
             display: none; flex-direction: column; align-items: center; justify-content: center; 
             z-index: 2000; cursor: move; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            resize: both; 
-            overflow: hidden; 
-            /* NEW MATRIX ADDITION: Forces the bounding box to maintain a perfect square aspect ratio */
+            resize: both; overflow: hidden; 
             aspect-ratio: 1 / 1 !important;
         }
-        
-        #qr-marker::-webkit-scrollbar {
-            display: none;
-        }
+        #qr-marker::-webkit-scrollbar { display: none; }
 
         #qr-graphic-target {
-            width: 100% !important;
-            height: 100% !important;
-            position: absolute !important;
-            top: 0 !important;
-            left: 0 !important;
-            box-sizing: border-box !important;
+            width: 100% !important; height: 100% !important; position: absolute !important;
+            top: 0 !important; left: 0 !important; box-sizing: border-box !important;
         }
-
         #qr-graphic-target canvas, 
         #qr-graphic-target img {
-            width: 100% !important;
-            height: 100% !important;
-            /* CHANGED back to contain to keep your pixel matrix scale high resolution and crisp */
-            object-fit: contain !important;
-            display: block !important;
+            width: 100% !important; height: 100% !important; object-fit: contain !important; display: block !important;
         }
 
         #qr-marker span { font-size: 10px; font-weight: bold; color: var(--primary); pointer-events: none; }
@@ -75,71 +61,36 @@
 
         /* GENERATE PDF CONFIGURATION SYSTEM STYLING */
         .gen-pdf-box {
-            margin-top: 20px;
-            padding-top: 15px;
-            border-top: 2px dashed #e2e8f0;
+            margin-top: 20px; padding-top: 15px; border-top: 2px dashed #e2e8f0;
         }
         .gen-pdf-box h3 {
-            margin: 0 0 12px 0;
-            font-size: 13px;
-            color: #475569;
-            text-transform: uppercase;
+            margin: 0 0 12px 0; font-size: 13px; color: #475569; text-transform: uppercase;
         }
         .btn-orange { background: #ea580c; color: white; margin-top: 10px; flex: 1; }
         .btn-orange:hover { background: #c2410c; }
         .btn-purple { background: #6b21a8; color: white; margin-top: 10px; width: 100%; }
         .btn-purple:hover { background: #581c87; }
         
-        .action-buttons-row {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-        }
+        .action-buttons-row { display: flex; gap: 10px; margin-top: 10px; }
         .btn-gray { background: #64748b; color: white; padding: 12px; border-radius: 10px; font-weight: 700; cursor: pointer; border: none; font-size: 13px; }
         .btn-gray:hover { background: #475569; }
 
         .product-preview-list {
-            margin-top: 12px;
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            padding: 10px;
-            max-height: 150px;
-            overflow-y: auto;
-            font-size: 11px;
+            margin-top: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; max-height: 150px; overflow-y: auto; font-size: 11px;
         }
         .product-preview-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 6px 0;
-            border-bottom: 1px solid #f1f5f9;
+            display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid #f1f5f9;
         }
         .product-preview-item:last-child { border-bottom: none; }
         
         .remove-item-btn {
-            background: #ef4444;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            padding: 2px 6px;
-            font-size: 10px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-left: 8px;
-            transition: 0.1s;
+            background: #ef4444; color: white; border: none; border-radius: 4px; padding: 2px 6px; font-size: 10px; font-weight: bold; cursor: pointer; margin-left: 8px; transition: 0.1s;
         }
         .remove-item-btn:hover { background: #dc2626; }
         .item-details-left { display: flex; flex-direction: column; gap: 2px; max-width: 70%; overflow: hidden; }
         .item-pricing-right { display: flex; align-items: center; gap: 10px; font-weight: 600; }
         
-        .char-counter-label {
-            float: right;
-            font-size: 10px;
-            color: #94a3b8;
-            text-transform: none;
-            font-weight: 400;
-        }
+        .char-counter-label { float: right; font-size: 10px; color: #94a3b8; text-transform: none; font-weight: 400; }
 
         /* GEAR SETTING AND SIDEBAR PANEL STYLING */
         .settings-icon {
@@ -157,7 +108,6 @@
         .btn-red { background: #dc2626; color: white; width: 100%; margin-top: 10px; }
         .btn-red:hover { background: #b91c1c; }
         
-        /* MODIFIED: ADAPTED STAMP MARKER SYSTEM SUPPORTING EXPANSIVE TRANSFORM OVERLAYS EXTREMITIES LIKE THE QR DECORATOR */
         #stamp-marker {
             position: absolute; width: 120px; height: 120px; border: 2px dashed #dc2626; display: none;
             align-items: center; justify-content: center; z-index: 2005; cursor: move;
@@ -182,7 +132,6 @@
 <body>
 
 <div id="on-screen-note"></div>
-
 <div class="settings-icon" id="gearIcon">⚙️</div>
 
 <div class="settings-panel" id="settingsPanel">
@@ -190,18 +139,9 @@
     <div class="settings-option-item" id="digitalStampOptionMenu">🏵️ Digital Stamp Option</div>
     
     <div class="stamp-form" id="stampFormArea">
-        <div class="input-group">
-            <label>Company Name</label>
-            <input type="text" id="stampCompany" placeholder="e.g., Acme Corp">
-        </div>
-        <div class="input-group">
-            <label>Approved By</label>
-            <input type="text" id="stampApprover" placeholder="e.g., Manager Name">
-        </div>
-        <div class="input-group">
-            <label>Date</label>
-            <input type="date" id="stampDate">
-        </div>
+        <div class="input-group"><label>Company Name</label><input type="text" id="stampCompany" placeholder="e.g., Acme Corp"></div>
+        <div class="input-group"><label>Approved By</label><input type="text" id="stampApprover" placeholder="e.g., Manager Name"></div>
+        <div class="input-group"><label>Date</label><input type="date" id="stampDate"></div>
         <div class="input-group">
             <label>Ink Color</label>
             <select id="stampColor">
@@ -239,18 +179,9 @@
 
             <div class="gen-pdf-box">
                 <h3>Generate PDF Option</h3>
-                <div class="input-group">
-                    <label>Product Name <span class="char-counter-label" id="charCounter">0/35</span></label>
-                    <input type="text" id="prodName" placeholder="Product name" maxlength="35">
-                </div>
-                <div class="input-group">
-                    <label>Product Price</label>
-                    <input type="number" id="prodPrice" placeholder="0.00">
-                </div>
-                <div class="input-group">
-                    <label>Quantity</label>
-                    <input type="number" id="prodQty" placeholder="1" value="1">
-                </div>
+                <div class="input-group"><label>Product Name <span class="char-counter-label" id="charCounter">0/35</span></label><input type="text" id="prodName" placeholder="Product name" maxlength="35"></div>
+                <div class="input-group"><label>Product Price</label><input type="number" id="prodPrice" placeholder="0.00"></div>
+                <div class="input-group"><label>Quantity</label><input type="number" id="prodQty" placeholder="1" value="1"></div>
                 <button id="addProductBtn" class="btn btn-purple">➕ Add Product</button>
                 <div id="productPreviewArea" class="product-preview-list" style="display: none;"></div>
 
@@ -266,7 +197,7 @@
                 <iframe id="pdf-frame"></iframe>
                 <img id="image-frame" alt="Invoice Preview Surface Substrate Layer">
                 <div id="click-overlay"></div>
-                <div id="click-overlay-stamp" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1005; display: none; background: rgba(0,0,0,0.01);"></div>
+                <div id="click-overlay-stamp"></div>
                 <div id="qr-marker">
                     <div style="font-size:18px;">🎯</div>
                     <span>DRAG & RESIZE</span>
@@ -287,48 +218,48 @@
     </div>
 </div>
 
-<script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/easyqrcodejs@4.6.2/dist/easy.qrcode.min.js"></script>
+<script src="https://unpkg.com"></script>
+<script src="https://jsdelivr.net"></script>
 <script>
+    // GLOBAL ARCHITECTURE STATE HOOKS DEFINED FIRST AT THE APPLICATION ROOT LAYER
     const gearIcon = document.getElementById('gearIcon');
     const settingsPanel = document.getElementById('settingsPanel');
     const stampOptionMenu = document.getElementById('digitalStampOptionMenu');
     const stampFormArea = document.getElementById('stampFormArea');
     const lockStampBtn = document.getElementById('lockStampBtn');
-
-    let originalBytes, posX = 0, posY = 0;
     const marker = document.getElementById('qr-marker');
-    const note = document.getElementById('on-screen-note');
-    
-    let productsList = [];
-
-    let stampPosX = 0, stampPosY = 0, stampImgDataUrl = null, isStampPlaced = false, isStampDragging = false;
     const stampMarker = document.getElementById('stamp-marker');
-
-    let currentZoomScale = 1.0;
+    const note = document.getElementById('on-screen-note');
     const workspaceScaler = document.getElementById('workspace-scaler');
     const zoomInBtn = document.getElementById('zoomInBtn');
     const zoomOutBtn = document.getElementById('zoomOutBtn');
     const zoomValueLabel = document.getElementById('zoomValueLabel');
 
+    let originalBytes, posX = 0, posY = 0;
+    let productsList = [];
+    let stampPosX = 0, stampPosY = 0, stampImgDataUrl = null, isStampPlaced = false;
+    let currentZoomScale = 1.0;
+
+    // TWIN SEAMLESS INTERACTIVE LOGIC VARIABLE FLAGGING MATRICES
+    let isDragging = false;
+    let isStampDragging = false;
+    let offsetX = 0, offsetY = 0;
+    let stampOffsetX = 0, stampOffsetY = 0;
+    let isQrLocked = false;
+    let isStampLocked = false;
+
     window.onload = () => {
         ['payeeName', 'vpa', 'amount', 'stampCompany', 'stampApprover', 'stampDate', 'stampColor', 'stampShape'].forEach(id => {
             const targetInputElement = document.getElementById(id);
             if (!targetInputElement) return;
-            
             if (localStorage.getItem(id)) {
                 targetInputElement.value = localStorage.getItem(id);
             }
-            targetInputElement.oninput = () => {
-                localStorage.setItem(id, targetInputElement.value);
-            };
+            targetInputElement.oninput = () => { localStorage.setItem(id, targetInputElement.value); };
             if (targetInputElement.tagName === 'SELECT') {
-                targetInputElement.onchange = () => {
-                    localStorage.setItem(id, targetInputElement.value);
-                };
+                targetInputElement.onchange = () => { localStorage.setItem(id, targetInputElement.value); };
             }
         });
-        
         if (!document.getElementById('stampDate').value) {
             const currentDateIsoString = new Date().toISOString().split('T')[0];
             document.getElementById('stampDate').value = currentDateIsoString;
@@ -344,10 +275,10 @@
         workspaceScaler.style.height = `${100 / currentZoomScale}%`;
     };
 
-      zoomInBtn.onclick = () => applyZoomMatrixTransformation(0.1);
+    zoomInBtn.onclick = () => applyZoomMatrixTransformation(0.1);
     zoomOutBtn.onclick = () => applyZoomMatrixTransformation(-0.1);
 
-        document.getElementById('fileInput').onchange = async (e) => {
+    document.getElementById('fileInput').onchange = async (e) => {
         const file = e.target.files[0];
         if (!file) return;
         await handleIncomingDocumentBufferChannels(file);
@@ -355,23 +286,19 @@
 
     document.getElementById('lockBtn').onclick = () => {
         if(!originalBytes) return alert("Select or Generate PDF First");
-        
         note.innerText = "📍 Click on the document to place your QR";
         note.style.display = 'block';
         document.getElementById('click-overlay').style.display = 'block';
-        
         setTimeout(() => { note.style.display = 'none'; }, 4000);
     };
 
     document.getElementById('click-overlay').onclick = (e) => {
-        const rect = document.getElementById('workspace-scaler').getBoundingClientRect();
+        const rect = workspaceScaler.getBoundingClientRect();
         posX = (e.clientX - rect.left) / currentZoomScale; 
         posY = (e.clientY - rect.top) / currentZoomScale;
-        
         marker.style.left = (posX - 40) + 'px'; marker.style.top = (posY - 40) + 'px';
         marker.style.display = 'flex';
         
-        // --- THIS PART INJECTS THE REAL LIVE QR ---
         const name = document.getElementById('payeeName').value;
         const vpa = document.getElementById('vpa').value;
         const amt = document.getElementById('amount').value;
@@ -380,27 +307,16 @@
         const liveTarget = document.getElementById('qr-graphic-target');
         liveTarget.innerHTML = ""; 
         liveTarget.style.display = "block"; 
-        
         new QRCode(liveTarget, { text: upi, width: 120, height: 120 });
-        // ------------------------------------------
 
-                document.getElementById('click-overlay').style.display = 'none';
+        document.getElementById('click-overlay').style.display = 'none';
         document.getElementById('downloadBtn').style.display = 'block';
         note.style.display = 'none';
     };
 
-    // FIXED: Variables are declared FIRST at the top so the script doesn't crash on refresh
-    const stampMarker = document.getElementById('stamp-marker');
-
-    let isDragging = false;
-    let isStampDragging = false; 
-    let offsetX = 0, offsetY = 0;
-    let stampOffsetX = 0, stampOffsetY = 0;
-    let isQrLocked = false; 
-    let isStampLocked = false; 
-
+    // TWIN SYNCHRONIZED ELEMENT DRAG HANDLERS WITH PROPER COORDINATE OFFSETS
     marker.onmousedown = (e) => { 
-        if (isQrLocked) return; 
+        if (isQrLocked) return;
         if (e.offsetX < marker.clientWidth - 15 && e.offsetY < marker.clientHeight - 15) {
             isDragging = true; 
             offsetX = e.clientX - marker.getBoundingClientRect().left;
@@ -409,7 +325,7 @@
     };
 
     stampMarker.onmousedown = (e) => { 
-        if (isStampLocked) return; 
+        if (isStampLocked) return;
         if (e.offsetX < stampMarker.clientWidth - 15 && e.offsetY < stampMarker.clientHeight - 15) {
             isStampDragging = true; 
             stampOffsetX = e.clientX - stampMarker.getBoundingClientRect().left;
@@ -418,7 +334,7 @@
     };
 
     window.onmousemove = (e) => {
-        const rect = document.getElementById('workspace-scaler').getBoundingClientRect();
+        const rect = workspaceScaler.getBoundingClientRect();
         if (isDragging && !isQrLocked) {
             posX = (e.clientX - rect.left - offsetX) / currentZoomScale;
             posY = (e.clientY - rect.top - offsetY) / currentZoomScale;
@@ -426,7 +342,6 @@
             marker.style.top = posY + 'px';
         }
         if (isStampDragging && !isStampLocked) { 
-            // FIXED: Mathematically matches your stamp creation function to stop any jumping or glitching!
             stampPosX = (e.clientX - rect.left) / currentZoomScale;
             stampPosY = (e.clientY - rect.top) / currentZoomScale;
             stampMarker.style.left = (stampPosX - (stampMarker.clientWidth / 2)) + 'px';
@@ -436,16 +351,14 @@
 
     window.onmouseup = () => {
         isDragging = false;
-        isStampDragging = false; 
+        isStampDragging = false;
     };
 
-    // TWIN LOCK LISTENER FOR BOTH QR CODE AND STAMP LAYOUTS
+    // PERFECTED ENTER KEY MATRIX EVENT INTERCEPTOR FOR TWIN SECURE GRAPHIC MOUNT LOCKING
     window.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
             if (!originalBytes) return;
-            
             let toastMessage = "";
-            
             if (marker.style.display === 'flex' && !isQrLocked) {
                 isQrLocked = true;
                 posX = parseFloat(marker.style.left || posX);
@@ -454,7 +367,6 @@
                 marker.style.cursor = "default";
                 toastMessage += "🔒 QR Code Position Locked! ";
             }
-            
             if (stampMarker.style.display === 'flex' && !isStampLocked) {
                 isStampLocked = true;
                 stampPosX = parseFloat(stampMarker.style.left || stampPosX);
@@ -464,17 +376,15 @@
                 stampMarker.style.cursor = "default";
                 toastMessage += "🏵️ Stamp Position Locked!";
             }
-            
             if (toastMessage !== "") {
-                const toast = document.getElementById('on-screen-note');
-                toast.innerText = toastMessage + " Ready to Download.";
-                toast.style.display = 'block';
-                setTimeout(() => { toast.style.display = 'none'; }, 3000);
+                note.innerText = toastMessage + " Ready to Download.";
+                note.style.display = 'block';
+                setTimeout(() => { note.style.display = 'none'; }, 3000);
             }
         }
     });
 
-    // DRIFT-FREE MULTI-ELEMENT DOWNLOAD EXPORT MATRIX ENGINE
+    // COMPILATION EXPORT PIPELINE PARSING ABSOLUTE PDF MATRIX GRAPHIC RENDERING BOUNDARIES
     document.getElementById('downloadBtn').onclick = async () => {
         try {
             const name = document.getElementById('payeeName').value;
@@ -484,7 +394,6 @@
             
             const liveQrContainer = document.getElementById('qr-graphic-target');
             if (!liveQrContainer) return alert("Please set your QR position first");
-            
             const liveCanvasElement = liveQrContainer.querySelector('canvas');
             if (!liveCanvasElement) return alert("QR Code graphic engine is missing. Re-place the position marker.");
             
@@ -494,25 +403,19 @@
             const qrImage = await pdfDoc.embedPng(qrImgDataUrl);
             
             const { width, height } = firstPage.getSize();
-            const preview = document.getElementById('workspace-scaler');
-            
             const pdfFrameNode = document.getElementById('pdf-frame');
             const imgFrameNode = document.getElementById('image-frame');
             
-            let sourceRenderWidth = preview.offsetWidth;
-            let sourceRenderHeight = preview.offsetHeight;
-            
+            let sourceRenderWidth = workspaceScaler.offsetWidth;
+            let sourceRenderHeight = workspaceScaler.offsetHeight;
             if (pdfFrameNode && pdfFrameNode.style.display === 'block') {
-                sourceRenderWidth = pdfFrameNode.offsetWidth;
-                sourceRenderHeight = pdfFrameNode.offsetHeight;
+                sourceRenderWidth = pdfFrameNode.offsetWidth; sourceRenderHeight = pdfFrameNode.offsetHeight;
             } else if (imgFrameNode && imgFrameNode.style.display === 'block') {
-                sourceRenderWidth = imgFrameNode.offsetWidth;
-                sourceRenderHeight = imgFrameNode.offsetHeight;
+                sourceRenderWidth = imgFrameNode.offsetWidth; sourceRenderHeight = imgFrameNode.offsetHeight;
             }
             
             const finalLeftPos = isQrLocked ? posX : parseFloat(marker.style.left || posX);
             const finalTopPos = isQrLocked ? posY : parseFloat(marker.style.top || posY);
-
             const pdfX = (finalLeftPos / sourceRenderWidth) * width;
             const pdfY = height - ((finalTopPos / sourceRenderHeight) * height);
             
@@ -520,30 +423,18 @@
             const finalQrHeight = (marker.clientHeight / sourceRenderHeight) * height;
             const finalSquareSize = Math.max(finalQrWidth, finalQrHeight);
 
-            firstPage.drawImage(qrImage, {
-                x: pdfX,
-                y: pdfY - finalSquareSize,
-                width: finalSquareSize,
-                height: finalSquareSize
-            });
+            firstPage.drawImage(qrImage, { x: pdfX, y: pdfY - finalSquareSize, width: finalSquareSize, height: finalSquareSize });
             
-                        if (isStampPlaced && stampImgDataUrl) {
+            if (isStampPlaced && stampImgDataUrl) {
                 const stampImageObject = await pdfDoc.embedPng(stampImgDataUrl);
-                
                 const finalStampLeft = isStampLocked ? stampPosX : parseFloat(stampMarker.style.left || stampPosX);
                 const finalStampTop = isStampLocked ? stampPosY : parseFloat(stampMarker.style.top || stampPosY);
-
                 const docStampX = (finalStampLeft / sourceRenderWidth) * width;
                 const docStampY = height - ((finalStampTop / sourceRenderHeight) * height);
                 const docStampW = (stampMarker.clientWidth / sourceRenderWidth) * width;
                 const docStampH = (stampMarker.clientHeight / sourceRenderHeight) * height;
                 
-                firstPage.drawImage(stampImageObject, {
-                    x: docStampX,
-                    y: docStampY - docStampH,
-                    width: docStampW,
-                    height: docStampH
-                });
+                firstPage.drawImage(stampImageObject, { x: docStampX, y: docStampY - docStampH, width: docStampW, height: docStampH });
             }
 
             const pdfData = await pdfDoc.save();
@@ -551,9 +442,7 @@
             link.href = URL.createObjectURL(new Blob([pdfData], { type: 'application/pdf' }));
             link.download = `Invoice_${name || 'Branded'}.pdf`;
             link.click();
-        } catch (e) { 
-            alert("Download Processing Failure: " + e.message); 
-        }
+        } catch (e) { alert("Download Processing Failure: " + e.message); }
     };
 
     document.getElementById('prodName').oninput = (e) => {
@@ -563,76 +452,48 @@
     const renderProductsPreviewWorkspace = () => {
         const previewBlock = document.getElementById('productPreviewArea');
         const clearBtn = document.getElementById('clearProductsBtn');
-        
         previewBlock.innerHTML = "";
-
         if (productsList.length === 0) {
-            previewBlock.style.display = 'none';
-            clearBtn.style.display = 'none';
-            
+            previewBlock.style.display = 'none'; clearBtn.style.display = 'none';
             const amountInput = document.getElementById('amount');
-            amountInput.value = "0.00";
-            amountInput.dispatchEvent(new Event('input'));
+            amountInput.value = "0.00"; amountInput.dispatchEvent(new Event('input'));
             return;
         }
-
-        previewBlock.style.display = 'block';
-        clearBtn.style.display = 'block';
-        
+        previewBlock.style.display = 'block'; clearBtn.style.display = 'block';
         let runningTotal = 0;
-
         productsList.forEach((item, targetIndex) => {
-            const itemTotalCost = item.price * item.qty;
-            runningTotal += itemTotalCost;
-
+            const itemTotalCost = item.price * item.qty; runningTotal += itemTotalCost;
             const rowItem = document.createElement('div');
             rowItem.className = 'product-preview-item';
-            
             rowItem.innerHTML = `
-                <div class="item-details-left">
-                    <span style="word-break: break-all;"><b>${item.name}</b></span>
-                    <span style="color: #64748b; font-size: 10px;">INR ${item.price.toFixed(2)} × ${item.qty}</span>
-                </div>
-                <div class="item-pricing-right">
-                    <span>INR ${itemTotalCost.toFixed(2)}</span>
-                    <button class="remove-item-btn" onclick="removeProductLineItem(${targetIndex})">❌</button>
-                </div>
+                <div class="item-details-left"><span style="word-break: break-all;"><b>${item.name}</b></span><span style="color: #64748b; font-size: 10px;">INR ${item.price.toFixed(2)} × ${item.qty}</span></div>
+                <div class="item-pricing-right"><span>INR ${itemTotalCost.toFixed(2)}</span><button class="remove-item-btn" onclick="removeProductLineItem(${targetIndex})">❌</button></div>
             `;
             previewBlock.appendChild(rowItem);
         });
-
         const amountInput = document.getElementById('amount');
-        amountInput.value = runningTotal.toFixed(2);
-        amountInput.dispatchEvent(new Event('input'));
+        amountInput.value = runningTotal.toFixed(2); amountInput.dispatchEvent(new Event('input'));
     };
 
     window.removeProductLineItem = (indexToPurge) => {
-        productsList.splice(indexToPurge, 1);
-        renderProductsPreviewWorkspace();
+        productsList.splice(indexToPurge, 1); renderProductsPreviewWorkspace();
     };
 
     document.getElementById('clearProductsBtn').onclick = () => {
-        productsList = [];
-        renderProductsPreviewWorkspace();
+        productsList = []; renderProductsPreviewWorkspace();
     };
 
     document.getElementById('addProductBtn').onclick = () => {
         const nameField = document.getElementById('prodName').value.trim();
         const priceField = parseFloat(document.getElementById('prodPrice').value || 0);
         const qtyField = parseInt(document.getElementById('prodQty').value || 0);
-
         if (!nameField) return alert("Please fill the Product Name field");
         if (nameField.length > 35) return alert("Product Name exceeds the maximum limit of 35 characters.");
         if (priceField <= 0) return alert("Please fill a valid Product Price");
         if (qtyField <= 0) return alert("Please specify a valid Quantity");
-
         productsList.push({ name: nameField, price: priceField, qty: qtyField });
         renderProductsPreviewWorkspace();
-
-        document.getElementById('prodName').value = "";
-        document.getElementById('prodPrice').value = "";
-        document.getElementById('prodQty').value = "1";
-        document.getElementById('charCounter').innerText = "0/35";
+        document.getElementById('prodName').value = ""; document.getElementById('prodPrice').value = ""; document.getElementById('prodQty').value = "1"; document.getElementById('charCounter').innerText = "0/35";
     };
 
     document.getElementById('makePdfBtn').onclick = async () => {
@@ -640,173 +501,99 @@
             const nameField = document.getElementById('prodName').value.trim();
             const priceField = parseFloat(document.getElementById('prodPrice').value || 0);
             const qtyField = parseInt(document.getElementById('prodQty').value || 0);
-
             if (nameField && priceField > 0 && qtyField > 0) {
                 if (nameField.length > 35) return alert("Product Name exceeds the maximum limit of 35 characters.");
-                productsList.push({ name: nameField, price: priceField, qty: qtyField });
-                renderProductsPreviewWorkspace();
-            } else {
-                return alert("Please add at least one product description line item to compile.");
-            }
+                productsList.push({ name: nameField, price: priceField, qty: qtyField }); renderProductsPreviewWorkspace();
+            } else { return alert("Please add at least one product description line item to compile."); }
         }
-
         try {
             const docInstance = await PDFLib.PDFDocument.create();
             const targetPage = docInstance.addPage([595.28, 841.89]);
             const { width, height } = targetPage.getSize();
-            
             let verticalPointerY = height - 70;
             targetPage.drawText("GENERATED INVOICE DOCUMENT", { x: 50, y: verticalPointerY, size: 20 });
             verticalPointerY -= 40;
-            
             let totalAggregatedBill = 0;
-
             productsList.forEach((product, idx) => {
-                const rowCost = product.price * product.qty;
-                totalAggregatedBill = totalAggregatedBill + rowCost;
-
-                targetPage.drawText(`${idx + 1}. ${product.name} - ${product.qty} pcs @ INR ${product.price.toFixed(2)} = INR ${rowCost.toFixed(2)}`, {
-                    x: 50,
-                    y: verticalPointerY,
-                    size: 12
-                });
+                const rowCost = product.price * product.qty; totalAggregatedBill += rowCost;
+                targetPage.drawText(`${idx + 1}. ${product.name} - ${product.qty} pcs @ INR ${product.price.toFixed(2)} = INR ${rowCost.toFixed(2)}`, { x: 50, y: verticalPointerY, size: 12 });
                 verticalPointerY -= 25;
             });
-
             verticalPointerY -= 15;
             targetPage.drawText("Grand Total Amount Due: INR " + totalAggregatedBill.toFixed(2), { x: 50, y: verticalPointerY, size: 15 });
-
             const amountInput = document.getElementById('amount');
-            amountInput.value = totalAggregatedBill.toFixed(2);
-            amountInput.dispatchEvent(new Event('input'));
-
+            amountInput.value = totalAggregatedBill.toFixed(2); amountInput.dispatchEvent(new Event('input'));
             originalBytes = await docInstance.save();
-
             document.getElementById('image-frame').style.display = 'none';
             document.getElementById('pdf-frame').src = URL.createObjectURL(new Blob([originalBytes], {type: 'application/pdf'}));
             document.getElementById('pdf-frame').style.display = 'block';
         } catch (err) { alert("Generation Core Failure: " + err.message); }
     };
 
-    gearIcon.onclick = () => {
-        settingsPanel.style.display = settingsPanel.style.display === 'block' ? 'none' : 'block';
-    };
-
-    stampOptionMenu.onclick = () => {
-        stampFormArea.style.display = stampFormArea.style.display === 'block' ? 'none' : 'block';
-    };
+    gearIcon.onclick = () => { settingsPanel.style.display = settingsPanel.style.display === 'block' ? 'none' : 'block'; };
+    stampOptionMenu.onclick = () => { stampFormArea.style.display = stampFormArea.style.display === 'block' ? 'none' : 'block'; };
 
     lockStampBtn.onclick = () => {
         if (!originalBytes) return alert("Select or Generate PDF First");
-        
         const comp = document.getElementById('stampCompany').value.trim();
         const appr = document.getElementById('stampApprover').value.trim();
         const dateV = document.getElementById('stampDate').value;
         const selectedInkColor = document.getElementById('stampColor').value;
         const selectedShape = document.getElementById('stampShape').value;
-        
         if (!comp || !appr || !dateV) return alert("Please fill all stamp info fields (Company Name, Approved By, Date)");
 
-        const canvas = document.createElement('canvas');
-        canvas.width = 480; 
-        canvas.height = 480;
-        const ctx = canvas.getContext('2d');
-
-        ctx.clearRect(0, 0, 480, 480);
-        
-        const stampGraphicBufferCanvas = document.createElement('canvas');
-        stampGraphicBufferCanvas.width = 480;
-        stampGraphicBufferCanvas.height = 480;
+        const canvas = document.createElement('canvas'); canvas.width = 480; canvas.height = 480;
+        const ctx = canvas.getContext('2d'); ctx.clearRect(0, 0, 480, 480);
+        const stampGraphicBufferCanvas = document.createElement('canvas'); stampGraphicBufferCanvas.width = 480; stampGraphicBufferCanvas.height = 480;
         const bufferCtx = stampGraphicBufferCanvas.getContext('2d');
-
-        bufferCtx.strokeStyle = selectedInkColor;
-        bufferCtx.fillStyle = selectedInkColor;
-        bufferCtx.textAlign = 'center';
-        bufferCtx.textBaseline = 'middle';
+        bufferCtx.strokeStyle = selectedInkColor; bufferCtx.fillStyle = selectedInkColor; bufferCtx.textAlign = 'center'; bufferCtx.textBaseline = 'middle';
 
         if (selectedShape === 'circle') {
-            bufferCtx.lineWidth = 8;
-            bufferCtx.beginPath(); bufferCtx.arc(240, 240, 200, 0, Math.PI * 2); bufferCtx.stroke();
-            bufferCtx.lineWidth = 3;
-            bufferCtx.beginPath(); bufferCtx.arc(240, 240, 184, 0, Math.PI * 2); bufferCtx.stroke();
-
-            bufferCtx.font = 'bold 26px "Courier New", monospace';
-            bufferCtx.fillText(comp.toUpperCase().substring(0, 22), 240, 150);
-            bufferCtx.font = '22px "Courier New", monospace';
-            bufferCtx.fillText("APPROVED BY:", 240, 220);
-            bufferCtx.font = 'bold 24px "Courier New", monospace';
-            bufferCtx.fillText(appr.substring(0, 18), 240, 260);
-            bufferCtx.font = 'bold 22px "Courier New", monospace';
-            bufferCtx.fillText(dateV, 240, 330);
+            bufferCtx.lineWidth = 8; bufferCtx.beginPath(); bufferCtx.arc(240, 240, 200, 0, Math.PI * 2); bufferCtx.stroke();
+            bufferCtx.lineWidth = 3; bufferCtx.beginPath(); bufferCtx.arc(240, 240, 184, 0, Math.PI * 2); bufferCtx.stroke();
+            bufferCtx.font = 'bold 26px "Courier New", monospace'; bufferCtx.fillText(comp.toUpperCase().substring(0, 22), 240, 150);
+            bufferCtx.font = '22px "Courier New", monospace'; bufferCtx.fillText("APPROVED BY:", 240, 220);
+            bufferCtx.font = 'bold 24px "Courier New", monospace'; bufferCtx.fillText(appr.substring(0, 18), 240, 260);
+            bufferCtx.font = 'bold 22px "Courier New", monospace'; bufferCtx.fillText(dateV, 240, 330);
             stampMarker.style.borderRadius = '50%';
-        } 
-        else if (selectedShape === 'oval') {
-            bufferCtx.lineWidth = 8;
-            bufferCtx.beginPath(); bufferCtx.ellipse(240, 240, 220, 140, 0, 0, Math.PI * 2); bufferCtx.stroke();
-            bufferCtx.lineWidth = 3;
-            bufferCtx.beginPath(); bufferCtx.ellipse(240, 240, 206, 126, 0, 0, Math.PI * 2); bufferCtx.stroke();
-
-            bufferCtx.font = 'bold 26px "Courier New", monospace';
-            bufferCtx.fillText(comp.toUpperCase().substring(0, 24), 240, 170);
-            bufferCtx.font = '20px "Courier New", monospace';
-            bufferCtx.fillText("APPROVED BY: " + appr.substring(0, 14), 240, 230);
-            bufferCtx.font = 'bold 22px "Courier New", monospace';
-            bufferCtx.fillText(dateV, 240, 280);
+        } else if (selectedShape === 'oval') {
+            bufferCtx.lineWidth = 8; bufferCtx.beginPath(); bufferCtx.ellipse(240, 240, 220, 140, 0, 0, Math.PI * 2); bufferCtx.stroke();
+            bufferCtx.lineWidth = 3; bufferCtx.beginPath(); bufferCtx.ellipse(240, 240, 206, 126, 0, 0, Math.PI * 2); bufferCtx.stroke();
+            bufferCtx.font = 'bold 26px "Courier New", monospace'; bufferCtx.fillText(comp.toUpperCase().substring(0, 24), 240, 170);
+            bufferCtx.font = '20px "Courier New", monospace'; bufferCtx.fillText("APPROVED BY: " + appr.substring(0, 14), 240, 230);
+            bufferCtx.font = 'bold 22px "Courier New", monospace'; bufferCtx.fillText(dateV, 240, 280);
             stampMarker.style.borderRadius = '50%';
-        } 
-        else if (selectedShape === 'rectangular') {
-            bufferCtx.lineWidth = 8;
-            bufferCtx.strokeRect(30, 110, 420, 260);
-            bufferCtx.lineWidth = 3;
-            bufferCtx.strokeRect(42, 122, 396, 236);
-
-            bufferCtx.font = 'bold 28px "Courier New", monospace';
-            bufferCtx.fillText(comp.toUpperCase().substring(0, 26), 240, 180);
-            bufferCtx.font = '22px "Courier New", monospace';
-            bufferCtx.fillText("APPROVED BY: " + appr.substring(0, 16), 240, 240);
-            bufferCtx.font = 'bold 24px "Courier New", monospace';
-            bufferCtx.fillText(dateV, 240, 290);
+        } else if (selectedShape === 'rectangular') {
+            bufferCtx.lineWidth = 8; bufferCtx.strokeRect(30, 110, 420, 260);
+            bufferCtx.lineWidth = 3; bufferCtx.strokeRect(42, 122, 396, 236);
+            bufferCtx.font = 'bold 28px "Courier New", monospace'; bufferCtx.fillText(comp.toUpperCase().substring(0, 26), 240, 180);
+            bufferCtx.font = '22px "Courier New", monospace'; bufferCtx.fillText("APPROVED BY: " + appr.substring(0, 16), 240, 240);
+            bufferCtx.font = 'bold 24px "Courier New", monospace'; bufferCtx.fillText(dateV, 240, 290);
             stampMarker.style.borderRadius = '0px';
-        } 
-        else if (selectedShape === 'square') {
-            bufferCtx.lineWidth = 8;
-            bufferCtx.strokeRect(50, 50, 380, 380);
-            bufferCtx.lineWidth = 3;
-            bufferCtx.strokeRect(62, 62, 356, 356);
-
-            bufferCtx.font = 'bold 26px "Courier New", monospace';
-            bufferCtx.fillText(comp.toUpperCase().substring(0, 22), 240, 140);
-            bufferCtx.font = '22px "Courier New", monospace';
-            bufferCtx.fillText("APPROVED BY:", 240, 210);
-            bufferCtx.font = 'bold 24px "Courier New", monospace';
-            bufferCtx.fillText(appr.substring(0, 18), 240, 260);
-            bufferCtx.font = 'bold 22px "Courier New", monospace';
-            bufferCtx.fillText(dateV, 240, 330);
+        } else if (selectedShape === 'square') {
+            bufferCtx.lineWidth = 8; bufferCtx.strokeRect(50, 50, 380, 380);
+            bufferCtx.lineWidth = 3; bufferCtx.strokeRect(62, 62, 356, 356);
+            bufferCtx.font = 'bold 26px "Courier New", monospace'; bufferCtx.fillText(comp.toUpperCase().substring(0, 22), 240, 140);
+            bufferCtx.font = '22px "Courier New", monospace'; bufferCtx.fillText("APPROVED BY:", 240, 210);
+            bufferCtx.font = 'bold 24px "Courier New", monospace'; bufferCtx.fillText(appr.substring(0, 18), 240, 260);
+            bufferCtx.font = 'bold 22px "Courier New", monospace'; bufferCtx.fillText(dateV, 240, 330);
             stampMarker.style.borderRadius = '8px';
         }
 
-        ctx.drawImage(stampGraphicBufferCanvas, 0, 0);
-        ctx.fillStyle = selectedInkColor;
-        
+        ctx.drawImage(stampGraphicBufferCanvas, 0, 0); ctx.fillStyle = selectedInkColor;
         for (let idx = 0; idx < 1200; idx++) {
-            const randomCoordX = Math.random() * 480;
-            const randomCoordY = Math.random() * 480;
+            const randomCoordX = Math.random() * 480; const randomCoordY = Math.random() * 480;
             if (bufferCtx.getImageData(randomCoordX, randomCoordY, 1, 1).data[3] > 0) {
                 ctx.clearRect(randomCoordX, randomCoordY, Math.random() * 2 + 1, Math.random() * 2 + 1);
             }
         }
         for (let idx = 0; idx < 450; idx++) {
-            const randomSpreadX = Math.random() * 480;
-            const randomSpreadY = Math.random() * 480;
+            const randomSpreadX = Math.random() * 480; const randomSpreadY = Math.random() * 480;
             if (bufferCtx.getImageData(randomSpreadX, randomSpreadY, 1, 1).data[3] === 0) {
-                ctx.globalAlpha = Math.random() * 0.4;
-                ctx.fillRect(randomSpreadX, randomSpreadY, 1.5, 1.5);
+                ctx.globalAlpha = Math.random() * 0.4; ctx.fillRect(randomSpreadX, randomSpreadY, 1.5, 1.5);
             }
         }
-        ctx.globalAlpha = 1.0;
-
-        stampImgDataUrl = canvas.toDataURL('image/png');
-
+        ctx.globalAlpha = 1.0; stampImgDataUrl = canvas.toDataURL('image/png');
         stampMarker.innerHTML = `<img src="${stampImgDataUrl}" style="width:100%; height:100%; pointer-events:none;" />`;
         stampMarker.style.borderColor = selectedInkColor;
 
@@ -817,20 +604,15 @@
     };
 
     document.getElementById('click-overlay-stamp').onclick = (e) => {
-        const rect = document.getElementById('workspace-scaler').getBoundingClientRect();
+        const rect = workspaceScaler.getBoundingClientRect();
         stampPosX = (e.clientX - rect.left) / currentZoomScale; 
         stampPosY = (e.clientY - rect.top) / currentZoomScale;
-        
         stampMarker.style.left = (stampPosX - (stampMarker.clientWidth / 2)) + 'px';
         stampMarker.style.top = (stampPosY - (stampMarker.clientHeight / 2)) + 'px';
         stampMarker.style.display = 'flex';
-        
         isStampPlaced = true;
-        document.getElementById('click-overlay-stamp').style.display = 'none';
-        note.style.display = 'none';
+        document.getElementById('click-overlay-stamp').style.display = 'none'; note.style.display = 'none';
     };
-
-    stampMarker.onmousedown = (e) => { if(e.offsetX < stampMarker.clientWidth - 15 && e.offsetY < stampMarker.clientHeight - 15) isStampDragging = true; };
 
     document.addEventListener('paste', async (e) => {
         const clipboardItems = (e.clipboardData || e.originalEvent.clipboardData).items;
@@ -838,7 +620,6 @@
             if (clipboardItems[i].type.indexOf('image') !== -1) {
                 const capturedImageBlob = clipboardItems[i].getAsFile();
                 await handleIncomingDocumentBufferChannels(capturedImageBlob);
-                
                 const dataTransferInstance = new DataTransfer();
                 dataTransferInstance.items.add(capturedImageBlob);
                 document.getElementById('fileInput').files = dataTransferInstance.files;
@@ -850,17 +631,12 @@
     async function handleIncomingDocumentBufferChannels(fileObj) {
         originalBytes = await fileObj.arrayBuffer();
         const generatedObjectUrl = URL.createObjectURL(new Blob([originalBytes], {type: fileObj.type}));
-        
         if (fileObj.type === "application/pdf") {
-            document.getElementById('image-frame').style.display = 'none';
-            document.getElementById('image-frame').src = "";
-            document.getElementById('pdf-frame').src = generatedObjectUrl;
-            document.getElementById('pdf-frame').style.display = 'block';
+            document.getElementById('image-frame').style.display = 'none'; document.getElementById('image-frame').src = "";
+            document.getElementById('pdf-frame').src = generatedObjectUrl; document.getElementById('pdf-frame').style.display = 'block';
         } else if (fileObj.type.startsWith("image/")) {
-            document.getElementById('pdf-frame').style.display = 'none';
-            document.getElementById('pdf-frame').src = "";
-            document.getElementById('image-frame').src = generatedObjectUrl;
-            document.getElementById('image-frame').style.display = 'block';
+            document.getElementById('pdf-frame').style.display = 'none'; document.getElementById('pdf-frame').src = "";
+            document.getElementById('image-frame').src = generatedObjectUrl; document.getElementById('image-frame').style.display = 'block';
         }
         document.getElementById('downloadBtn').style.display = 'block';
     }
