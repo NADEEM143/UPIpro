@@ -369,7 +369,7 @@
         posX = (e.clientX - rect.left) / currentZoomScale; 
         posY = (e.clientY - rect.top) / currentZoomScale;
         
-        marker.style.left = (posX - 40) + 'px'; marker.style.top = (posY - 40) + 'px';
+        marker.style.left = (posX - 10) + 'px'; marker.style.top = (posY - 10) + 'px';
         marker.style.display = 'flex';
         
         // --- THIS PART INJECTS THE REAL LIVE QR ---
@@ -853,8 +853,8 @@
         stampPosY = (e.clientY - rect.top) / currentZoomScale;
         
         // FIX: Replaced dynamic clientWidth (which is 0 when hidden) with a solid 60px baseline offset to center the stamp on click
-                stampMarker.style.left = (stampPosX - 60) + 'px';
-        stampMarker.style.top = (stampPosY - 60) + 'px';
+                stampMarker.style.left = (stampPosX - 10) + 'px';
+        stampMarker.style.top = (stampPosY - 10) + 'px';
         stampMarker.style.display = 'flex';
         
         isStampPlaced = true;
