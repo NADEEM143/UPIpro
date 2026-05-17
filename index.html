@@ -509,8 +509,8 @@
             const actualWorkspaceHeight = rect.height / currentZoomScale;
 
             // FIX: Subtracts the layout offset matching your visual placement adjustments exactly
-            const finalLeftPos = posX - 40;
-            const finalTopPos = posY - 40;
+            const finalLeftPos = parseFloat(marker.style.left) || posX;
+const finalTopPos = parseFloat(marker.style.top) || posY;
 
             // Lifted size calculations up first
 const finalQrWidth = (marker.clientWidth / actualWorkspaceWidth) * width;
@@ -531,8 +531,8 @@ const pdfY = height - ((finalTopPos / actualWorkspaceHeight) * height) - finalSq
                 const stampImageObject = await pdfDoc.embedPng(stampImgDataUrl);
 
                 // FIX: Subtracts the 60px visual offset to map the stamp exactly where your placeholder box sat
-                const finalStampLeft = stampPosX - 60;
-                const finalStampTop = stampPosY - 60;
+                const finalStampLeft = parseFloat(stampMarker.style.left) || stampPosX;
+const finalStampTop = parseFloat(stampMarker.style.top) || stampPosY;
 
                 // FIXED: Dimensions calculation lifted up FIRST so docStampH is ready and loaded in memory
                 let docStampW = (stampMarker.clientWidth / actualWorkspaceWidth) * width;
@@ -912,8 +912,9 @@ const pdfY = height - ((finalTopPos / actualWorkspaceHeight) * height) - finalSq
                     const qrImage = await pdfDoc.embedPng(qrImgDataUrl);
 
                     // FIXED: Calculates exact DOM left/top styles independently to maintain true visual placement positioning
-                    const markerLeftStyle = parseFloat(marker.style.left) || (posX - 40);
-                    const markerTopStyle = parseFloat(marker.style.top) || (posY - 40);
+                    // FIXED: Reads your exact style snapshots directly without running secondary subtraction calculations
+const markerLeftStyle = parseFloat(marker.style.left) || posX;
+const markerTopStyle = parseFloat(marker.style.top) || posY;
 
                     // Lifted size calculations up first
 const finalQrWidth = (marker.clientWidth / actualWorkspaceWidth) * width;
@@ -937,8 +938,8 @@ const pdfY = height - (markerTopStyle / actualWorkspaceHeight) * height - finalS
                 const stampImageObject = await pdfDoc.embedPng(stampImgDataUrl);
 
                 // FIXED: Calculates exact DOM left/top styles independently to maintain true visual placement positioning
-                const stampLeftStyle = parseFloat(stampMarker.style.left) || (stampPosX - 60);
-                const stampTopStyle = parseFloat(stampMarker.style.top) || (stampPosY - 60);
+                const stampLeftStyle = parseFloat(stampMarker.style.left) || stampPosX;
+const stampTopStyle = parseFloat(stampMarker.style.top) || stampPosY;
 
                 const docStampX = (stampLeftStyle / actualWorkspaceWidth) * width;
                 const docStampY = height - (stampTopStyle / actualWorkspaceHeight) * height - docStampH;
