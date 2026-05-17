@@ -920,106 +920,153 @@
         }
         document.getElementById('downloadBtn').style.display = 'block';
     }
-        // LIVE VIEWPORT PREVIEW MATRIX COMPILATION ENGINE (FIXED ALIGNMENT REFERENCE CRASH)
     document.getElementById('previewBtn').onclick = async () => {
         try {
             if (!originalBytes) return alert("Select or Generate PDF First");
 
             const liveQrContainer = document.getElementById('qr-graphic-target');
-            const pdfDoc = await PDFLib.PDFDocument.load(originalBytes);
-            const pages = pdfDoc.getPages();
-            const firstPage = pages[0]; 
-            const { width, height } = firstPage.getSize();
             const preview = document.getElementById('workspace-scaler');
-            
-            // FIXED: Dynamically references the unscaled loaded content layer instead of volatile viewport bounds
             const pdfFrameNode = document.getElementById('pdf-frame');
             const imgFrameNode = document.getElementById('image-frame');
-            
-            let actualWorkspaceWidth = 1;
-            let actualWorkspaceHeight = 1;
-            
-                        if (pdfFrameNode && pdfFrameNode.style.display === 'block') {
-                actualWorkspaceWidth = pdfFrameNode.offsetWidth;
-                actualWorkspaceHeight = pdfFrameNode.offsetHeight;
-            } else if (imgFrameNode && imgFrameNode.style.display === 'block') {
-                // FIXED: Bypasses volatile element layout box models completely to read pristine file data values
-                actualWorkspaceWidth = imgFrameNode.naturalWidth;
-                actualWorkspaceHeight = imgFrameNode.naturalHeight;
+
+            // 1. CHOOSE THE RIGHT ENGINE PATH: IMAGE OR PDF SUBSTRATE
+            if (imgFrameNode && imgFrameNode.style.display === 'block') {
+                // CORE PATH A: You are working on an uploaded/pasted Image template
+                const canvas = document.createElement('canvas');
+                canvas.width = imgFrameNode.naturalWidth;
+                canvas.height = imgFrameNode.naturalHeight;
+                const ctx = canvas.getContext('2d');
+
+                ctx.drawImage(imgFrameNode, 0, 0);
+
+                const actualWorkspaceWidth = imgFrameNode.naturalWidth;
+                const actualWorkspaceHeight = imgFrameNode.naturalHeight;
+                const scaleFactorX = preview.offsetWidth / actualWorkspaceWidth;
+                const scaleFactorY = preview.offsetHeight / actualWorkspaceHeight;
+
+                if (liveQrContainer && liveQrContainer.style.display === "block") {
+                    const liveCanvasElement = liveQrContainer.querySelector('canvas');
+                    if (liveCanvasElement) {
+                        const markerLeftStyleRaw = isQrLocked ? (posX - 40) : (parseFloat(marker.style.left) || (posX - 40));
+                        const markerTopStyleRaw = isQrLocked ? (posY - 40) : (parseFloat(marker.style.top) || (posY - 40));
+
+                        const imgX = markerLeftStyleRaw / scaleFactorX;
+                        const imgY = markerTopStyleRaw / scaleFactorY;
+                        const imgW = marker.clientWidth / scaleFactorX;
+                        const imgH = marker.clientHeight / scaleFactorY;
+                        const squareSize = Math.max(imgW, imgH);
+
+                        ctx.drawImage(liveCanvasElement, imgX, imgY, squareSize, squareSize);
+                    }
+                }
+
+                if (isStampPlaced && stampImgDataUrl) {
+                    const tempStampImg = new Image();
+                    tempStampImg.src = stampImgDataUrl;
+                    await new Promise(resolve => tempStampImg.onload = resolve);
+
+                    const stampLeftStyleRaw = isStampLocked ? (stampPosX - 60) : (parseFloat(stampMarker.style.left) || (stampPosX - 60));
+                    const stampTopStyleRaw = isStampLocked ? (stampPosY - 60) : (parseFloat(stampMarker.style.top) || (stampPosY - 60));
+
+                    const stampX = stampLeftStyleRaw / scaleFactorX;
+                    const stampY = stampTopStyleRaw / scaleFactorY;
+                    let stampW = stampMarker.clientWidth / scaleFactorX;
+                    let stampH = stampMarker.clientHeight / scaleFactorY;
+
+                    const currentSelectedShapeType = document.getElementById('stampShape').value;
+                    if (currentSelectedShapeType === 'circle' || currentSelectedShapeType === 'square') {
+                        const unifiedSize = Math.max(stampW, stampH);
+                        stampW = unifiedSize;
+                        stampH = unifiedSize;
+                    }
+
+                    ctx.drawImage(tempStampImg, stampX, stampY, stampW, stampH);
+                }
+
+                imgFrameNode.src = canvas.toDataURL ? canvas.toDataURL('image/png') : canvas.toDataURL();
+                
+                marker.style.display = 'none';
+                stampMarker.style.display = 'none';
+
             } else {
+                // CORE PATH B: You are working on a native PDF Document substrate
+                const pdfDoc = await PDFLib.PDFDocument.load(originalBytes);
+                
+                // FIXED: Instantiates pages collection and defines targetExportPage safely before drawing calculations execute
+                const pagesCollection = pdfDoc.getPages();
+                const targetExportPage = pagesCollection[currentActivePageIndex] || pagesCollection[0];
+                
+                const { width, height } = targetExportPage.getSize();
 
-                actualWorkspaceWidth = preview.offsetWidth;
-                actualWorkspaceHeight = preview.offsetHeight;
-            }
+                let actualWorkspaceWidth = pdfFrameNode.offsetWidth || preview.offsetWidth;
+                let actualWorkspaceHeight = pdfFrameNode.offsetHeight || preview.offsetHeight;
 
-            // 1. Process and Embed QR Code if it has been positioned
-            if (liveQrContainer && liveQrContainer.style.display === "block") {
-                const liveCanvasElement = liveQrContainer.querySelector('canvas');
-                if (liveCanvasElement) {
-                    const qrImgDataUrl = liveCanvasElement.toDataURL('image/png');
-                    const qrImage = await pdfDoc.embedPng(qrImgDataUrl);
+                // B2. Embed QR Code onto PDF Target Page
+                if (liveQrContainer && liveQrContainer.style.display === "block") {
+                    const liveCanvasElement = liveQrContainer.querySelector('canvas');
+                    if (liveCanvasElement) {
+                        const qrImgDataUrl = liveCanvasElement.toDataURL('image/png');
+                        const qrImage = await pdfDoc.embedPng(qrImgDataUrl);
 
-                    const markerLeftStyle = isQrLocked ? (posX - 40) : (parseFloat(marker.style.left) || (posX - 40));
-                    const markerTopStyle = isQrLocked ? (posY - 40) : (parseFloat(marker.style.top) || (posY - 40));
+                        const markerLeftStyle = isQrLocked ? (posX - 40) : (parseFloat(marker.style.left) || (posX - 40));
+                        const markerTopStyle = isQrLocked ? (posY - 40) : (parseFloat(marker.style.top) || (posY - 40));
 
-                    const finalQrWidth = (marker.clientWidth / actualWorkspaceWidth) * width;
-                    const finalQrHeight = (marker.clientHeight / actualWorkspaceHeight) * height;
-                    const finalSquareSize = Math.max(finalQrWidth, finalQrHeight);
+                        const finalQrWidth = (marker.clientWidth / actualWorkspaceWidth) * width;
+                        const finalQrHeight = (marker.clientHeight / actualWorkspaceHeight) * height;
+                        const finalSquareSize = Math.max(finalQrWidth, finalQrHeight);
 
-                    const pdfX = (markerLeftStyle / actualWorkspaceWidth) * width;
-                    // FIXED: Pure relative ratio calculation matches your text block borders with perfect accuracy
-                    const pdfY = height - (markerTopStyle / actualWorkspaceHeight) * height - finalSquareSize;
+                        const pdfX = (markerLeftStyle / actualWorkspaceWidth) * width;
+                        const pdfY = height - (markerTopStyle / actualWorkspaceHeight) * height - finalSquareSize;
 
-                    firstPage.drawImage(qrImage, {
-                        x: pdfX,
-                        y: pdfY,
-                        width: finalSquareSize,
-                        height: finalSquareSize
+                        // FIXED: targetExportPage is now fully defined and ready in local memory scope
+                        targetExportPage.drawImage(qrImage, {
+                            x: pdfX,
+                            y: pdfY,
+                            width: finalSquareSize,
+                            height: finalSquareSize
+                        });
+                    }
+                }
+
+                // B3. Embed Digital Stamp onto PDF Target Page
+                if (isStampPlaced && stampImgDataUrl) {
+                    const stampImageObject = await pdfDoc.embedPng(stampImgDataUrl);
+
+                    const stampLeftStyle = isStampLocked ? (stampPosX - 60) : (parseFloat(stampMarker.style.left) || (stampPosX - 60));
+                    const stampTopStyle = isStampLocked ? (stampPosY - 60) : (parseFloat(stampMarker.style.top) || (stampPosY - 60));
+
+                    let docStampW = (stampMarker.clientWidth / actualWorkspaceWidth) * width;
+                    let docStampH = (stampMarker.clientHeight / actualWorkspaceHeight) * height;
+
+                    const currentSelectedShapeType = document.getElementById('stampShape').value;
+                    if (currentSelectedShapeType === 'circle' || currentSelectedShapeType === 'square') {
+                        const unifiedSquareDimensionValue = Math.max(docStampW, docStampH);
+                        docStampW = unifiedSquareDimensionValue;
+                        docStampH = unifiedSquareDimensionValue;
+                    }
+
+                    const docStampX = (stampLeftStyle / actualWorkspaceWidth) * width;
+                    const docStampY = height - (stampTopStyle / actualWorkspaceHeight) * height - docStampH;
+
+                    // FIXED: targetExportPage is now fully defined and ready in local memory scope
+                    targetExportPage.drawImage(stampImageObject, {
+                        x: docStampX,
+                        y: docStampY,
+                        width: docStampW,
+                        height: docStampH
                     });
                 }
+
+                const previewPdfBytes = await pdfDoc.save();
+                const previewBlobUrl = URL.createObjectURL(new Blob([previewPdfBytes], { type: 'application/pdf' }));
+
+                marker.style.display = 'none';
+                stampMarker.style.display = 'none';
+
+                document.getElementById('image-frame').style.display = 'none';
+                pdfFrameNode.src = previewBlobUrl;
+                pdfFrameNode.style.display = 'block';
             }
-            
-            // 2. Process and Embed Digital Stamp if it has been positioned
-            if (isStampPlaced && stampImgDataUrl) {
-                const stampImageObject = await pdfDoc.embedPng(stampImgDataUrl);
-
-                const stampLeftStyle = isStampLocked ? (stampPosX - 60) : (parseFloat(stampMarker.style.left) || (stampPosX - 60));
-                const stampTopStyle = isStampLocked ? (stampPosY - 60) : (parseFloat(stampMarker.style.top) || (stampPosY - 60));
-
-                let docStampW = (stampMarker.clientWidth / actualWorkspaceWidth) * width;
-                let docStampH = (stampMarker.clientHeight / actualWorkspaceHeight) * height;
-                
-                const currentSelectedShapeType = document.getElementById('stampShape').value;
-                if (currentSelectedShapeType === 'circle' || currentSelectedShapeType === 'square') {
-                    const unifiedSquareDimensionValue = Math.max(docStampW, docStampH);
-                    docStampW = unifiedSquareDimensionValue;
-                    docStampH = unifiedSquareDimensionValue;
-                }
-
-                                const docStampX = (stampLeftStyle / actualWorkspaceWidth) * width;
-                // FIXED: Perfectly handles the PDF bottom-left origin calculation to stop upward drift
-                const docStampY = height - (stampTopStyle / actualWorkspaceHeight) * height - docStampH;
-
-                // FIXED: Changed from firstPage to targetExportPage to lock it securely onto the correct page (Page 1, 2, 3, etc.)
-                targetExportPage.drawImage(stampImageObject, {
-                    x: docStampX,
-                    y: docStampY,
-                    width: docStampW,
-                    height: docStampH
-                });
-            }
-
-            // 3. Compile Buffer Array and Force Refresh the Live Viewport Frame
-            const previewPdfBytes = await pdfDoc.save();
-            const previewBlobUrl = URL.createObjectURL(new Blob([previewPdfBytes], { type: 'application/pdf' }));
-            
-            marker.style.display = 'none';
-            stampMarker.style.display = 'none';
-
-            document.getElementById('image-frame').style.display = 'none';
-            const pdfFrameNodePreview = document.getElementById('pdf-frame');
-            pdfFrameNodePreview.src = previewBlobUrl;
-            pdfFrameNodePreview.style.display = 'block';
 
             const toast = document.getElementById('on-screen-note');
             toast.innerText = "👁️ Preview Loaded! Verification Surface Updated.";
