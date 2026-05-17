@@ -785,24 +785,28 @@
         ctx.drawImage(stampGraphicBufferCanvas, 0, 0);
         ctx.fillStyle = selectedInkColor;
         
-        for (let idx = 0; idx < 1200; idx++) {
+                for (let idx = 0; idx < 1200; idx++) {
             const randomCoordX = Math.random() * 480;
             const randomCoordY = Math.random() * 480;
             if (bufferCtx.getImageData(randomCoordX, randomCoordY, 1, 1).data[3] > 0) {
-                ctx.clearRect(randomCoordX, randomCoordY, Math.random() * 2 + 1, Math.random() * 2 + 1);
+                // FIXED: Changed ctx to bufferCtx to properly clear pixel data for the erosion effect
+                bufferCtx.clearRect(randomCoordX, randomCoordY, Math.random() * 2 + 1, Math.random() * 2 + 1);
             }
         }
         for (let idx = 0; idx < 450; idx++) {
             const randomSpreadX = Math.random() * 480;
             const randomSpreadY = Math.random() * 480;
             if (bufferCtx.getImageData(randomSpreadX, randomSpreadY, 1, 1).data[3] === 0) {
-                ctx.globalAlpha = Math.random() * 0.4;
-                ctx.fillRect(randomSpreadX, randomSpreadY, 1.5, 1.5);
+                // FIXED: Changed ctx to bufferCtx to safely render scattered ink noise spray
+                bufferCtx.globalAlpha = Math.random() * 0.4;
+                bufferCtx.fillRect(randomSpreadX, randomSpreadY, 1.5, 1.5);
             }
         }
-        ctx.globalAlpha = 1.0;
+        // FIXED: Safely reset the baseline alpha channel on the active buffer context
+        bufferCtx.globalAlpha = 1.0;
 
-        stampImgDataUrl = canvas.toDataURL('image/png');
+        // FIXED: Swapped canvas to stampGraphicBufferCanvas to extract your valid PNG base64 string
+        stampImgDataUrl = stampGraphicBufferCanvas.toDataURL('image/png');
 
         stampMarker.innerHTML = `<img src="${stampImgDataUrl}" style="width:100%; height:100%; pointer-events:none;" />`;
         stampMarker.style.borderColor = selectedInkColor;
@@ -818,8 +822,9 @@
         stampPosX = (e.clientX - rect.left) / currentZoomScale; 
         stampPosY = (e.clientY - rect.top) / currentZoomScale;
         
-        stampMarker.style.left = (stampPosX - (stampMarker.clientWidth / 2)) + 'px';
-        stampMarker.style.top = (stampPosY - (stampMarker.clientHeight / 2)) + 'px';
+        // FIX: Replaced dynamic clientWidth (which is 0 when hidden) with a solid 60px baseline offset to center the stamp on click
+        stampMarker.style.left = (stampPosX - 60) + 'px';
+        stampMarker.style.top = (stampPosY - 60) + 'px';
         stampMarker.style.display = 'flex';
         
         isStampPlaced = true;
@@ -827,7 +832,15 @@
         note.style.display = 'none';
     };
 
-    stampMarker.onmousedown = (e) => { if(e.offsetX < stampMarker.clientWidth - 15 && e.offsetY < stampMarker.clientHeight - 15) isStampDragging = true; };
+    // FIX: Prevents dragging when locked, tracks correct bounding box offsets, and mirrors the exact working logic of your QR code marker
+    stampMarker.onmousedown = (e) => { 
+        if (isStampLocked) return; 
+        if (e.offsetX < stampMarker.clientWidth - 15 && e.offsetY < stampMarker.clientHeight - 15) {
+            isStampDragging = true; 
+            stampOffsetX = e.clientX - stampMarker.getBoundingClientRect().left;
+            stampOffsetY = e.clientY - stampMarker.getBoundingClientRect().top;
+        }
+    };
 
     document.addEventListener('paste', async (e) => {
         const clipboardItems = (e.clipboardData || e.originalEvent.clipboardData).items;
