@@ -384,13 +384,16 @@
         new QRCode(liveTarget, { text: upi, width: 120, height: 120 });
         // ------------------------------------------
 
-        document.getElementById('click-overlay').style.display = 'none';
+                document.getElementById('click-overlay').style.display = 'none';
         document.getElementById('downloadBtn').style.display = 'block';
         note.style.display = 'none';
     };
 
+    // FIXED: Variables are declared FIRST at the top so the script doesn't crash on refresh
+    const stampMarker = document.getElementById('stamp-marker');
+
     let isDragging = false;
-    let isStampDragging = false; // NEW: Explicit tracking hook for stamp dragging
+    let isStampDragging = false; 
     let offsetX = 0, offsetY = 0;
     let stampOffsetX = 0, stampOffsetY = 0;
     let isQrLocked = false; 
@@ -408,7 +411,7 @@
     stampMarker.onmousedown = (e) => { 
         if (isStampLocked) return; 
         if (e.offsetX < stampMarker.clientWidth - 15 && e.offsetY < stampMarker.clientHeight - 15) {
-            isStampDragging = true; // FIXED: Safely awakens the stamp dragging event chain
+            isStampDragging = true; 
             stampOffsetX = e.clientX - stampMarker.getBoundingClientRect().left;
             stampOffsetY = e.clientY - stampMarker.getBoundingClientRect().top;
         }
@@ -423,16 +426,17 @@
             marker.style.top = posY + 'px';
         }
         if (isStampDragging && !isStampLocked) { 
-            stampPosX = (e.clientX - rect.left - stampOffsetX) / currentZoomScale;
-            stampPosY = (e.clientY - rect.top - stampOffsetY) / currentZoomScale;
-            stampMarker.style.left = stampPosX + 'px';
-            stampMarker.style.top = stampPosY + 'px';
+            // FIXED: Mathematically matches your stamp creation function to stop any jumping or glitching!
+            stampPosX = (e.clientX - rect.left) / currentZoomScale;
+            stampPosY = (e.clientY - rect.top) / currentZoomScale;
+            stampMarker.style.left = (stampPosX - (stampMarker.clientWidth / 2)) + 'px';
+            stampMarker.style.top = (stampPosY - (stampMarker.clientHeight / 2)) + 'px';
         }
     };
 
     window.onmouseup = () => {
         isDragging = false;
-        isStampDragging = false; // FIXED: Safely terminates both drag sequences when mouse is released
+        isStampDragging = false; 
     };
 
     // TWIN LOCK LISTENER FOR BOTH QR CODE AND STAMP LAYOUTS
