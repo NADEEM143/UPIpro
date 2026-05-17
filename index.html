@@ -262,12 +262,26 @@
             </div>
         </div>
         
-        <div class="preview-area" id="dropzone">
-            <div id="workspace-scaler">
+               <div class="preview-area" id="dropzone">
+            <div id="workspace-scaler" style="position: relative;">
+                
+                <!-- 📥 ADDED INITIALIZATION UPLOAD PROMPT PANEL -->
+                <div id="upload-placeholder-prompt" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; font-family: system-ui, -apple-system, sans-serif; padding: 40px; pointer-events: none; user-select: none; position: absolute; z-index: 10;">
+                    <!-- Upload Icon Visual Anchor -->
+                    <div style="width: 70px; height: 70px; background-color: rgba(59, 130, 246, 0.15); border: 2px dashed #3b82f6; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);">
+                        <span style="font-size: 32px;">📥</span>
+                    </div>
+                    <!-- Main Text Message Parameters -->
+                    <h3 style="color: #f8fafc; font-size: 18px; font-weight: 600; margin: 0 0 8px 0; letter-spacing: -0.01em;">Upload your Invoice PDF or Paste Clipboard Screenshot</h3>
+                    <p style="color: #94a3b8; font-size: 13px; max-width: 320px; margin: 0; line-height: 1.5;">Drop a transaction document anywhere over this blank viewport container panel surface area to initialize branding matrices.</p>
+                </div>
+
+                <!-- Substrate view frames remain safe underneath -->
                 <iframe id="pdf-frame"></iframe>
                 <img id="image-frame" alt="Invoice Preview Surface Substrate Layer">
                 <div id="click-overlay"></div>
                 <div id="click-overlay-stamp" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1005; display: none; background: rgba(0,0,0,0.01);"></div>
+                
                 <div id="qr-marker">
                     <div style="font-size:18px;">🎯</div>
                     <span>DRAG & RESIZE</span>
@@ -906,9 +920,13 @@
         }
     });
 
-    async function handleIncomingDocumentBufferChannels(fileObj) {
+        async function handleIncomingDocumentBufferChannels(fileObj) {
         originalBytes = await fileObj.arrayBuffer();
         const generatedObjectUrl = URL.createObjectURL(new Blob([originalBytes], {type: fileObj.type}));
+        
+        // 🌟 FIXED: Hides the visual guide layout prompt instantly upon file buffer initialization
+        const initialPromptNode = document.getElementById('upload-placeholder-prompt');
+        if (initialPromptNode) initialPromptNode.style.display = 'none';
         
         if (fileObj.type === "application/pdf") {
             document.getElementById('image-frame').style.display = 'none';
@@ -921,6 +939,8 @@
             document.getElementById('image-frame').src = generatedObjectUrl;
             document.getElementById('image-frame').style.display = 'block';
         }
+        
+        document.getElementById('previewBtn').style.display = 'block';
         document.getElementById('downloadBtn').style.display = 'block';
     }
         // LIVE VIEWPORT PREVIEW MATRIX COMPILATION ENGINE
