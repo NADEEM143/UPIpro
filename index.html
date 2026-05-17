@@ -546,7 +546,7 @@
 
                         const pdfX = (finalLeftPos / actualWorkspaceWidth) * width;
             // FIXED: Pure relative ratio calculation matches your text block borders with perfect accuracy
-            const pdfY = height - (finalTopPos / actualWorkspaceHeight) * height;
+            const pdfY = height - (finalTopPos / actualWorkspaceHeight) * height - finalSquareSize;
 
             // FIXED: Draws your QR code safely on your dynamic multi-page variable target
             targetExportPage.drawImage(qrImage, {
@@ -968,7 +968,7 @@
 
                     const pdfX = (markerLeftStyle / actualWorkspaceWidth) * width;
                     // FIXED: Pure relative ratio calculation matches your text block borders with perfect accuracy
-                    const pdfY = height - (markerTopStyle / actualWorkspaceHeight) * height;
+                    const pdfY = height - (markerTopStyle / actualWorkspaceHeight) * height - finalSquareSize;
 
                     firstPage.drawImage(qrImage, {
                         x: pdfX,
@@ -996,10 +996,12 @@
                     docStampH = unifiedSquareDimensionValue;
                 }
 
-                const docStampX = (stampLeftStyle / actualWorkspaceWidth) * width;
-                const docStampY = height - ((stampTopStyle / actualWorkspaceHeight) * height) - docStampH;
+                                const docStampX = (stampLeftStyle / actualWorkspaceWidth) * width;
+                // FIXED: Perfectly handles the PDF bottom-left origin calculation to stop upward drift
+                const docStampY = height - (stampTopStyle / actualWorkspaceHeight) * height - docStampH;
 
-                firstPage.drawImage(stampImageObject, {
+                // FIXED: Changed from firstPage to targetExportPage to lock it securely onto the correct page (Page 1, 2, 3, etc.)
+                targetExportPage.drawImage(stampImageObject, {
                     x: docStampX,
                     y: docStampY,
                     width: docStampW,
