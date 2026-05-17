@@ -520,9 +520,9 @@ const finalSquareSize = Math.max(finalQrWidth, finalQrHeight);
 const pdfX = (finalLeftPos / actualWorkspaceWidth) * width;
 const pdfY = height - ((finalTopPos / actualWorkspaceHeight) * height) - finalSquareSize; // 👍 Now it works perfectly!
 
-            firstPage.drawImage(qrImage, {
+                        firstPage.drawImage(qrImage, {
                 x: pdfX,
-                y: pdfY - finalSquareSize,
+                y: pdfY,
                 width: finalSquareSize,
                 height: finalSquareSize
             });
@@ -534,10 +534,7 @@ const pdfY = height - ((finalTopPos / actualWorkspaceHeight) * height) - finalSq
                 const finalStampLeft = stampPosX - 60;
                 const finalStampTop = stampPosY - 60;
 
-                const docStampX = (finalStampLeft / actualWorkspaceWidth) * width;
-                const docStampY = height - ((finalStampTop / actualWorkspaceHeight) * height) - docStampH;
-                
-                // FIX: Enforces a strict square dimensional override if a circular option is chosen to prevent stretching
+                // FIXED: Dimensions calculation lifted up FIRST so docStampH is ready and loaded in memory
                 let docStampW = (stampMarker.clientWidth / actualWorkspaceWidth) * width;
                 let docStampH = (stampMarker.clientHeight / actualWorkspaceHeight) * height;
                 
@@ -548,9 +545,13 @@ const pdfY = height - ((finalTopPos / actualWorkspaceHeight) * height) - finalSq
                     docStampH = unifiedSquareDimensionValue;
                 }
 
+                const docStampX = (finalStampLeft / actualWorkspaceWidth) * width;
+                // FIXED: Successfully references docStampH without crashing the main script execution thread
+                const docStampY = height - ((finalStampTop / actualWorkspaceHeight) * height) - docStampH;
+
                 firstPage.drawImage(stampImageObject, {
                     x: docStampX,
-                    y: docStampY - docStampH,
+                    y: docStampY, // FIXED: Direct clean positioning coordinate injection mapping
                     width: docStampW,
                     height: docStampH
                 });
