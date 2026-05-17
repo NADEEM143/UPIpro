@@ -471,7 +471,7 @@
         }
     });
 
-        // DRIFT-FREE MULTI-ELEMENT DOWNLOAD EXPORT MATRIX ENGINE
+            // DRIFT-FREE MULTI-ELEMENT DOWNLOAD EXPORT MATRIX ENGINE (FIXED POSITIONS & SHAPES)
     document.getElementById('downloadBtn').onclick = async () => {
         try {
             const name = document.getElementById('payeeName').value;
@@ -493,18 +493,16 @@
             const { width, height } = firstPage.getSize();
             const preview = document.getElementById('workspace-scaler');
             
-            // FIXED: Uses normalized parent boundaries to anchor layout coordinate ratios
             const actualWorkspaceWidth = preview.offsetWidth;
             const actualWorkspaceHeight = preview.offsetHeight;
 
-            // FIXED: Leverages unscaled coordinate positions directly from your active tracking state variables
-            const finalLeftPos = posX;
-            const finalTopPos = posY;
+            // FIX: Subtracts the 40px layout offset to perfectly match your visual cursor placement choice
+            const finalLeftPos = posX - 40;
+            const finalTopPos = posY - 40;
 
             const pdfX = (finalLeftPos / actualWorkspaceWidth) * width;
             const pdfY = height - ((finalTopPos / actualWorkspaceHeight) * height);
             
-            // FIXED: Normalized size math prevents the QR code from shrinking or expanding based on zoom states
             const finalQrWidth = (marker.clientWidth / actualWorkspaceWidth) * width;
             const finalQrHeight = (marker.clientHeight / actualWorkspaceHeight) * height;
             const finalSquareSize = Math.max(finalQrWidth, finalQrHeight);
@@ -519,12 +517,24 @@
             if (isStampPlaced && stampImgDataUrl) {
                 const stampImageObject = await pdfDoc.embedPng(stampImgDataUrl);
 
-                // FIXED: Direct variable injection maps the digital stamp securely to the layout frame
-                const docStampX = (stampPosX / actualWorkspaceWidth) * width;
-                const docStampY = height - ((stampPosY / actualWorkspaceHeight) * height);
-                const docStampW = (stampMarker.clientWidth / actualWorkspaceWidth) * width;
-                const docStampH = (stampMarker.clientHeight / actualWorkspaceHeight) * height;
+                // FIX: Subtracts the 60px visual offset to map the stamp exactly where your placeholder box sat
+                const finalStampLeft = stampPosX - 60;
+                const finalStampTop = stampPosY - 60;
+
+                const docStampX = (finalStampLeft / actualWorkspaceWidth) * width;
+                const docStampY = height - ((finalStampTop / actualWorkspaceHeight) * height);
                 
+                // FIX: Enforces a strict square dimensional override if a circular option is chosen to prevent stretching
+                let docStampW = (stampMarker.clientWidth / actualWorkspaceWidth) * width;
+                let docStampH = (stampMarker.clientHeight / actualWorkspaceHeight) * height;
+                
+                const currentSelectedShapeType = document.getElementById('stampShape').value;
+                if (currentSelectedShapeType === 'circle' || currentSelectedShapeType === 'square') {
+                    const unifiedSquareDimensionValue = Math.max(docStampW, docStampH);
+                    docStampW = unifiedSquareDimensionValue;
+                    docStampH = unifiedSquareDimensionValue;
+                }
+
                 firstPage.drawImage(stampImageObject, {
                     x: docStampX,
                     y: docStampY - docStampH,
