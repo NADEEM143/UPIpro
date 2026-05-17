@@ -488,7 +488,7 @@
         }
     });
    
-    document.getElementById('downloadBtn').onclick = async () => {
+        document.getElementById('downloadBtn').onclick = async () => {
         try {
             const name = document.getElementById('payeeName').value;
             const vpa = document.getElementById('vpa').value;
@@ -503,10 +503,15 @@
             
             const qrImgDataUrl = liveCanvasElement.toDataURL('image/png');
             const pdfDoc = await PDFLib.PDFDocument.load(originalBytes);
-            const firstPage = pdfDoc.getPages()[0];
+            
+            // FIXED: Safe dynamic multi-page tracking references
+            const pagesCollection = pdfDoc.getPages();
+            const targetExportPage = pagesCollection[currentActivePageIndex] || pagesCollection[0];
+
             const qrImage = await pdfDoc.embedPng(qrImgDataUrl);
             
-            const { width, height } = firstPage.getSize();
+            // FIXED: Correctly gets the dimensions of the active target page without crashing
+            const { width, height } = targetExportPage.getSize();
             const preview = document.getElementById('workspace-scaler');
             
             // FIXED: Dynamically references the unscaled loaded content layer instead of volatile viewport bounds
@@ -539,18 +544,19 @@
             const finalQrHeight = (marker.clientHeight / actualWorkspaceHeight) * height;
             const finalSquareSize = Math.max(finalQrWidth, finalQrHeight);
 
-            const pdfX = (finalLeftPos / actualWorkspaceWidth) * width;
+                        const pdfX = (finalLeftPos / actualWorkspaceWidth) * width;
             // FIXED: Pure relative ratio calculation matches your text block borders with perfect accuracy
             const pdfY = height - (finalTopPos / actualWorkspaceHeight) * height;
 
-            firstPage.drawImage(qrImage, {
+            // FIXED: Draws your QR code safely on your dynamic multi-page variable target
+            targetExportPage.drawImage(qrImage, {
                 x: pdfX,
                 y: pdfY,
                 width: finalSquareSize,
                 height: finalSquareSize
             });
             
-            // FIXED: Closed out your dynamic stamp processing loops safely inside the same structural closure block
+            // FIXED: Correctly separates the stamp conditional layer outside the QR drawing engine parameters
             if (isStampPlaced && stampImgDataUrl) {
                 const stampImageObject = await pdfDoc.embedPng(stampImgDataUrl);
 
@@ -570,7 +576,8 @@
                 const docStampX = (finalStampLeft / actualWorkspaceWidth) * width;
                 const docStampY = height - ((finalStampTop / actualWorkspaceHeight) * height) - docStampH;
                 
-                firstPage.drawImage(stampImageObject, {
+                // FIXED: Draws your Digital Stamp safely on the matching dynamic multi-page variable target
+                targetExportPage.drawImage(stampImageObject, {
                     x: docStampX,
                     y: docStampY,
                     width: docStampW,
