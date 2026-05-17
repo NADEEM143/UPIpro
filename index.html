@@ -482,8 +482,7 @@
         }
     });
 
-    // DRIFT-FREE MULTI-ELEMENT DOWNLOAD EXPORT MATRIX ENGINE (FIXED POSITIONS & SHAPES)
-        // DRIFT-FREE MULTI-ELEMENT DOWNLOAD EXPORT MATRIX ENGINE (FIXED RESIZING SHIFT)
+   
     document.getElementById('downloadBtn').onclick = async () => {
         try {
             const name = document.getElementById('payeeName').value;
@@ -516,17 +515,20 @@
                 actualWorkspaceWidth = pdfFrameNode.offsetWidth;
                 actualWorkspaceHeight = pdfFrameNode.offsetHeight;
             } else if (imgFrameNode && imgFrameNode.style.display === 'block') {
-                // For uploaded or clipboard-pasted JPEG frames like your Policybazaar capture
-                actualWorkspaceWidth = imgFrameNode.naturalWidth || imgFrameNode.offsetWidth;
-                actualWorkspaceHeight = imgFrameNode.naturalHeight || imgFrameNode.offsetHeight;
+                // FIXED: Bypasses volatile element layout box models completely to read pristine file data values
+                actualWorkspaceWidth = imgFrameNode.naturalWidth;
+                actualWorkspaceHeight = imgFrameNode.naturalHeight;
             } else {
                 actualWorkspaceWidth = preview.offsetWidth;
                 actualWorkspaceHeight = preview.offsetHeight;
             }
 
-            // Automatically checks if locked and safely offsets matching visual layout positions
-            const finalLeftPos = isQrLocked ? (posX - 40) : (parseFloat(marker.style.left) || (posX - 40));
-            const finalTopPos = isQrLocked ? (posY - 40) : (parseFloat(marker.style.top) || (posY - 40));
+            // FIXED: Automatically checks if locked and normalizes screen clicks into true raw image pixel resolution vectors
+            const currentResponsiveLayoutScaleFactorX = imgFrameNode.offsetWidth / actualWorkspaceWidth;
+            const currentResponsiveLayoutScaleFactorY = imgFrameNode.offsetHeight / actualWorkspaceHeight;
+
+            const finalLeftPos = (isQrLocked ? (posX - 40) : (parseFloat(marker.style.left) || (posX - 40))) / currentResponsiveLayoutScaleFactorX;
+            const finalTopPos = (isQrLocked ? (posY - 40) : (parseFloat(marker.style.top) || (posY - 40))) / currentResponsiveLayoutScaleFactorY;
 
             const finalQrWidth = (marker.clientWidth / actualWorkspaceWidth) * width;
             const finalQrHeight = (marker.clientHeight / actualWorkspaceHeight) * height;
@@ -547,8 +549,8 @@
             if (isStampPlaced && stampImgDataUrl) {
                 const stampImageObject = await pdfDoc.embedPng(stampImgDataUrl);
 
-                const finalStampLeft = isStampLocked ? (stampPosX - 60) : (parseFloat(stampMarker.style.left) || (stampPosX - 60));
-                const finalStampTop = isStampLocked ? (stampPosY - 60) : (parseFloat(stampMarker.style.top) || (stampPosY - 60));
+                const finalStampLeft = (isStampLocked ? (stampPosX - 60) : (parseFloat(stampMarker.style.left) || (stampPosX - 60))) / currentResponsiveLayoutScaleFactorX;
+                const finalStampTop = (isStampLocked ? (stampPosY - 60) : (parseFloat(stampMarker.style.top) || (stampPosY - 60))) / currentResponsiveLayoutScaleFactorY;
 
                 let docStampW = (stampMarker.clientWidth / actualWorkspaceWidth) * width;
                 let docStampH = (stampMarker.clientHeight / actualWorkspaceHeight) * height;
@@ -925,14 +927,15 @@
             let actualWorkspaceWidth = 1;
             let actualWorkspaceHeight = 1;
             
-            if (pdfFrameNode && pdfFrameNode.style.display === 'block') {
+                        if (pdfFrameNode && pdfFrameNode.style.display === 'block') {
                 actualWorkspaceWidth = pdfFrameNode.offsetWidth;
                 actualWorkspaceHeight = pdfFrameNode.offsetHeight;
             } else if (imgFrameNode && imgFrameNode.style.display === 'block') {
-                // For uploaded or clipboard-pasted JPEG frames like your Policybazaar capture
-                actualWorkspaceWidth = imgFrameNode.naturalWidth || imgFrameNode.offsetWidth;
-                actualWorkspaceHeight = imgFrameNode.naturalHeight || imgFrameNode.offsetHeight;
+                // FIXED: Bypasses volatile element layout box models completely to read pristine file data values
+                actualWorkspaceWidth = imgFrameNode.naturalWidth;
+                actualWorkspaceHeight = imgFrameNode.naturalHeight;
             } else {
+
                 actualWorkspaceWidth = preview.offsetWidth;
                 actualWorkspaceHeight = preview.offsetHeight;
             }
