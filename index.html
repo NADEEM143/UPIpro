@@ -158,7 +158,7 @@
         .btn-red:hover { background: #b91c1c; }
         
         /* MODIFIED: ADAPTED STAMP MARKER SYSTEM SUPPORTING EXPANSIVE TRANSFORM OVERLAYS EXTREMITIES LIKE THE QR DECORATOR */
-        #stamp-marker {
+                #stamp-marker {
             position: absolute; width: 120px; height: 120px; border: 2px dashed #dc2626; display: none;
             align-items: center; justify-content: center; z-index: 2005; cursor: move;
             background: rgba(220, 38, 38, 0.02); mix-blend-mode: multiply; filter: drop-shadow(0.5px 0.5px 0.5px rgba(0,0,0,0.15));
@@ -177,6 +177,47 @@
         }
         .zoom-btn:hover { background: #475569; }
         .zoom-display { color: white; font-size: 11px; font-weight: 600; align-self: center; padding: 0 6px; min-width: 42px; text-align: center; }
+
+        /* ELITE PREMIUM RESPONSIVE WORKSPACE MEDIA QUERY LAYOUT MATRIX */
+        @media (max-width: 1024px) {
+            /* Transitions sidebar layout flow onto a unified top-to-bottom stack */
+            body {
+                flex-direction: column !important;
+                overflow-y: auto !important;
+                height: auto !important;
+                padding: 12px !important;
+            }
+
+            /* Compresses your control form area panels into a matching layout row format */
+            .sidebar-panel-container, 
+            #settingsPanel,
+            div[style*="width: 30%"], 
+            div[style*="width: 25%"] {
+                width: 100% !important;
+                max-width: 100% !important;
+                margin-bottom: 16px !important;
+                box-sizing: border-box !important;
+            }
+
+            /* Prevents the preview workspace from collapsing or breaking on narrow screens */
+            #dropzone,
+            #workspace-scaler,
+            div[style*="width: 70%"],
+            div[style*="width: 75%"] {
+                width: 100% !important;
+                height: 500px !important; /* Locks stable depth constraints for mobile screens */
+                box-sizing: border-box !important;
+            }
+
+            /* Scales typography sizes dynamically to preserve premium readability */
+            #upload-placeholder-prompt h3 {
+                font-size: 16px !important;
+            }
+            #upload-placeholder-prompt p {
+                font-size: 12px !important;
+                max-width: 280px !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -430,12 +471,15 @@
 
     // Dragging/Resize Mechanics
     // PERFECTED DRIFT-FREE DRAGGING MECHANICS WITH TWIN ENTER-LOCKS
-    let isDragging = false;
+        let isDragging = false;
     let offsetX = 0, offsetY = 0;
     let stampOffsetX = 0, stampOffsetY = 0;
     let isQrLocked = false; 
     let isStampLocked = false; 
 
+    // ==========================================
+    // DESKTOP MOUSE DRAGGING ENGINE LOGIC PATHS
+    // ==========================================
     marker.onmousedown = (e) => { 
         if (isQrLocked) return; 
         if (e.offsetX < marker.clientWidth - 15 && e.offsetY < marker.clientHeight - 15) {
@@ -463,7 +507,6 @@
             marker.style.top = posY + 'px';
         }
         if (isStampDragging && !isStampLocked) { 
-            // FIXED: Wrapped positions in extra parentheses before scaling to prevent movement drift completely
             stampPosX = ((e.clientX - rect.left) - stampOffsetX) / currentZoomScale;
             stampPosY = ((e.clientY - rect.top) - stampOffsetY) / currentZoomScale;
             stampMarker.style.left = stampPosX + 'px';
@@ -475,6 +518,55 @@
         isDragging = false;
         isStampDragging = false;
     };
+
+    // ==========================================
+    // MOBILE TOUCH DRAGGING ENGINE LOGIC PATHS
+    // ==========================================
+    marker.ontouchstart = (e) => {
+        if (isQrLocked) return;
+        isDragging = true;
+        const touch = e.touches[0] || e.changedTouches[0];
+        if (!touch) return;
+        const rect = marker.getBoundingClientRect();
+        offsetX = touch.clientX - rect.left;
+        offsetY = touch.clientY - rect.top;
+    };
+
+    stampMarker.ontouchstart = (e) => {
+        if (isStampLocked) return;
+        isStampDragging = true; 
+        const touch = e.touches[0] || e.changedTouches[0];
+        if (!touch) return;
+        const rect = stampMarker.getBoundingClientRect();
+        stampOffsetX = touch.clientX - rect.left;
+        stampOffsetY = touch.clientY - rect.top;
+    };
+
+    window.addEventListener('touchmove', (e) => {
+        if (!isDragging && !isStampDragging) return;
+        const touch = e.touches[0] || e.changedTouches[0];
+        if (!touch) return;
+        const rect = document.getElementById('workspace-scaler').getBoundingClientRect();
+        
+        if (marker.style.display === 'flex' && !isQrLocked && isDragging) {
+            posX = ((touch.clientX - rect.left) - offsetX) / currentZoomScale;
+            posY = ((touch.clientY - rect.top) - offsetY) / currentZoomScale;
+            marker.style.left = posX + 'px';
+            marker.style.top = posY + 'px';
+        }
+        
+        if (stampMarker.style.display === 'flex' && !isStampLocked && isStampDragging) {
+            stampPosX = ((touch.clientX - rect.left) - stampOffsetX) / currentZoomScale;
+            stampPosY = ((touch.clientY - rect.top) - stampOffsetY) / currentZoomScale;
+            stampMarker.style.left = stampPosX + 'px';
+            stampMarker.style.top = stampPosY + 'px';
+        }
+    }, { passive: false }); 
+
+    window.addEventListener('touchend', () => {
+        isDragging = false;
+        isStampDragging = false;
+    });
 
     // TWIN LOCK LISTENER FOR BOTH QR CODE AND STAMP LAYOUTS
     window.addEventListener('keydown', (e) => {
