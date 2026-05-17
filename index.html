@@ -268,15 +268,20 @@
     <!-- 🏢 BUSINESS DETAILS INTERFACE CHANNEL SECTION (PLACED SAFELY INSIDE THE PANEL CONTAINER CLOSURE) -->
     <div class="settings-option-item" id="businessDetailsOptionMenu" style="margin-top: 10px;">🏢 Business Details Option</div>
 
-    <div class="stamp-form" id="businessFormArea">
-        <div class="input-group"><label>Business Name</label><input type="text" id="bizName" placeholder="e.g., HARIOM SALES"></div>
-        <div class="input-group"><label>Proprietor Name</label><input type="text" id="bizProprietor" placeholder="e.g., Hariom Tejwani"></div>
-        <div class="input-group"><label>Mobile 1</label><input type="text" id="bizMob1" placeholder="1234567890"></div>
-        <div class="input-group"><label>Mobile 2</label><input type="text" id="bizMob2" placeholder="1234567890"></div>
-        <div class="input-group"><label>Email ID</label><input type="text" id="bizEmail" placeholder="info@biz.com"></div>
-        <div class="input-group"><label>GST Number</label><input type="text" id="bizGst" placeholder="22AFYPTxxxxxxxx"></div>
-        <div class="input-group"><label>Business Address</label><input type="text" id="bizAddress" placeholder="Ward No. 50, Sindai Bajar Chowk..."></div>
-    </div>
+    <!-- Locate this container panel in your HTML layout block -->
+<div class="stamp-form" id="businessFormArea">
+    <div class="input-group"><label>Business Name</label><input type="text" id="bizName" placeholder="e.g., HARIOM SALES"></div>
+    <div class="input-group"><label>Proprietor Name</label><input type="text" id="bizProprietor" placeholder="e.g., Hariom Tejwani"></div>
+    <div class="input-group"><label>Mobile 1</label><input type="text" id="bizMob1" placeholder="1234567890"></div>
+    <div class="input-group"><label>Mobile 2</label><input type="text" id="bizMob2" placeholder="1234567890"></div>
+    <div class="input-group"><label>Email ID</label><input type="text" id="bizEmail" placeholder="info@biz.com"></div>
+    <div class="input-group"><label>GST Number</label><input type="text" id="bizGst" placeholder="22AFYPTxxxxxxxx"></div>
+    <div class="input-group"><label>Business Address</label><input type="text" id="bizAddress" placeholder="Ward No. 50, Sindai Bajar Chowk..."></div>
+    
+    <!-- 📅 ADD THIS NEW CUSTOM INPUT LAYER HERE -->
+    <div class="input-group"><label>Invoice Date</label><input type="text" id="bizDate" placeholder="e.g., 17/05/2026 or leave blank"></div>
+</div>
+
 </div> <!-- SECURE PANEL CLOSING BOUNDARY TAG -->
     
 <div class="container">
@@ -404,7 +409,7 @@
     const zoomValueLabel = document.getElementById('zoomValueLabel');
 
         window.onload = () => {
-        ['payeeName', 'vpa', 'amount', 'stampCompany', 'stampApprover', 'stampDate', 'stampColor', 'stampShape', 'bizName', 'bizProprietor', 'bizMob1', 'bizMob2', 'bizEmail', 'bizGst', 'bizAddress'].forEach(id => {
+    ['payeeName', 'vpa', 'amount', 'stampCompany', 'stampApprover', 'stampDate', 'stampColor', 'stampShape', 'bizName', 'bizProprietor', 'bizMob1', 'bizMob2', 'bizEmail', 'bizGst', 'bizAddress', 'bizDate'].forEach(id => {
             const targetInputElement = document.getElementById(id);
             if (!targetInputElement) return;
             
@@ -816,7 +821,7 @@
         document.getElementById('charCounter').innerText = "0/35";
     };
 
-            document.getElementById('makePdfBtn').onclick = async () => {
+                document.getElementById('makePdfBtn').onclick = async () => {
         if (productsList.length === 0) {
             const nameField = document.getElementById('prodName').value.trim();
             const priceField = parseFloat(document.getElementById('prodPrice').value || 0);
@@ -836,6 +841,10 @@
             const targetPage = docInstance.addPage([595.28, 841.89]);
             const { width, height } = targetPage.getSize();
             
+            // Core standard font assets extraction
+            const boldFontProfile = await docInstance.embedFont(PDFLib.StandardFonts.HelveticaBold);
+            const regularFontProfile = await docInstance.embedFont(PDFLib.StandardFonts.Helvetica);
+            
             // --- 🏢 BUSINESS HEADER DATA EXTRACTION LOGIC ---
             const bName = document.getElementById('bizName').value.toUpperCase() || "BUSINESS NAME";
             const bProp = document.getElementById('bizProprietor').value || "";
@@ -844,32 +853,46 @@
             const bEmail = document.getElementById('bizEmail').value || "";
             const bGst = document.getElementById('bizGst').value || "";
             const bAddr = document.getElementById('bizAddress').value || "";
+            const bDateValue = document.getElementById('bizDate').value.trim() || "__/__/20__";
 
             let verticalPointerY = height - 50;
 
-            // Top Header Left & Right Elements
-            if(bGst) targetPage.drawText(`GSTIN: ${bGst}`, { x: 50, y: verticalPointerY, size: 10 });
-            if(bProp) targetPage.drawText(bProp, { x: width - 180, y: verticalPointerY, size: 11 });
+            // Top Header Left (GST) & Right (Proprietor Profile)
+            if(bGst) {
+                targetPage.drawText(`GSTIN: ${bGst}`, { x: 40, y: verticalPointerY, size: 11, font: boldFontProfile });
+            }
+            if(bProp) {
+                targetPage.drawText(bProp, { x: width - 180, y: verticalPointerY, size: 12, font: boldFontProfile });
+            }
             
             verticalPointerY -= 15;
-            if(bMob1) targetPage.drawText(`Mo. ${bMob1}`, { x: width - 180, y: verticalPointerY, size: 10 });
+            if(bMob1) {
+                targetPage.drawText(`Mo. ${bMob1}`, { x: width - 180, y: verticalPointerY, size: 10, font: boldFontProfile });
+            }
             
             verticalPointerY -= 12;
-            if(bMob2) targetPage.drawText(bMob2, { x: width - 159, y: verticalPointerY, size: 10 });
-            if(bEmail) targetPage.drawText(bEmail, { x: width - 180, y: verticalPointerY - 12, size: 9 });
+            if(bMob2) {
+                targetPage.drawText(bMob2, { x: width - 159, y: verticalPointerY, size: 10, font: boldFontProfile });
+            }
+            if(bEmail) {
+                targetPage.drawText(bEmail, { x: width - 180, y: verticalPointerY - 12, size: 9, font: regularFontProfile });
+            }
 
-            // Big Bold Center Business Brand Title Accent
-            targetPage.drawText(bName, { x: 50, y: height - 90, size: 24 });
+            // 🌟 ULTRA-BIG BOLD BRAND TITLE ACCENT (HARIOM SALES LOOKALIKE)
+            targetPage.drawText(bName, { x: 40, y: height - 100, size: 32, font: boldFontProfile });
             
             // Address & Date Layout Rows
-            verticalPointerY = height - 110;
-            if(bAddr) targetPage.drawText(bAddr, { x: 50, y: verticalPointerY, size: 10 });
+            verticalPointerY = height - 125;
+            if(bAddr) {
+                targetPage.drawText(bAddr, { x: 40, y: verticalPointerY, size: 11, font: boldFontProfile });
+            }
             
-            targetPage.drawText(`Date:     /    /20   `, { x: width - 140, y: verticalPointerY, size: 10 });
+            // Renders your dynamic customized input string value safely over the layout marker
+            targetPage.drawText(`Date: ${bDateValue}`, { x: width - 140, y: verticalPointerY, size: 11, font: boldFontProfile });
 
             // Horizontal Line Break Separation Ruler
-            verticalPointerY -= 10;
-            targetPage.drawLine({ start: { x: 40, y: verticalPointerY }, end: { x: width - 40, y: verticalPointerY }, strokeWidth: 1.5 });
+            verticalPointerY -= 12;
+            targetPage.drawLine({ start: { x: 40, y: verticalPointerY }, end: { x: width - 40, y: verticalPointerY }, strokeWidth: 2 });
 
             // Clear baseline tracking pointer to leave room for the header area bounding box
             verticalPointerY -= 40; 
@@ -883,13 +906,14 @@
                 targetPage.drawText(`${idx + 1}. ${product.name} - ${product.qty} pcs @ INR ${product.price.toFixed(2)} = INR ${rowCost.toFixed(2)}`, {
                     x: 50,
                     y: verticalPointerY,
-                    size: 12
+                    size: 12,
+                    font: regularFontProfile
                 });
                 verticalPointerY -= 25;
             });
 
             verticalPointerY -= 15;
-            targetPage.drawText("Grand Total Amount Due: INR " + totalAggregatedBill.toFixed(2), { x: 50, y: verticalPointerY, size: 15 });
+            targetPage.drawText("Grand Total Amount Due: INR " + totalAggregatedBill.toFixed(2), { x: 50, y: verticalPointerY, size: 15, font: boldFontProfile });
 
             const amountInput = document.getElementById('amount');
             amountInput.value = totalAggregatedBill.toFixed(2);
@@ -897,7 +921,6 @@
 
             originalBytes = await docInstance.save();
 
-            // 🌟 FIXED: Hides the visual guide layout prompt overlay instantly upon file creation
             const initialPromptNode = document.getElementById('upload-placeholder-prompt');
             if (initialPromptNode) initialPromptNode.style.display = 'none';
 
@@ -905,7 +928,6 @@
             document.getElementById('pdf-frame').src = URL.createObjectURL(new Blob([originalBytes], {type: 'application/pdf'}));
             document.getElementById('pdf-frame').style.display = 'block';
 
-            // Exposes matching action buttons automatically
             document.getElementById('previewBtn').style.display = 'block';
             document.getElementById('downloadBtn').style.display = 'block';
             
