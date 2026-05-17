@@ -471,7 +471,7 @@
         }
     });
 
-            // DRIFT-FREE MULTI-ELEMENT DOWNLOAD EXPORT MATRIX ENGINE (FIXED POSITIONS & SHAPES)
+                // DRIFT-FREE MULTI-ELEMENT DOWNLOAD EXPORT MATRIX ENGINE (FIXED POSITIONS & SHAPES)
     document.getElementById('downloadBtn').onclick = async () => {
         try {
             const name = document.getElementById('payeeName').value;
@@ -493,10 +493,12 @@
             const { width, height } = firstPage.getSize();
             const preview = document.getElementById('workspace-scaler');
             
-            const actualWorkspaceWidth = preview.offsetWidth;
-            const actualWorkspaceHeight = preview.offsetHeight;
+            // FIX: Uses strict browser bounding dimensions normalized against the active zoom matrix scale factor
+            const rect = preview.getBoundingClientRect();
+            const actualWorkspaceWidth = rect.width / currentZoomScale;
+            const actualWorkspaceHeight = rect.height / currentZoomScale;
 
-            // FIX: Subtracts the 40px layout offset to perfectly match your visual cursor placement choice
+            // FIX: Subtracts the layout offset matching your visual placement adjustments exactly
             const finalLeftPos = posX - 40;
             const finalTopPos = posY - 40;
 
