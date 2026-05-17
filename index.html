@@ -471,7 +471,7 @@
         }
     });
 
-    // DRIFT-FREE MULTI-ELEMENT DOWNLOAD EXPORT MATRIX ENGINE
+        // DRIFT-FREE MULTI-ELEMENT DOWNLOAD EXPORT MATRIX ENGINE
     document.getElementById('downloadBtn').onclick = async () => {
         try {
             const name = document.getElementById('payeeName').value;
@@ -493,28 +493,20 @@
             const { width, height } = firstPage.getSize();
             const preview = document.getElementById('workspace-scaler');
             
-            const pdfFrameNode = document.getElementById('pdf-frame');
-            const imgFrameNode = document.getElementById('image-frame');
-            
-            let sourceRenderWidth = preview.offsetWidth;
-            let sourceRenderHeight = preview.offsetHeight;
-            
-            if (pdfFrameNode && pdfFrameNode.style.display === 'block') {
-                sourceRenderWidth = pdfFrameNode.offsetWidth;
-                sourceRenderHeight = pdfFrameNode.offsetHeight;
-            } else if (imgFrameNode && imgFrameNode.style.display === 'block') {
-                sourceRenderWidth = imgFrameNode.offsetWidth;
-                sourceRenderHeight = imgFrameNode.offsetHeight;
-            }
-            
-            const finalLeftPos = isQrLocked ? posX : parseFloat(marker.style.left || posX);
-            const finalTopPos = isQrLocked ? posY : parseFloat(marker.style.top || posY);
+            // FIXED: Uses normalized parent boundaries to anchor layout coordinate ratios
+            const actualWorkspaceWidth = preview.offsetWidth;
+            const actualWorkspaceHeight = preview.offsetHeight;
 
-            const pdfX = (finalLeftPos / sourceRenderWidth) * width;
-            const pdfY = height - ((finalTopPos / sourceRenderHeight) * height);
+            // FIXED: Leverages unscaled coordinate positions directly from your active tracking state variables
+            const finalLeftPos = posX;
+            const finalTopPos = posY;
+
+            const pdfX = (finalLeftPos / actualWorkspaceWidth) * width;
+            const pdfY = height - ((finalTopPos / actualWorkspaceHeight) * height);
             
-            const finalQrWidth = (marker.clientWidth / sourceRenderWidth) * width;
-            const finalQrHeight = (marker.clientHeight / sourceRenderHeight) * height;
+            // FIXED: Normalized size math prevents the QR code from shrinking or expanding based on zoom states
+            const finalQrWidth = (marker.clientWidth / actualWorkspaceWidth) * width;
+            const finalQrHeight = (marker.clientHeight / actualWorkspaceHeight) * height;
             const finalSquareSize = Math.max(finalQrWidth, finalQrHeight);
 
             firstPage.drawImage(qrImage, {
@@ -524,16 +516,14 @@
                 height: finalSquareSize
             });
             
-                        if (isStampPlaced && stampImgDataUrl) {
+            if (isStampPlaced && stampImgDataUrl) {
                 const stampImageObject = await pdfDoc.embedPng(stampImgDataUrl);
-                
-                const finalStampLeft = isStampLocked ? stampPosX : parseFloat(stampMarker.style.left || stampPosX);
-                const finalStampTop = isStampLocked ? stampPosY : parseFloat(stampMarker.style.top || stampPosY);
 
-                const docStampX = (finalStampLeft / sourceRenderWidth) * width;
-                const docStampY = height - ((finalStampTop / sourceRenderHeight) * height);
-                const docStampW = (stampMarker.clientWidth / sourceRenderWidth) * width;
-                const docStampH = (stampMarker.clientHeight / sourceRenderHeight) * height;
+                // FIXED: Direct variable injection maps the digital stamp securely to the layout frame
+                const docStampX = (stampPosX / actualWorkspaceWidth) * width;
+                const docStampY = height - ((stampPosY / actualWorkspaceHeight) * height);
+                const docStampW = (stampMarker.clientWidth / actualWorkspaceWidth) * width;
+                const docStampH = (stampMarker.clientHeight / actualWorkspaceHeight) * height;
                 
                 firstPage.drawImage(stampImageObject, {
                     x: docStampX,
