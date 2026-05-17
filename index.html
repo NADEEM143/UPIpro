@@ -448,11 +448,11 @@
             
             let toastMessage = "";
             
-            if (marker.style.display === 'flex' && !isQrLocked) {
+                        if (marker.style.display === 'flex' && !isQrLocked) {
                 isQrLocked = true;
-                // FIXED: Extracts the exact raw positional coordinate bounds without running repetitive addition offsets
-                posX = parseFloat(marker.style.left || posX);
-                posY = parseFloat(marker.style.top || posY);
+                // FIXED: Adding back the 40px baseline offset recovers the exact visual center position for your PDF translation math matrix
+                posX = (parseFloat(marker.style.left) || posX) + 40;
+                posY = (parseFloat(marker.style.top) || posY) + 40;
                 marker.style.borderColor = "#059669"; 
                 marker.style.cursor = "default";
                 toastMessage += "🔒 QR Code Position Locked! ";
@@ -460,9 +460,9 @@
             
             if (stampMarker.style.display === 'flex' && !isStampLocked) {
                 isStampLocked = true;
-                // FIXED: Extracts the exact raw positional coordinate bounds without running repetitive addition offsets
-                stampPosX = parseFloat(stampMarker.style.left || stampPosX);
-                stampPosY = parseFloat(stampMarker.style.top || stampPosY);
+                // FIXED: Adding back the 60px baseline offset recovers the exact visual center position for your PDF translation math matrix
+                stampPosX = (parseFloat(stampMarker.style.left) || stampPosX) + 60;
+                stampPosY = (parseFloat(stampMarker.style.top) || stampPosY) + 60;
                 stampMarker.style.borderStyle = "solid"; 
                 stampMarker.style.borderColor = "#059669"; 
                 stampMarker.style.cursor = "default";
@@ -504,16 +504,16 @@
             const preview = document.getElementById('workspace-scaler');
             
             // FIX: Uses strict browser bounding dimensions normalized against the active zoom matrix scale factor
-            const rect = preview.getBoundingClientRect();
+                       const rect = preview.getBoundingClientRect();
             const actualWorkspaceWidth = rect.width / currentZoomScale;
             const actualWorkspaceHeight = rect.height / currentZoomScale;
 
-            // FIX: Subtracts the layout offset matching your visual placement adjustments exactly
-            const finalLeftPos = parseFloat(marker.style.left) || posX;
-const finalTopPos = parseFloat(marker.style.top) || posY;
+            // FIXED: Automatically checks if locked and safely offsets matching visual layout positions
+            const finalLeftPos = isQrLocked ? (posX - 40) : (parseFloat(marker.style.left) || (posX - 40));
+            const finalTopPos = isQrLocked ? (posY - 40) : (parseFloat(marker.style.top) || (posY - 40));
 
-            // Lifted size calculations up first
-const finalQrWidth = (marker.clientWidth / actualWorkspaceWidth) * width;
+            const pdfX = (finalLeftPos / actualWorkspaceWidth) * width;
+
 const finalQrHeight = (marker.clientHeight / actualWorkspaceHeight) * height;
 const finalSquareSize = Math.max(finalQrWidth, finalQrHeight);
 
@@ -913,20 +913,23 @@ const finalStampTop = parseFloat(stampMarker.style.top) || stampPosY;
 
                     // FIXED: Calculates exact DOM left/top styles independently to maintain true visual placement positioning
                     // FIXED: Reads your exact style snapshots directly without running secondary subtraction calculations
-const markerLeftStyle = parseFloat(marker.style.left) || posX;
-const markerTopStyle = parseFloat(marker.style.top) || posY;
+                    // FIXED: Automatically checks if locked and safely offsets matching visual layout positions
+                                        // FIXED: Checks if locked and safely sets matching visual positions
+                    const markerLeftStyle = isQrLocked ? (posX - 40) : (parseFloat(marker.style.left) || (posX - 40));
+                    const markerTopStyle = isQrLocked ? (posY - 40) : (parseFloat(marker.style.top) || (posY - 40));
 
-                    // Lifted size calculations up first
-const finalQrWidth = (marker.clientWidth / actualWorkspaceWidth) * width;
-const finalQrHeight = (marker.clientHeight / actualWorkspaceHeight) * height;
-const finalSquareSize = Math.max(finalQrWidth, finalQrHeight);
+                    // FIXED: Restored the missing finalQrWidth declaration to stop runtime crashes
+                    const finalQrWidth = (marker.clientWidth / actualWorkspaceWidth) * width;
+                    const finalQrHeight = (marker.clientHeight / actualWorkspaceHeight) * height;
+                    const finalSquareSize = Math.max(finalQrWidth, finalQrHeight);
 
-const pdfX = (markerLeftStyle / actualWorkspaceWidth) * width;
-const pdfY = height - (markerTopStyle / actualWorkspaceHeight) * height - finalSquareSize; // 👍 Now it works perfectly!
+                    // FIXED: Removed duplicate declaration layers
+                    const pdfX = (markerLeftStyle / actualWorkspaceWidth) * width;
+                    const pdfY = height - ((markerTopStyle / actualWorkspaceHeight) * height) - finalSquareSize;
 
                     firstPage.drawImage(qrImage, {
                         x: pdfX,
-                        y: pdfY - finalSquareSize,
+                        y: pdfY, // FIXED: Cleared double-subtraction to lock alignment inside your red border
                         width: finalSquareSize,
                         height: finalSquareSize
                     });
