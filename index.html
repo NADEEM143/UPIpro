@@ -596,6 +596,7 @@
     });
 
     // TWIN LOCK LISTENER FOR BOTH QR CODE AND STAMP LAYOUTS
+        // TWIN LOCK LISTENER FOR BOTH QR CODE AND STAMP LAYOUTS
     window.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
             if (!originalBytes) return;
@@ -604,9 +605,8 @@
             
             if (marker.style.display === 'flex' && !isQrLocked) {
                 isQrLocked = true;
-                // FIXED: Adding back the 40px baseline offset recovers the exact visual center position for your PDF translation math matrix
-                posX = (parseFloat(marker.style.left) || posX) + 40;
-                posY = (parseFloat(marker.style.top) || posY) + 40;
+                // FIXED: Stop adding 40px here! Keep raw coordinates clean for the math engines
+                marker.style.borderStyle = "solid";
                 marker.style.borderColor = "#059669"; 
                 marker.style.cursor = "default";
                 toastMessage += "🔒 QR Code Position Locked! ";
@@ -614,17 +614,14 @@
             
             if (stampMarker.style.display === 'flex' && !isStampLocked) {
                 isStampLocked = true;
-                // FIXED: Adding back the 60px baseline offset recovers the exact visual center position for your PDF translation math matrix
-                stampPosX = (parseFloat(stampMarker.style.left) || stampPosX) + 60;
-                stampPosY = (parseFloat(stampMarker.style.top) || stampPosY) + 60;
+                // FIXED: Stop adding 60px here! Keep raw coordinates clean for the math engines
                 stampMarker.style.borderStyle = "solid"; 
                 stampMarker.style.borderColor = "#059669"; 
                 stampMarker.style.cursor = "default";
                 toastMessage += "🏵️ Stamp Position Locked!";
             }
             
-                        if (toastMessage !== "") {
-                // Automatically exposes your layout actions buttons
+            if (toastMessage !== "") {
                 document.getElementById('previewBtn').style.display = 'block';
                 document.getElementById('downloadBtn').style.display = 'block';
 
@@ -633,11 +630,10 @@
                 toast.style.display = 'block';
                 setTimeout(() => { toast.style.display = 'none'; }, 3000);
 
-                // FIXED: Triggers the entire live preview engine automatically when Enter is pressed!
                 setTimeout(() => {
                     const previewBtn = document.getElementById('previewBtn');
                     if (previewBtn) previewBtn.click();
-                }, 50); // Small 50ms delay to guarantee tracking styles finish updating in memory first
+                }, 50);
             }
         }
     });
@@ -672,15 +668,16 @@
             const scaleY = height / actualWorkspaceHeight;
 
             // 🌟 FIXED: Changed display === 'flex' to checking coordinate baseline (posX > 0)
-            if (liveQrContainer && posX > 0) {
+                        // 🌟 FIXED: Swapped validation check to ensure generation occurs if the target container has text content
+            if (liveQrContainer && liveQrContainer.innerHTML !== "") {
                 const liveCanvasElement = liveQrContainer.querySelector('canvas');
                 if (liveCanvasElement) {
                     const qrImgDataUrl = liveCanvasElement.toDataURL('image/png');
                     const qrImage = await pdfDoc.embedPng(qrImgDataUrl);
                     
-                    // FIXED: Fallback values ensure coordinates are preserved when element styles disappear
-                    const mLeft = parseFloat(marker.style.left) || (posX - 40);
-                    const mTop = parseFloat(marker.style.top) || (posY - 40);
+                    // 🌟 FIXED FALLBACK ORDER: Uses uncorrupted raw coordinates first when marker styles get hidden
+                    const mLeft = posX !== 0 ? (posX - 40) : (parseFloat(marker.style.left) || 0);
+                    const mTop = posY !== 0 ? (posY - 40) : (parseFloat(marker.style.top) || 0);
                     
                     const finalQrWidth = (marker.clientWidth || 100) * scaleX;
                     const finalQrHeight = (marker.clientHeight || 100) * scaleY;
@@ -1248,33 +1245,36 @@
                     }
                 }
 
-                if (isStampPlaced && stampImgDataUrl && stampMarker.style.display === 'flex') {
-                    const stampImageObject = await pdfDoc.embedPng(stampImgDataUrl);
+                           // 🌟 FIXED: Changed display === 'flex' check to tracking coordinate baseline (stampPosX !== 0)
+            if (isStampPlaced && stampImgDataUrl && stampPosX !== 0) {
+                const stampImageObject = await pdfDoc.embedPng(stampImgDataUrl);
 
-                    const sLeft = parseFloat(stampMarker.style.left) || (stampPosX - 60);
-                    const sTop = parseFloat(stampMarker.style.top) || (stampPosY - 60);
+                // 🌟 FIXED FALLBACK ORDER: Uses uncorrupted raw coordinates first when marker styles get hidden
+                const sLeft = stampPosX !== 0 ? (stampPosX - 60) : (parseFloat(stampMarker.style.left) || 0);
+                const sTop = stampPosY !== 0 ? (stampPosY - 60) : (parseFloat(stampMarker.style.top) || 0);
 
-                    let docStampW = stampMarker.clientWidth * scaleX;
-                    let docStampH = stampMarker.clientHeight * scaleY;
+                // FIXED: Fallback values ensure dimensions remain stable if styles toggle hidden
+                let docStampW = (stampMarker.clientWidth || 120) * scaleX;
+                let docStampH = (stampMarker.clientHeight || 120) * scaleY;
 
-                    const currentSelectedShapeType = document.getElementById('stampShape').value;
-                    if (currentSelectedShapeType === 'circle' || currentSelectedShapeType === 'square') {
-                        const unifiedSquareDimensionValue = Math.max(docStampW, docStampH);
-                        docStampW = unifiedSquareDimensionValue;
-                        docStampH = unifiedSquareDimensionValue;
-                    }
-
-                    const docStampX = sLeft * scaleX;
-                    const pageStampYOffsetCorrection = Math.floor(sTop / actualWorkspaceHeight) * height;
-                    const docStampY = height - ((sTop * scaleY) - pageStampYOffsetCorrection) - docStampH;
-
-                    targetExportPage.drawImage(stampImageObject, {
-                        x: docStampX,
-                        y: docStampY,
-                        width: docStampW,
-                        height: docStampH
-                    });
+                const currentSelectedShapeType = document.getElementById('stampShape').value;
+                if (currentSelectedShapeType === 'circle' || currentSelectedShapeType === 'square') {
+                    const unifiedSquareDimensionValue = Math.max(docStampW, docStampH);
+                    docStampW = unifiedSquareDimensionValue;
+                    docStampH = unifiedSquareDimensionValue;
                 }
+
+                const docStampX = sLeft * scaleX;
+                const pageStampYOffsetCorrection = Math.floor(sTop / actualWorkspaceHeight) * height;
+                const docStampY = height - ((sTop * scaleY) - pageStampYOffsetCorrection) - docStampH;
+
+                targetExportPage.drawImage(stampImageObject, {
+                    x: docStampX,
+                    y: docStampY,
+                    width: docStampW,
+                    height: docStampH
+                });
+            }
 
                 const previewPdfBytes = await pdfDoc.save();
                 const previewBlobUrl = URL.createObjectURL(new Blob([previewPdfBytes], { type: 'application/pdf' }));
