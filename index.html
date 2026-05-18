@@ -821,14 +821,14 @@
         document.getElementById('charCounter').innerText = "0/35";
     };
 
-                document.getElementById('makePdfBtn').onclick = async () => {
+                    document.getElementById('makePdfBtn').onclick = async () => {
         if (productsList.length === 0) {
             const nameField = document.getElementById('prodName').value.trim();
             const priceField = parseFloat(document.getElementById('prodPrice').value || 0);
             const qtyField = parseInt(document.getElementById('prodQty').value || 0);
 
             if (nameField && priceField > 0 && qtyField > 0) {
-                if (nameField.length > 35) return alert("Product Name exceeds the maximum limit of 35 characters.");
+                if (nameField.length > 35) return alert("Product Name exceeds maximum limit of 35 characters.");
                 productsList.push({ name: nameField, price: priceField, qty: qtyField });
                 renderProductsPreviewWorkspace();
             } else {
@@ -838,85 +838,144 @@
 
         try {
             const docInstance = await PDFLib.PDFDocument.create();
-            const targetPage = docInstance.addPage([595.28, 841.89]);
+            const targetPage = docInstance.addPage([595.28, 841.89]); // Standard A4 Dimensions
             const { width, height } = targetPage.getSize();
             
-            // Core standard font assets extraction
-            const boldFontProfile = await docInstance.embedFont(PDFLib.StandardFonts.HelveticaBold);
-            const regularFontProfile = await docInstance.embedFont(PDFLib.StandardFonts.Helvetica);
+            // Embed fonts
+            const boldFont = await docInstance.embedFont(PDFLib.StandardFonts.HelveticaBold);
+            const regularFont = await docInstance.embedFont(PDFLib.StandardFonts.Helvetica);
             
-            // --- 🏢 BUSINESS HEADER DATA EXTRACTION LOGIC ---
-            const bName = document.getElementById('bizName').value.toUpperCase() || "BUSINESS NAME";
-            const bProp = document.getElementById('bizProprietor').value || "";
-            const bMob1 = document.getElementById('bizMob1').value || "";
-            const bMob2 = document.getElementById('bizMob2').value || "";
+            // Extract business parameters
+            const bName = document.getElementById('bizName').value.toUpperCase() || "HARIOM SALES";
+            const bProp = document.getElementById('bizProprietor').value || "Hariom Tejwani";
+            const bMob1 = document.getElementById('bizMob1').value || "1234567890";
+            const bMob2 = document.getElementById('bizMob2').value || "1234567890";
             const bEmail = document.getElementById('bizEmail').value || "";
-            const bGst = document.getElementById('bizGst').value || "";
-            const bAddr = document.getElementById('bizAddress').value || "";
-            const bDateValue = document.getElementById('bizDate').value.trim() || "__/__/20__";
+            const bGst = document.getElementById('bizGst').value || "22AFYPTxxxxxxxx";
+            const bAddr = document.getElementById('bizAddress').value || "Ward No. 50, Sindai Bajar Chowk, Kawardha (C.G.), 491995";
+            const bDateValue = document.getElementById('bizDate').value.trim() || "__ / __ / 20__";
 
-            let verticalPointerY = height - 50;
-
-            // Top Header Left (GST) & Right (Proprietor Profile)
-            if(bGst) {
-                targetPage.drawText(`GSTIN: ${bGst}`, { x: 40, y: verticalPointerY, size: 11, font: boldFontProfile });
-            }
-            if(bProp) {
-                targetPage.drawText(bProp, { x: width - 180, y: verticalPointerY, size: 12, font: boldFontProfile });
-            }
+            // ========================================================
+            // 🏢 1. PREMIUM HEADER STRUCTURE DESIGN
+            // ========================================================
+            let topY = height - 50;
+            if (bGst) targetPage.drawText(`GSTIN: ${bGst}`, { x: 40, y: topY, size: 10, font: boldFont });
+            targetPage.drawText(bProp, { x: width - 180, y: topY, size: 11, font: boldFont });
             
-            verticalPointerY -= 15;
-            if(bMob1) {
-                targetPage.drawText(`Mo. ${bMob1}`, { x: width - 180, y: verticalPointerY, size: 10, font: boldFontProfile });
-            }
+            topY -= 14;
+            targetPage.drawText(`Mo. ${bMob1}`, { x: width - 180, y: topY, size: 10, font: boldFont });
+            topY -= 12;
+            targetPage.drawText(bMob2, { x: width - 159, y: topY, size: 10, font: boldFont });
             
-            verticalPointerY -= 12;
-            if(bMob2) {
-                targetPage.drawText(bMob2, { x: width - 159, y: verticalPointerY, size: 10, font: boldFontProfile });
-            }
-            if(bEmail) {
-                targetPage.drawText(bEmail, { x: width - 180, y: verticalPointerY - 12, size: 9, font: regularFontProfile });
+            if (bEmail) {
+                topY -= 12;
+                targetPage.drawText(bEmail, { x: width - 180, y: topY, size: 9, font: regularFont });
             }
 
-            // 🌟 ULTRA-BIG BOLD BRAND TITLE ACCENT (HARIOM SALES LOOKALIKE)
-            targetPage.drawText(bName, { x: 40, y: height - 100, size: 32, font: boldFontProfile });
+            // Big Bold Title Headline 
+            targetPage.drawText(bName, { x: 40, y: height - 95, size: 28, font: boldFont });
             
-            // Address & Date Layout Rows
-            verticalPointerY = height - 125;
-            if(bAddr) {
-                targetPage.drawText(bAddr, { x: 40, y: verticalPointerY, size: 11, font: boldFontProfile });
-            }
-            
-            // Renders your dynamic customized input string value safely over the layout marker
-            targetPage.drawText(`Date: ${bDateValue}`, { x: width - 140, y: verticalPointerY, size: 11, font: boldFontProfile });
+            let addrY = height - 112;
+            targetPage.drawText(bAddr, { x: 40, y: addrY, size: 10, font: boldFont });
+            targetPage.drawText(`Date:  ${bDateValue}`, { x: width - 150, y: addrY, size: 10, font: boldFont });
 
-            // Horizontal Line Break Separation Ruler
-            verticalPointerY -= 12;
-            targetPage.drawLine({ start: { x: 40, y: verticalPointerY }, end: { x: width - 40, y: verticalPointerY }, strokeWidth: 2 });
+            // Thick line below header address row
+            targetPage.drawLine({ start: { x: 40, y: height - 122 }, end: { x: width - 40, y: height - 122 }, strokeWidth: 1.5 });
 
-            // Clear baseline tracking pointer to leave room for the header area bounding box
-            verticalPointerY -= 40; 
-            
-            let totalAggregatedBill = 0;
+            // ========================================================
+            // 👤 2. CUSTOMER / CLIENT ROWS PLACEHOLDERS
+            // ========================================================
+            let clientY = height - 150;
+            targetPage.drawText("Mr./Mrs. __________________________________________ Mo. _____________________", { x: 40, y: clientY, size: 11, font: boldFont });
+            clientY -= 22;
+            targetPage.drawText("Address ____________________________________________________________________", { x: 40, y: clientY, size: 11, font: boldFont });
 
-            productsList.forEach((product, idx) => {
-                const rowCost = product.price * product.qty;
-                totalAggregatedBill = totalAggregatedBill + rowCost;
+            // ========================================================
+            // 📊 3. STRUCTURED INVOICE GRID TABLE BLOCK
+            // ========================================================
+            const tableTopY = height - 200;
+            const tableBottomY = 160; 
+            const tableLeftX = 40;
+            const tableRightX = width - 40;
 
-                targetPage.drawText(`${idx + 1}. ${product.name} - ${product.qty} pcs @ INR ${product.price.toFixed(2)} = INR ${rowCost.toFixed(2)}`, {
-                    x: 50,
-                    y: verticalPointerY,
-                    size: 12,
-                    font: regularFontProfile
-                });
-                verticalPointerY -= 25;
+            // Horizontal Table Outlines (Header & Content Bounds)
+            targetPage.drawLine({ start: { x: tableLeftX, y: tableTopY }, end: { x: tableRightX, y: tableTopY }, strokeWidth: 1 });
+            targetPage.drawLine({ start: { x: tableLeftX, y: tableTopY - 25 }, end: { x: tableRightX, y: tableTopY - 25 }, strokeWidth: 1 });
+            targetPage.drawLine({ start: { x: tableLeftX, y: tableBottomY }, end: { x: tableRightX, y: tableBottomY }, strokeWidth: 1 });
+
+            // Vertical Boundary Column Line Alignments
+            const colX = { no: 40, part: 75, qty: 340, rate: 410, amt: 480, end: width - 40 };
+
+            // Draw clean vertical column separation bars straight down to the base rows
+            Object.values(colX).forEach(xPos => {
+                targetPage.drawLine({ start: { x: xPos, y: tableTopY }, end: { x: xPos, y: tableBottomY }, strokeWidth: 1 });
             });
 
-            verticalPointerY -= 15;
-            targetPage.drawText("Grand Total Amount Due: INR " + totalAggregatedBill.toFixed(2), { x: 50, y: verticalPointerY, size: 15, font: boldFontProfile });
+            // Column Header Label Text Positions
+            targetPage.drawText("No.", { x: colX.no + 10, y: tableTopY - 17, size: 11, font: boldFont });
+            targetPage.drawText("Particular", { x: colX.part + 10, y: tableTopY - 17, size: 11, font: boldFont });
+            targetPage.drawText("Qty", { x: colX.qty + 12, y: tableTopY - 17, size: 11, font: boldFont });
+            targetPage.drawText("Rate", { x: colX.rate + 12, y: tableTopY - 17, size: 11, font: boldFont });
+            targetPage.drawText("Amount", { x: colX.amt + 22, y: tableTopY - 17, size: 11, font: boldFont });
 
+            // ========================================================
+            // 🔄 4. POPULATE LINE ITEM DATA ROWS
+            // ========================================================
+            let itemY = tableTopY - 42;
+            let subTotalCost = 0;
+
+            productsList.forEach((product, idx) => {
+                if (itemY < tableBottomY + 15) return; // Prevent writing data past the lower safety bounds
+
+                const rowCost = product.price * product.qty;
+                subTotalCost += rowCost;
+
+                targetPage.drawText((idx + 1).toString(), { x: colX.no + 12, y: itemY, size: 11, font: regularFont });
+                targetPage.drawText(product.name, { x: colX.part + 10, y: itemY, size: 11, font: regularFont });
+                targetPage.drawText(product.qty.toString(), { x: colX.qty + 20, y: itemY, size: 11, font: regularFont });
+                targetPage.drawText(product.price.toFixed(2), { x: colX.rate + 10, y: itemY, size: 11, font: regularFont });
+                targetPage.drawText(rowCost.toFixed(2), { x: colX.amt + 15, y: itemY, size: 11, font: regularFont });
+
+                itemY -= 22; // Row spacing step
+            });
+
+            // ========================================================
+            // 📈 5. TAX CALCULATIONS & FOOTER TOTAL MATRIX BLOCK
+            // ========================================================
+            const cgstValue = subTotalCost * 0.09;
+            const sgstValue = subTotalCost * 0.09;
+            const absoluteGrandTotal = subTotalCost + cgstValue + sgstValue;
+
+            // Box borders for total aggregates down on the bottom-right corner
+            targetPage.drawLine({ start: { x: colX.rate, y: tableBottomY - 20 }, end: { x: colX.end }, strokeWidth: 1 });
+            targetPage.drawLine({ start: { x: colX.rate, y: tableBottomY - 40 }, end: { x: colX.end }, strokeWidth: 1 });
+            targetPage.drawLine({ start: { x: colX.rate, y: tableBottomY - 60 }, end: { x: colX.end }, strokeWidth: 1 });
+            targetPage.drawLine({ start: { x: tableLeftX, y: tableBottomY - 80 }, end: { x: colX.end }, strokeWidth: 1 });
+
+            // Vertical divider to protect bottom boxes alignment
+            targetPage.drawLine({ start: { x: colX.amt, y: tableBottomY }, end: { x: colX.amt, y: tableBottomY - 80 }, strokeWidth: 1 });
+
+            // Fill aggregate label cells 
+            targetPage.drawText("SubTotal", { x: colX.rate + 6, y: tableBottomY - 14, size: 10, font: boldFont });
+            targetPage.drawText(subTotalCost.toFixed(2), { x: colX.amt + 15, y: tableBottomY - 14, size: 11, font: boldFont });
+
+            targetPage.drawText("CGST  9%", { x: colX.rate + 6, y: tableBottomY - 34, size: 10, font: regularFont });
+            targetPage.drawText(cgstValue.toFixed(2), { x: colX.amt + 15, y: tableBottomY - 34, size: 11, font: regularFont });
+
+            targetPage.drawText("SGST  9%", { x: colX.rate + 6, y: tableBottomY - 54, size: 10, font: regularFont });
+            targetPage.drawText(sgstValue.toFixed(2), { x: colX.amt + 15, y: tableBottomY - 54, size: 11, font: regularFont });
+
+            // Total Block
+            targetPage.drawText("Total", { x: colX.rate + 6, y: tableBottomY - 74, size: 12, font: boldFont });
+            targetPage.drawText(absoluteGrandTotal.toFixed(2), { x: colX.amt + 15, y: tableBottomY - 74, size: 12, font: boldFont });
+
+            // Lower Note and Signature placeholders
+            targetPage.drawText("In words: __________________________________________________", { x: tableLeftX + 5, y: tableBottomY - 74, size: 10, font: regularFont });
+            targetPage.drawText("Signature", { x: width - 110, y: tableBottomY - 120, size: 11, font: boldFont });
+
+            // Sync total cost value back to form inputs
             const amountInput = document.getElementById('amount');
-            amountInput.value = totalAggregatedBill.toFixed(2);
+            amountInput.value = absoluteGrandTotal.toFixed(2);
             amountInput.dispatchEvent(new Event('input'));
 
             originalBytes = await docInstance.save();
