@@ -663,7 +663,7 @@
             let actualWorkspaceWidth = pdfFrameNode.clientWidth || pdfFrameNode.offsetWidth || width;
             let actualWorkspaceHeight = pdfFrameNode.clientHeight || pdfFrameNode.offsetHeight || height;
             
-            if (imgFrameNode && imgFrameNode.style.display === 'block') {
+                        if (imgFrameNode && imgFrameNode.style.display === 'block') {
                 actualWorkspaceWidth = imgFrameNode.naturalWidth;
                 actualWorkspaceHeight = imgFrameNode.naturalHeight;
             }
@@ -671,17 +671,19 @@
             const scaleX = width / actualWorkspaceWidth;
             const scaleY = height / actualWorkspaceHeight;
 
-            if (liveQrContainer && marker.style.display === 'flex') {
+            // 🌟 FIXED: Changed display === 'flex' to checking coordinate baseline (posX > 0)
+            if (liveQrContainer && posX > 0) {
                 const liveCanvasElement = liveQrContainer.querySelector('canvas');
                 if (liveCanvasElement) {
                     const qrImgDataUrl = liveCanvasElement.toDataURL('image/png');
                     const qrImage = await pdfDoc.embedPng(qrImgDataUrl);
                     
+                    // FIXED: Fallback values ensure coordinates are preserved when element styles disappear
                     const mLeft = parseFloat(marker.style.left) || (posX - 40);
                     const mTop = parseFloat(marker.style.top) || (posY - 40);
                     
-                    const finalQrWidth = marker.clientWidth * scaleX;
-                    const finalQrHeight = marker.clientHeight * scaleY;
+                    const finalQrWidth = (marker.clientWidth || 100) * scaleX;
+                    const finalQrHeight = (marker.clientHeight || 100) * scaleY;
                     const finalSquareSize = Math.max(finalQrWidth, finalQrHeight);
                     
                     const pdfX = mLeft * scaleX;
@@ -1178,7 +1180,8 @@
                     }
                 }
 
-                if (isStampPlaced && stampImgDataUrl && stampMarker.style.display === 'flex') {
+                               // 🌟 FIXED: Changed style.display check to tracking coordinate baseline (stampPosX > 0)
+                if (isStampPlaced && stampImgDataUrl && stampPosX > 0) {
                     const tempStampImg = new Image();
                     tempStampImg.src = stampImgDataUrl;
                     await new Promise(resolve => tempStampImg.onload = resolve);
@@ -1188,8 +1191,10 @@
 
                     const stampX = sLeft / scaleFactorX;
                     const stampY = sTop / scaleFactorY;
-                    let stampW = stampMarker.clientWidth / scaleFactorX;
-                    let stampH = stampMarker.clientHeight / scaleFactorY;
+                    
+                    // FIXED: Fallback values ensure dimensions remain stable if styles toggle hidden
+                    let stampW = (stampMarker.clientWidth || 120) / scaleFactorX;
+                    let stampH = (stampMarker.clientHeight || 120) / scaleFactorY;
 
                     const currentSelectedShapeType = document.getElementById('stampShape').value;
                     if (currentSelectedShapeType === 'circle' || currentSelectedShapeType === 'square') {
