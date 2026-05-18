@@ -400,7 +400,6 @@
     let productsList = [];
 
     let stampPosX = 0, stampPosY = 0, stampImgDataUrl = null, isStampPlaced = false, isStampDragging = false;
-let pdfDocumentInstance = null; // 🌟 FIXED: Added missing global PDF tracking reference
     const stampMarker = document.getElementById('stamp-marker');
 
     let currentZoomScale = 1.0;
@@ -408,44 +407,24 @@ let pdfDocumentInstance = null; // 🌟 FIXED: Added missing global PDF tracking
     const zoomInBtn = document.getElementById('zoomInBtn');
     const zoomOutBtn = document.getElementById('zoomOutBtn');
     const zoomValueLabel = document.getElementById('zoomValueLabel');
-    window.onload = () => {
-        // Safe list containing every single interactive input ID present in your sidebars and menus
-        const allInputIds = ['payeeName', 'vpa', 'amount', 'stampCompany', 'stampApprover', 'stampDate', 'stampColor', 'stampShape', 'bizName', 'bizProprietor', 'bizMob1', 'bizMob2', 'bizEmail', 'bizGst', 'bizAddress', 'bizDate', 'custName', 'custMob', 'custAddress'];
-        
-        allInputIds.forEach(id => {
+
+        window.onload = () => {
+    ['payeeName', 'vpa', 'amount', 'stampCompany', 'stampApprover', 'stampDate', 'stampColor', 'stampShape', 'bizName', 'bizProprietor', 'bizMob1', 'bizMob2', 'bizEmail', 'bizGst', 'bizAddress', 'bizDate'].forEach(id => {
             const targetInputElement = document.getElementById(id);
-            
-            // 🌟 CRITICAL FIX: If any element hasn't loaded or is missing in the HTML, skip it cleanly instead of crashing the entire script!
             if (!targetInputElement) return;
             
-            // Restore saved memory
-            if (localStorage.getItem(id) !== null) {
+            if (localStorage.getItem(id)) {
                 targetInputElement.value = localStorage.getItem(id);
-            } else if (targetInputElement.value) {
-                // If local storage is empty but HTML has a default (like NADIM ENTERPRISE), save it now
-                localStorage.setItem(id, targetInputElement.value);
             }
-            
-            // Handle updates safely
             targetInputElement.oninput = () => {
                 localStorage.setItem(id, targetInputElement.value);
             };
-            
             if (targetInputElement.tagName === 'SELECT') {
                 targetInputElement.onchange = () => {
                     localStorage.setItem(id, targetInputElement.value);
                 };
             }
         });
-        
-        // Handle fallback dates safely without interrupting the loop above
-        const stampDateEl = document.getElementById('stampDate');
-        if (stampDateEl && !stampDateEl.value) {
-            const currentDateIsoString = new Date().toISOString().split('T')[0];
-            stampDateEl.value = currentDateIsoString;
-            localStorage.setItem('stampDate', currentDateIsoString);
-        }
-    };
         
         if (!document.getElementById('stampDate').value) {
             const currentDateIsoString = new Date().toISOString().split('T')[0];
@@ -901,7 +880,6 @@ let pdfDocumentInstance = null; // 🌟 FIXED: Added missing global PDF tracking
             clientY -= 22;
             targetPage.drawText("Address ____________________________________________________________________", { x: 40, y: clientY, size: 11, font: boldFont });
 
-            // Table Grid Coordinate Configuration
             const tableTopY = height - 200;
             const tableBottomY = 160; 
             const tableLeftX = 40;
@@ -913,13 +891,14 @@ let pdfDocumentInstance = null; // 🌟 FIXED: Added missing global PDF tracking
 
             const colX = { no: 40, part: 75, qty: 340, rate: 410, amt: 480, end: width - 40 };
 
-            // Full Height Column Seperators
             targetPage.drawLine({ start: { x: colX.no, y: tableTopY }, end: { x: colX.no, y: tableBottomY }, strokeWidth: 1 });
             targetPage.drawLine({ start: { x: colX.part, y: tableTopY }, end: { x: colX.part, y: tableBottomY }, strokeWidth: 1 });
             targetPage.drawLine({ start: { x: colX.qty, y: tableTopY }, end: { x: colX.qty, y: tableBottomY }, strokeWidth: 1 });
-            targetPage.drawLine({ start: { x: colX.rate, y: tableTopY }, end: { x: colX.rate, y: tableBottomY - 80 }, strokeWidth: 1 }); // Extended downwards to cover lower totals rows
-            targetPage.drawLine({ start: { x: colX.amt, y: tableTopY }, end: { x: colX.amt, y: tableBottomY - 80 }, strokeWidth: 1 }); // Extended downwards to cover lower totals rows
-            targetPage.drawLine({ start: { x: colX.end, y: tableTopY }, end: { x: colX.end, y: tableBottomY - 80 }, strokeWidth: 1 }); // Extended downwards to cover lower totals rows
+            
+            // 🌟 FIXED: Vertical column separation bars extend cleanly straight to the baseline grid boundaries
+            targetPage.drawLine({ start: { x: colX.rate, y: tableTopY }, end: { x: colX.rate, y: tableBottomY - 80 }, strokeWidth: 1 }); 
+            targetPage.drawLine({ start: { x: colX.amt, y: tableTopY }, end: { x: colX.amt, y: tableBottomY - 80 }, strokeWidth: 1 }); 
+            targetPage.drawLine({ start: { x: colX.end, y: tableTopY }, end: { x: colX.end, y: tableBottomY - 80 }, strokeWidth: 1 }); 
 
             targetPage.drawText("No.", { x: colX.no + 10, y: tableTopY - 17, size: 11, font: boldFont });
             targetPage.drawText("Particular", { x: colX.part + 10, y: tableTopY - 17, size: 11, font: boldFont });
@@ -949,14 +928,15 @@ let pdfDocumentInstance = null; // 🌟 FIXED: Added missing global PDF tracking
             const sgstValue = subTotalCost * 0.09;
             const absoluteGrandTotal = subTotalCost + cgstValue + sgstValue;
 
-            // ========================================================
-            // 🌟 FIXED SUMMARY BORDERS (MATCHES ATTACHED SNIPPET IMAGE)
-            // ========================================================
+            // 🌟 FIXED SUMMARY BORDERS (MATCHES THE ATTACHED IMAGE SPECIFICATION EXTENTS)
             targetPage.drawLine({ start: { x: colX.rate, y: tableBottomY - 20 }, end: { x: colX.end, y: tableBottomY - 20 }, strokeWidth: 1 });
             targetPage.drawLine({ start: { x: colX.rate, y: tableBottomY - 40 }, end: { x: colX.end, y: tableBottomY - 40 }, strokeWidth: 1 });
             targetPage.drawLine({ start: { x: colX.rate, y: tableBottomY - 60 }, end: { x: colX.end, y: tableBottomY - 60 }, strokeWidth: 1 });
+            
+            // Outer bottom envelope container baseline frame line
             targetPage.drawLine({ start: { x: tableLeftX, y: tableBottomY - 80 }, end: { x: colX.end, y: tableBottomY - 80 }, strokeWidth: 1 });
 
+            // Text calculations anchors layout placements 
             targetPage.drawText("SubTotal", { x: colX.rate + 6, y: tableBottomY - 14, size: 10, font: boldFont });
             targetPage.drawText(subTotalCost.toFixed(2), { x: colX.amt + 15, y: tableBottomY - 14, size: 11, font: boldFont });
 
@@ -969,9 +949,7 @@ let pdfDocumentInstance = null; // 🌟 FIXED: Added missing global PDF tracking
             targetPage.drawText("Total", { x: colX.rate + 6, y: tableBottomY - 74, size: 12, font: boldFont });
             targetPage.drawText(absoluteGrandTotal.toFixed(2), { x: colX.amt + 15, y: tableBottomY - 74, size: 12, font: boldFont });
 
-            // ========================================================
-            // 🌟 DYNAMIC AUTOMATED NUMBER TO WORDS INJECTION
-            // ========================================================
+            // 🌟 AUTOMATED INDIAN NUMBER TO WORDS PARSER STRATA PLACEMENT
             const wordsTranslationString = convertAmountToWords(absoluteGrandTotal);
             targetPage.drawText(`In words:  ${wordsTranslationString}`, { x: tableLeftX + 5, y: tableBottomY - 74, size: 10, font: boldFont });
             
@@ -1119,11 +1097,13 @@ let pdfDocumentInstance = null; // 🌟 FIXED: Added missing global PDF tracking
             if (bufferCtx.getImageData(randomSpreadX, randomSpreadY, 1, 1).data[3] === 0) {
                 // FIXED: Changed ctx to bufferCtx to safely render scattered ink noise spray
                 bufferCtx.globalAlpha = Math.random() * 0.4;
-                                bufferCtx.fillRect(randomSpreadX, randomSpreadY, 1.5, 1.5);
+                bufferCtx.fillRect(randomSpreadX, randomSpreadY, 1.5, 1.5);
             }
         }
-        // 🌟 FIXED: Re-establish clean execution paths by adding back missing closures
+        // FIXED: Safely reset the baseline alpha channel on the active buffer context
         bufferCtx.globalAlpha = 1.0;
+
+        // FIXED: Swapped canvas to stampGraphicBufferCanvas to extract your valid PNG base64 string
         stampImgDataUrl = stampGraphicBufferCanvas.toDataURL('image/png');
 
         stampMarker.innerHTML = `<img src="${stampImgDataUrl}" style="width:100%; height:100%; pointer-events:none;" />`;
@@ -1133,7 +1113,7 @@ let pdfDocumentInstance = null; // 🌟 FIXED: Added missing global PDF tracking
         note.innerText = "🏵️ Click on the document to place your Digital Stamp";
         note.style.display = 'block';
         document.getElementById('click-overlay-stamp').style.display = 'block';
-    }; // Clocks out lockStampBtn.onclick handler loop safely
+    };
 
     document.getElementById('click-overlay-stamp').onclick = (e) => {
         const rect = document.getElementById('workspace-scaler').getBoundingClientRect();
@@ -1354,6 +1334,7 @@ let pdfDocumentInstance = null; // 🌟 FIXED: Added missing global PDF tracking
             alert("Preview Canvas Render Failure: " + previewError.message);
         }
            
+    // 🌟 PERFECT: Pure standalone function structure with no stray outer brackets
     function convertAmountToWords(amount) {
         const sglDigit = ["Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"],
             dblDigit = ["Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"],
