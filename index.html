@@ -1138,6 +1138,8 @@
 
                 let actualWorkspaceWidth = pdfFrameNode.offsetWidth || preview.offsetWidth;
                 let actualWorkspaceHeight = pdfFrameNode.offsetHeight || preview.offsetHeight;
+                const scaleX = width / actualWorkspaceWidth;
+                const scaleY = height / actualWorkspaceHeight;
 
                 if (liveQrContainer && liveQrContainer.style.display === "block") {
                     const liveCanvasElement = liveQrContainer.querySelector('canvas');
