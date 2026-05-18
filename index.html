@@ -821,7 +821,7 @@
         document.getElementById('charCounter').innerText = "0/35";
     };
 
-                    document.getElementById('makePdfBtn').onclick = async () => {
+                        document.getElementById('makePdfBtn').onclick = async () => {
         if (productsList.length === 0) {
             const nameField = document.getElementById('prodName').value.trim();
             const priceField = parseFloat(document.getElementById('prodPrice').value || 0);
@@ -838,14 +838,12 @@
 
         try {
             const docInstance = await PDFLib.PDFDocument.create();
-            const targetPage = docInstance.addPage([595.28, 841.89]); // Standard A4 Dimensions
+            const targetPage = docInstance.addPage([595.28, 841.89]); 
             const { width, height } = targetPage.getSize();
             
-            // Embed fonts
             const boldFont = await docInstance.embedFont(PDFLib.StandardFonts.HelveticaBold);
             const regularFont = await docInstance.embedFont(PDFLib.StandardFonts.Helvetica);
             
-            // Extract business parameters
             const bName = document.getElementById('bizName').value.toUpperCase() || "HARIOM SALES";
             const bProp = document.getElementById('bizProprietor').value || "Hariom Tejwani";
             const bMob1 = document.getElementById('bizMob1').value || "1234567890";
@@ -855,9 +853,7 @@
             const bAddr = document.getElementById('bizAddress').value || "Ward No. 50, Sindai Bajar Chowk, Kawardha (C.G.), 491995";
             const bDateValue = document.getElementById('bizDate').value.trim() || "__ / __ / 20__";
 
-            // ========================================================
-            // 🏢 1. PREMIUM HEADER STRUCTURE DESIGN
-            // ========================================================
+            // Header Meta Data Setup
             let topY = height - 50;
             if (bGst) targetPage.drawText(`GSTIN: ${bGst}`, { x: 40, y: topY, size: 10, font: boldFont });
             targetPage.drawText(bProp, { x: width - 180, y: topY, size: 11, font: boldFont });
@@ -872,60 +868,50 @@
                 targetPage.drawText(bEmail, { x: width - 180, y: topY, size: 9, font: regularFont });
             }
 
-            // Big Bold Title Headline 
             targetPage.drawText(bName, { x: 40, y: height - 95, size: 28, font: boldFont });
             
             let addrY = height - 112;
             targetPage.drawText(bAddr, { x: 40, y: addrY, size: 10, font: boldFont });
             targetPage.drawText(`Date:  ${bDateValue}`, { x: width - 150, y: addrY, size: 10, font: boldFont });
 
-            // Thick line below header address row
             targetPage.drawLine({ start: { x: 40, y: height - 122 }, end: { x: width - 40, y: height - 122 }, strokeWidth: 1.5 });
 
-            // ========================================================
-            // 👤 2. CUSTOMER / CLIENT ROWS PLACEHOLDERS
-            // ========================================================
             let clientY = height - 150;
             targetPage.drawText("Mr./Mrs. __________________________________________ Mo. _____________________", { x: 40, y: clientY, size: 11, font: boldFont });
             clientY -= 22;
             targetPage.drawText("Address ____________________________________________________________________", { x: 40, y: clientY, size: 11, font: boldFont });
 
-            // ========================================================
-            // 📊 3. STRUCTURED INVOICE GRID TABLE BLOCK
-            // ========================================================
+            // Table Structure
             const tableTopY = height - 200;
             const tableBottomY = 160; 
             const tableLeftX = 40;
             const tableRightX = width - 40;
 
-            // Horizontal Table Outlines (Header & Content Bounds)
             targetPage.drawLine({ start: { x: tableLeftX, y: tableTopY }, end: { x: tableRightX, y: tableTopY }, strokeWidth: 1 });
             targetPage.drawLine({ start: { x: tableLeftX, y: tableTopY - 25 }, end: { x: tableRightX, y: tableTopY - 25 }, strokeWidth: 1 });
             targetPage.drawLine({ start: { x: tableLeftX, y: tableBottomY }, end: { x: tableRightX, y: tableBottomY }, strokeWidth: 1 });
 
-            // Vertical Boundary Column Line Alignments
             const colX = { no: 40, part: 75, qty: 340, rate: 410, amt: 480, end: width - 40 };
 
-            // Draw clean vertical column separation bars straight down to the base rows
-            Object.values(colX).forEach(xPos => {
-                targetPage.drawLine({ start: { x: xPos, y: tableTopY }, end: { x: xPos, y: tableBottomY }, strokeWidth: 1 });
-            });
+            // FIXED: Explicit structural keys passed into each array mapping coordinate loop execution path
+            targetPage.drawLine({ start: { x: colX.no, y: tableTopY }, end: { x: colX.no, y: tableBottomY }, strokeWidth: 1 });
+            targetPage.drawLine({ start: { x: colX.part, y: tableTopY }, end: { x: colX.part, y: tableBottomY }, strokeWidth: 1 });
+            targetPage.drawLine({ start: { x: colX.qty, y: tableTopY }, end: { x: colX.qty, y: tableBottomY }, strokeWidth: 1 });
+            targetPage.drawLine({ start: { x: colX.rate, y: tableTopY }, end: { x: colX.rate, y: tableBottomY }, strokeWidth: 1 });
+            targetPage.drawLine({ start: { x: colX.amt, y: tableTopY }, end: { x: colX.amt, y: tableBottomY }, strokeWidth: 1 });
+            targetPage.drawLine({ start: { x: colX.end, y: tableTopY }, end: { x: colX.end, y: tableBottomY }, strokeWidth: 1 });
 
-            // Column Header Label Text Positions
             targetPage.drawText("No.", { x: colX.no + 10, y: tableTopY - 17, size: 11, font: boldFont });
             targetPage.drawText("Particular", { x: colX.part + 10, y: tableTopY - 17, size: 11, font: boldFont });
             targetPage.drawText("Qty", { x: colX.qty + 12, y: tableTopY - 17, size: 11, font: boldFont });
             targetPage.drawText("Rate", { x: colX.rate + 12, y: tableTopY - 17, size: 11, font: boldFont });
             targetPage.drawText("Amount", { x: colX.amt + 22, y: tableTopY - 17, size: 11, font: boldFont });
 
-            // ========================================================
-            // 🔄 4. POPULATE LINE ITEM DATA ROWS
-            // ========================================================
             let itemY = tableTopY - 42;
             let subTotalCost = 0;
 
             productsList.forEach((product, idx) => {
-                if (itemY < tableBottomY + 15) return; // Prevent writing data past the lower safety bounds
+                if (itemY < tableBottomY + 15) return;
 
                 const rowCost = product.price * product.qty;
                 subTotalCost += rowCost;
@@ -936,26 +922,20 @@
                 targetPage.drawText(product.price.toFixed(2), { x: colX.rate + 10, y: itemY, size: 11, font: regularFont });
                 targetPage.drawText(rowCost.toFixed(2), { x: colX.amt + 15, y: itemY, size: 11, font: regularFont });
 
-                itemY -= 22; // Row spacing step
+                itemY -= 22;
             });
 
-            // ========================================================
-            // 📈 5. TAX CALCULATIONS & FOOTER TOTAL MATRIX BLOCK
-            // ========================================================
             const cgstValue = subTotalCost * 0.09;
             const sgstValue = subTotalCost * 0.09;
             const absoluteGrandTotal = subTotalCost + cgstValue + sgstValue;
 
-            // Box borders for total aggregates down on the bottom-right corner
-            targetPage.drawLine({ start: { x: colX.rate, y: tableBottomY - 20 }, end: { x: colX.end }, strokeWidth: 1 });
-            targetPage.drawLine({ start: { x: colX.rate, y: tableBottomY - 40 }, end: { x: colX.end }, strokeWidth: 1 });
-            targetPage.drawLine({ start: { x: colX.rate, y: tableBottomY - 60 }, end: { x: colX.end }, strokeWidth: 1 });
-            targetPage.drawLine({ start: { x: tableLeftX, y: tableBottomY - 80 }, end: { x: colX.end }, strokeWidth: 1 });
+            targetPage.drawLine({ start: { x: colX.rate, y: tableBottomY - 20 }, end: { x: colX.end, y: tableBottomY - 20 }, strokeWidth: 1 });
+            targetPage.drawLine({ start: { x: colX.rate, y: tableBottomY - 40 }, end: { x: colX.end, y: tableBottomY - 40 }, strokeWidth: 1 });
+            targetPage.drawLine({ start: { x: colX.rate, y: tableBottomY - 60 }, end: { x: colX.end, y: tableBottomY - 60 }, strokeWidth: 1 });
+            targetPage.drawLine({ start: { x: tableLeftX, y: tableBottomY - 80 }, end: { x: colX.end, y: tableBottomY - 80 }, strokeWidth: 1 });
 
-            // Vertical divider to protect bottom boxes alignment
             targetPage.drawLine({ start: { x: colX.amt, y: tableBottomY }, end: { x: colX.amt, y: tableBottomY - 80 }, strokeWidth: 1 });
 
-            // Fill aggregate label cells 
             targetPage.drawText("SubTotal", { x: colX.rate + 6, y: tableBottomY - 14, size: 10, font: boldFont });
             targetPage.drawText(subTotalCost.toFixed(2), { x: colX.amt + 15, y: tableBottomY - 14, size: 11, font: boldFont });
 
@@ -965,15 +945,12 @@
             targetPage.drawText("SGST  9%", { x: colX.rate + 6, y: tableBottomY - 54, size: 10, font: regularFont });
             targetPage.drawText(sgstValue.toFixed(2), { x: colX.amt + 15, y: tableBottomY - 54, size: 11, font: regularFont });
 
-            // Total Block
             targetPage.drawText("Total", { x: colX.rate + 6, y: tableBottomY - 74, size: 12, font: boldFont });
             targetPage.drawText(absoluteGrandTotal.toFixed(2), { x: colX.amt + 15, y: tableBottomY - 74, size: 12, font: boldFont });
 
-            // Lower Note and Signature placeholders
             targetPage.drawText("In words: __________________________________________________", { x: tableLeftX + 5, y: tableBottomY - 74, size: 10, font: regularFont });
             targetPage.drawText("Signature", { x: width - 110, y: tableBottomY - 120, size: 11, font: boldFont });
 
-            // Sync total cost value back to form inputs
             const amountInput = document.getElementById('amount');
             amountInput.value = absoluteGrandTotal.toFixed(2);
             amountInput.dispatchEvent(new Event('input'));
@@ -992,6 +969,7 @@
             
         } catch (err) { alert("Generation Core Failure: " + err.message); }
     };
+
         gearIcon.onclick = () => {
         settingsPanel.style.display = settingsPanel.style.display === 'block' ? 'none' : 'block';
     };
