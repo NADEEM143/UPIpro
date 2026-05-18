@@ -642,31 +642,24 @@
         }
     });
    
-            document.getElementById('downloadBtn').onclick = async () => {
+                document.getElementById('downloadBtn').onclick = async () => {
         try {
+            if (!originalBytes) return alert("Select or Generate PDF First");
+
             const name = document.getElementById('payeeName').value;
             const vpa = document.getElementById('vpa').value;
             const amt = document.getElementById('amount').value;
             const upi = `upi://pay?pa=${vpa}&pn=${encodeURIComponent(name)}&cu=INR&am=${parseFloat(amt || 0).toFixed(2)}`;
             
             const liveQrContainer = document.getElementById('qr-graphic-target');
-            if (!liveQrContainer) return alert("Please set your QR position first");
+            const pdfFrameNode = document.getElementById('pdf-frame');
+            const imgFrameNode = document.getElementById('image-frame');
             
-            const liveCanvasElement = liveQrContainer.querySelector('canvas');
-            if (!liveCanvasElement) return alert("QR Code graphic engine is missing. Re-place the position marker.");
-            
-            const qrImgDataUrl = liveCanvasElement.toDataURL('image/png');
             const pdfDoc = await PDFLib.PDFDocument.load(originalBytes);
-            
-            // FIXED: Resolves target index collection securely across multi-page sheets
             const pagesCollection = pdfDoc.getPages();
             const targetExportPage = pagesCollection[currentActivePageIndex] || pagesCollection[0];
             const { width, height } = targetExportPage.getSize();
             
-            const pdfFrameNode = document.getElementById('pdf-frame');
-            const imgFrameNode = document.getElementById('image-frame');
-            
-            // FIXED: References absolute unscaled coordinate bounds to kill shift drift
             let actualWorkspaceWidth = pdfFrameNode.clientWidth || pdfFrameNode.offsetWidth || width;
             let actualWorkspaceHeight = pdfFrameNode.clientHeight || pdfFrameNode.offsetHeight || height;
             
@@ -675,39 +668,40 @@
                 actualWorkspaceHeight = imgFrameNode.naturalHeight;
             }
 
-            // Absolute mathematical ratio converters
             const scaleX = width / actualWorkspaceWidth;
             const scaleY = height / actualWorkspaceHeight;
 
-            // Enforce scaling parameters
-            if (marker.style.display === 'flex') {
-                const qrImage = await pdfDoc.embedPng(qrImgDataUrl);
-                
-                // FIXED: Extracts the exact responsive workspace style point
-                const markerLeft = isQrLocked ? (posX - 40) : parseFloat(marker.style.left);
-                const markerTop = isQrLocked ? (posY - 40) : parseFloat(marker.style.top);
-                
-                const finalQrWidth = marker.clientWidth * scaleX;
-                const finalQrHeight = marker.clientHeight * scaleY;
-                const finalSquareSize = Math.max(finalQrWidth, finalQrHeight);
-                
-                const pdfX = markerLeft * scaleX;
-                // FIXED: PDF coordinates start from the bottom-left. This perfectly flips the Y axis.
-                const pdfY = height - (markerTop * scaleY) - finalSquareSize;
+            if (liveQrContainer && marker.style.display === 'flex') {
+                const liveCanvasElement = liveQrContainer.querySelector('canvas');
+                if (liveCanvasElement) {
+                    const qrImgDataUrl = liveCanvasElement.toDataURL('image/png');
+                    const qrImage = await pdfDoc.embedPng(qrImgDataUrl);
+                    
+                    const mLeft = parseFloat(marker.style.left) || (posX - 40);
+                    const mTop = parseFloat(marker.style.top) || (posY - 40);
+                    
+                    const finalQrWidth = marker.clientWidth * scaleX;
+                    const finalQrHeight = marker.clientHeight * scaleY;
+                    const finalSquareSize = Math.max(finalQrWidth, finalQrHeight);
+                    
+                    const pdfX = mLeft * scaleX;
+                    const pageYOffsetCorrection = Math.floor(mTop / actualWorkspaceHeight) * height;
+                    const pdfY = height - ((mTop * scaleY) - pageYOffsetCorrection) - finalSquareSize;
 
-                targetExportPage.drawImage(qrImage, {
-                    x: pdfX,
-                    y: pdfY,
-                    width: finalSquareSize,
-                    height: finalSquareSize
-                });
+                    targetExportPage.drawImage(qrImage, {
+                        x: pdfX,
+                        y: pdfY,
+                        width: finalSquareSize,
+                        height: finalSquareSize
+                    });
+                }
             }
 
-            if (isStampPlaced && stampImgDataUrl) {
+            if (isStampPlaced && stampImgDataUrl && stampMarker.style.display === 'flex') {
                 const stampImageObject = await pdfDoc.embedPng(stampImgDataUrl);
 
-                const stampLeft = isStampLocked ? (stampPosX - 60) : parseFloat(stampMarker.style.left);
-                const stampTop = isStampLocked ? (stampPosY - 60) : parseFloat(stampMarker.style.top);
+                const sLeft = parseFloat(stampMarker.style.left) || (stampPosX - 60);
+                const sTop = parseFloat(stampMarker.style.top) || (stampPosY - 60);
 
                 let docStampW = stampMarker.clientWidth * scaleX;
                 let docStampH = stampMarker.clientHeight * scaleY;
@@ -719,8 +713,9 @@
                     docStampH = unifiedSquareDimensionValue;
                 }
 
-                const docStampX = stampLeft * scaleX;
-                const docStampY = height - (stampTop * scaleY) - docStampH;
+                const docStampX = sLeft * scaleX;
+                const pageStampYOffsetCorrection = Math.floor(sTop / actualWorkspaceHeight) * height;
+                const docStampY = height - ((sTop * scaleY) - pageStampYOffsetCorrection) - docStampH;
                 
                 targetExportPage.drawImage(stampImageObject, {
                     x: docStampX,
@@ -1146,6 +1141,7 @@
     }
         // LIVE VIEWPORT PREVIEW MATRIX COMPILATION ENGINE
     document.getElementById('previewBtn').onclick = async () => {
+            document.getElementById('previewBtn').onclick = async () => {
         try {
             if (!originalBytes) return alert("Select or Generate PDF First");
 
@@ -1167,14 +1163,14 @@
                 const scaleFactorX = preview.offsetWidth / actualWorkspaceWidth;
                 const scaleFactorY = preview.offsetHeight / actualWorkspaceHeight;
 
-                if (liveQrContainer && liveQrContainer.style.display === "block") {
+                if (liveQrContainer && marker.style.display === 'flex') {
                     const liveCanvasElement = liveQrContainer.querySelector('canvas');
                     if (liveCanvasElement) {
-                        const markerLeftStyleRaw = isQrLocked ? (posX - 40) : (parseFloat(marker.style.left) || (posX - 40));
-                        const markerTopStyleRaw = isQrLocked ? (posY - 40) : (parseFloat(marker.style.top) || (posY - 40));
+                        const mLeft = parseFloat(marker.style.left) || (posX - 40);
+                        const mTop = parseFloat(marker.style.top) || (posY - 40);
 
-                        const imgX = markerLeftStyleRaw / scaleFactorX;
-                        const imgY = markerTopStyleRaw / scaleFactorY;
+                        const imgX = mLeft / scaleFactorX;
+                        const imgY = mTop / scaleFactorY;
                         const imgW = marker.clientWidth / scaleFactorX;
                         const imgH = marker.clientHeight / scaleFactorY;
                         const squareSize = Math.max(imgW, imgH);
@@ -1183,16 +1179,16 @@
                     }
                 }
 
-                if (isStampPlaced && stampImgDataUrl) {
+                if (isStampPlaced && stampImgDataUrl && stampMarker.style.display === 'flex') {
                     const tempStampImg = new Image();
                     tempStampImg.src = stampImgDataUrl;
                     await new Promise(resolve => tempStampImg.onload = resolve);
 
-                    const stampLeftStyleRaw = isStampLocked ? (stampPosX - 60) : (parseFloat(stampMarker.style.left) || (stampPosX - 60));
-                    const stampTopStyleRaw = isStampLocked ? (stampPosY - 60) : (parseFloat(stampMarker.style.top) || (stampPosY - 60));
+                    const sLeft = parseFloat(stampMarker.style.left) || (stampPosX - 60);
+                    const sTop = parseFloat(stampMarker.style.top) || (stampPosY - 60);
 
-                    const stampX = stampLeftStyleRaw / scaleFactorX;
-                    const stampY = stampTopStyleRaw / scaleFactorY;
+                    const stampX = sLeft / scaleFactorX;
+                    const stampY = sTop / scaleFactorY;
                     let stampW = stampMarker.clientWidth / scaleFactorX;
                     let stampH = stampMarker.clientHeight / scaleFactorY;
 
@@ -1207,45 +1203,37 @@
                 }
 
                 imgFrameNode.src = canvas.toDataURL('image/png');
-                
                 marker.style.display = 'none';
                 stampMarker.style.display = 'none';
 
-                        } else {
+            } else {
                 const pdfDoc = await PDFLib.PDFDocument.load(originalBytes);
                 const pagesCollection = pdfDoc.getPages();
-                
-                // FIXED: Extracts the exact page from our newly injected detector
                 const targetExportPage = pagesCollection[currentActivePageIndex] || pagesCollection[0];
                 const { width, height } = targetExportPage.getSize();
 
-                const pdfFrameNode = document.getElementById('pdf-frame');
-                
-                // FIXED: Absolute coordinate isolation boundaries
                 let actualWorkspaceWidth = pdfFrameNode.clientWidth || pdfFrameNode.offsetWidth || width;
                 let actualWorkspaceHeight = pdfFrameNode.clientHeight || pdfFrameNode.offsetHeight || height;
 
                 const scaleX = width / actualWorkspaceWidth;
                 const scaleY = height / actualWorkspaceHeight;
 
-                if (liveQrContainer && liveQrContainer.style.display === "block") {
+                if (liveQrContainer && marker.style.display === 'flex') {
                     const liveCanvasElement = liveQrContainer.querySelector('canvas');
                     if (liveCanvasElement) {
                         const qrImgDataUrl = liveCanvasElement.toDataURL('image/png');
                         const qrImage = await pdfDoc.embedPng(qrImgDataUrl);
 
-                        const markerLeft = isQrLocked ? (posX - 40) : parseFloat(marker.style.left);
-                        const markerTop = isQrLocked ? (posY - 40) : parseFloat(marker.style.top);
+                        const mLeft = parseFloat(marker.style.left) || (posX - 40);
+                        const mTop = parseFloat(marker.style.top) || (posY - 40);
 
                         const finalQrWidth = marker.clientWidth * scaleX;
                         const finalQrHeight = marker.clientHeight * scaleY;
                         const finalSquareSize = Math.max(finalQrWidth, finalQrHeight);
 
-                        const pdfX = markerLeft * scaleX;
-                        
-                        // FIXED: Maps to individual multi-page index limits natively without global coordinate bleed
-                        const pageYOffsetCorrection = Math.floor(markerTop / actualWorkspaceHeight) * height;
-                        const pdfY = height - ((markerTop * scaleY) - pageYOffsetCorrection) - finalSquareSize;
+                        const pdfX = mLeft * scaleX;
+                        const pageYOffsetCorrection = Math.floor(mTop / actualWorkspaceHeight) * height;
+                        const pdfY = height - ((mTop * scaleY) - pageYOffsetCorrection) - finalSquareSize;
 
                         targetExportPage.drawImage(qrImage, {
                             x: pdfX,
@@ -1256,11 +1244,11 @@
                     }
                 }
 
-                if (isStampPlaced && stampImgDataUrl) {
+                if (isStampPlaced && stampImgDataUrl && stampMarker.style.display === 'flex') {
                     const stampImageObject = await pdfDoc.embedPng(stampImgDataUrl);
 
-                    const stampLeft = isStampLocked ? (stampPosX - 60) : parseFloat(stampMarker.style.left);
-                    const stampTop = isStampLocked ? (stampPosY - 60) : parseFloat(stampMarker.style.top);
+                    const sLeft = parseFloat(stampMarker.style.left) || (stampPosX - 60);
+                    const sTop = parseFloat(stampMarker.style.top) || (stampPosY - 60);
 
                     let docStampW = stampMarker.clientWidth * scaleX;
                     let docStampH = stampMarker.clientHeight * scaleY;
@@ -1272,9 +1260,9 @@
                         docStampH = unifiedSquareDimensionValue;
                     }
 
-                    const docStampX = stampLeft * scaleX;
-                    const pageStampYOffsetCorrection = Math.floor(stampTop / actualWorkspaceHeight) * height;
-                    const docStampY = height - ((stampTop * scaleY) - pageStampYOffsetCorrection) - docStampH;
+                    const docStampX = sLeft * scaleX;
+                    const pageStampYOffsetCorrection = Math.floor(sTop / actualWorkspaceHeight) * height;
+                    const docStampY = height - ((sTop * scaleY) - pageStampYOffsetCorrection) - docStampH;
 
                     targetExportPage.drawImage(stampImageObject, {
                         x: docStampX,
@@ -1303,11 +1291,7 @@
         } catch (previewError) {
             alert("Preview Canvas Render Failure: " + previewError.message);
         }
-    }; // SECURE PREVIEW BUTTON HANDLER CLOSING ACCORDION BRACKET
-
-    // =========================================================================
-    // PLACED SAFELY OUTSIDE: FIXED MULTI-PAGE RENDER INITIALIZER
-    // =========================================================================
+    };
     function renderPdfToViewport(file) {
         const reader = new FileReader();
         const pdfFrame = document.getElementById('pdf-frame');
