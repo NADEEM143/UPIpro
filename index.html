@@ -653,9 +653,11 @@
             let actualWorkspaceHeight = 1;
             
             if (pdfFrameNode && pdfFrameNode.style.display === 'block') {
-                actualWorkspaceWidth = pdfFrameNode.offsetWidth;
-                actualWorkspaceHeight = pdfFrameNode.offsetHeight;
-            } else if (imgFrameNode && imgFrameNode.style.display === 'block') {
+    actualWorkspaceWidth = pdfFrameNode.offsetWidth;
+    // FIXED: Divide total workspace height by total pages to isolate an individual A4 sheet frame layer depth
+    actualWorkspaceHeight = pdfFrameNode.offsetHeight / pagesCollection.length;
+}
+            else if (imgFrameNode && imgFrameNode.style.display === 'block') {
                 // FIXED: Bypasses volatile element layout box models completely to read pristine file data values
                 actualWorkspaceWidth = imgFrameNode.naturalWidth;
                 actualWorkspaceHeight = imgFrameNode.naturalHeight;
@@ -1136,10 +1138,11 @@
                 
                 const { width, height } = targetExportPage.getSize();
 
-                let actualWorkspaceWidth = pdfFrameNode.offsetWidth || preview.offsetWidth;
-                let actualWorkspaceHeight = pdfFrameNode.offsetHeight || preview.offsetHeight;
-                const scaleX = width / actualWorkspaceWidth;
-                const scaleY = height / actualWorkspaceHeight;
+               let actualWorkspaceWidth = pdfFrameNode.offsetWidth || preview.offsetWidth;
+// FIXED: Divide total workspace height by total pages to isolate an individual A4 sheet frame layer depth
+let actualWorkspaceHeight = (pdfFrameNode.offsetHeight || preview.offsetHeight) / pagesCollection.length;
+const scaleX = width / actualWorkspaceWidth;
+const scaleY = height / actualWorkspaceHeight;
 
                 if (liveQrContainer && liveQrContainer.style.display === "block") {
                     const liveCanvasElement = liveQrContainer.querySelector('canvas');
