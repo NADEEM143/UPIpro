@@ -953,7 +953,7 @@
             const wordsTranslationString = convertAmountToWords(absoluteGrandTotal);
             targetPage.drawText(`In words:  ${wordsTranslationString}`, { x: tableLeftX + 5, y: tableBottomY - 74, size: 10, font: boldFont });
             
-            targetPage.drawText("Signature", { x: width - 110, y: tableBottomY - 120, size: 11, font: boldFont });
+            targetPage.drawText("Signature or Stamp", { x: width - 110, y: tableBottomY - 120, size: 11, font: boldFont });
 
             const amountInput = document.getElementById('amount');
             amountInput.value = absoluteGrandTotal.toFixed(2);
