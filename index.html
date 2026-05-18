@@ -654,8 +654,8 @@
             
             if (pdfFrameNode && pdfFrameNode.style.display === 'block') {
     actualWorkspaceWidth = pdfFrameNode.offsetWidth;
-    // FIXED: Divide total workspace height by total pages to isolate an individual A4 sheet frame layer depth
-    actualWorkspaceHeight = pdfFrameNode.offsetHeight / pagesCollection.length;
+    // FIXED: Sourced from a flawless 1.414 A4 technical aspect-ratio index map to isolate single page depth grid dimensions independently of browser layout constraints
+    actualWorkspaceHeight = actualWorkspaceWidth * 1.4142;
 }
             else if (imgFrameNode && imgFrameNode.style.display === 'block') {
                 // FIXED: Bypasses volatile element layout box models completely to read pristine file data values
@@ -1138,9 +1138,13 @@
                 
                 const { width, height } = targetExportPage.getSize();
 
-               let actualWorkspaceWidth = pdfFrameNode.offsetWidth || preview.offsetWidth;
-// FIXED: Divide total workspace height by total pages to isolate an individual A4 sheet frame layer depth
-let actualWorkspaceHeight = (pdfFrameNode.offsetHeight || preview.offsetHeight) / pagesCollection.length;
+               // FIXED: Establish the exact baseline display canvas width of the iframe viewport
+let actualWorkspaceWidth = pdfFrameNode.offsetWidth || preview.offsetWidth;
+
+// FIXED: Sourced from a flawless 1.414 A4 technical aspect-ratio index map to isolate single page depth grid dimensions independently of browser layout constraints
+let actualWorkspaceHeight = actualWorkspaceWidth * 1.4142;
+
+// FIXED: Maintain explicit separate scaling ratios for dimensions vs scroll coordinate offsets to kill size explosion bugs
 const scaleX = width / actualWorkspaceWidth;
 const scaleY = height / actualWorkspaceHeight;
 
