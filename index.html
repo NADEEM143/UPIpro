@@ -635,7 +635,7 @@
         }
     });
    
-        document.getElementById('downloadBtn').onclick = async () => {
+            document.getElementById('downloadBtn').onclick = async () => {
         try {
             const name = document.getElementById('payeeName').value;
             const vpa = document.getElementById('vpa').value;
@@ -651,67 +651,59 @@
             const qrImgDataUrl = liveCanvasElement.toDataURL('image/png');
             const pdfDoc = await PDFLib.PDFDocument.load(originalBytes);
             
-            // FIXED: Safe dynamic multi-page tracking references
+            // FIXED: Resolves target index collection securely across multi-page sheets
             const pagesCollection = pdfDoc.getPages();
             const targetExportPage = pagesCollection[currentActivePageIndex] || pagesCollection[0];
-
-            const qrImage = await pdfDoc.embedPng(qrImgDataUrl);
-            
-            // FIXED: Correctly gets the dimensions of the active target page without crashing
             const { width, height } = targetExportPage.getSize();
-            const preview = document.getElementById('workspace-scaler');
             
-            // FIXED: Dynamically references the unscaled loaded content layer instead of volatile viewport bounds
             const pdfFrameNode = document.getElementById('pdf-frame');
             const imgFrameNode = document.getElementById('image-frame');
             
-            let actualWorkspaceWidth = 1;
-            let actualWorkspaceHeight = 1;
+            // FIXED: References absolute unscaled coordinate bounds to kill shift drift
+            let actualWorkspaceWidth = pdfFrameNode.clientWidth || pdfFrameNode.offsetWidth || width;
+            let actualWorkspaceHeight = pdfFrameNode.clientHeight || pdfFrameNode.offsetHeight || height;
             
-            if (pdfFrameNode && pdfFrameNode.style.display === 'block') {
-                actualWorkspaceWidth = pdfFrameNode.offsetWidth;
-                actualWorkspaceHeight = pdfFrameNode.offsetHeight;
-            } else if (imgFrameNode && imgFrameNode.style.display === 'block') {
-                // FIXED: Bypasses volatile element layout box models completely to read pristine file data values
+            if (imgFrameNode && imgFrameNode.style.display === 'block') {
                 actualWorkspaceWidth = imgFrameNode.naturalWidth;
                 actualWorkspaceHeight = imgFrameNode.naturalHeight;
-            } else {
-                actualWorkspaceWidth = preview.offsetWidth;
-                actualWorkspaceHeight = preview.offsetHeight;
             }
 
-            // FIXED: Automatically checks if locked and normalizes screen clicks into true raw image pixel resolution vectors
-            const currentResponsiveLayoutScaleFactorX = imgFrameNode.offsetWidth / actualWorkspaceWidth;
-            const currentResponsiveLayoutScaleFactorY = imgFrameNode.offsetHeight / actualWorkspaceHeight;
+            // Absolute mathematical ratio converters
+            const scaleX = width / actualWorkspaceWidth;
+            const scaleY = height / actualWorkspaceHeight;
 
-            const finalLeftPos = (isQrLocked ? (posX - 40) : (parseFloat(marker.style.left) || (posX - 40))) / currentResponsiveLayoutScaleFactorX;
-            const finalTopPos = (isQrLocked ? (posY - 40) : (parseFloat(marker.style.top) || (posY - 40))) / currentResponsiveLayoutScaleFactorY;
+            // Enforce scaling parameters
+            if (marker.style.display === 'flex') {
+                const qrImage = await pdfDoc.embedPng(qrImgDataUrl);
+                
+                // FIXED: Extracts the exact responsive workspace style point
+                const markerLeft = isQrLocked ? (posX - 40) : parseFloat(marker.style.left);
+                const markerTop = isQrLocked ? (posY - 40) : parseFloat(marker.style.top);
+                
+                const finalQrWidth = marker.clientWidth * scaleX;
+                const finalQrHeight = marker.clientHeight * scaleY;
+                const finalSquareSize = Math.max(finalQrWidth, finalQrHeight);
+                
+                const pdfX = markerLeft * scaleX;
+                // FIXED: PDF coordinates start from the bottom-left. This perfectly flips the Y axis.
+                const pdfY = height - (markerTop * scaleY) - finalSquareSize;
 
-            const finalQrWidth = (marker.clientWidth / actualWorkspaceWidth) * width;
-            const finalQrHeight = (marker.clientHeight / actualWorkspaceHeight) * height;
-            const finalSquareSize = Math.max(finalQrWidth, finalQrHeight);
+                targetExportPage.drawImage(qrImage, {
+                    x: pdfX,
+                    y: pdfY,
+                    width: finalSquareSize,
+                    height: finalSquareSize
+                });
+            }
 
-                        const pdfX = (finalLeftPos / actualWorkspaceWidth) * width;
-            // FIXED: Pure relative ratio calculation matches your text block borders with perfect accuracy
-            const pdfY = height - (finalTopPos / actualWorkspaceHeight) * height - finalSquareSize;
-
-            // FIXED: Draws your QR code safely on your dynamic multi-page variable target
-            targetExportPage.drawImage(qrImage, {
-                x: pdfX,
-                y: pdfY,
-                width: finalSquareSize,
-                height: finalSquareSize
-            });
-            
-            // FIXED: Correctly separates the stamp conditional layer outside the QR drawing engine parameters
             if (isStampPlaced && stampImgDataUrl) {
                 const stampImageObject = await pdfDoc.embedPng(stampImgDataUrl);
 
-                const finalStampLeft = (isStampLocked ? (stampPosX - 60) : (parseFloat(stampMarker.style.left) || (stampPosX - 60))) / currentResponsiveLayoutScaleFactorX;
-                const finalStampTop = (isStampLocked ? (stampPosY - 60) : (parseFloat(stampMarker.style.top) || (stampPosY - 60))) / currentResponsiveLayoutScaleFactorY;
+                const stampLeft = isStampLocked ? (stampPosX - 60) : parseFloat(stampMarker.style.left);
+                const stampTop = isStampLocked ? (stampPosY - 60) : parseFloat(stampMarker.style.top);
 
-                let docStampW = (stampMarker.clientWidth / actualWorkspaceWidth) * width;
-                let docStampH = (stampMarker.clientHeight / actualWorkspaceHeight) * height;
+                let docStampW = stampMarker.clientWidth * scaleX;
+                let docStampH = stampMarker.clientHeight * scaleY;
                 
                 const currentSelectedShapeType = document.getElementById('stampShape').value;
                 if (currentSelectedShapeType === 'circle' || currentSelectedShapeType === 'square') {
@@ -720,10 +712,9 @@
                     docStampH = unifiedSquareDimensionValue;
                 }
 
-                const docStampX = (finalStampLeft / actualWorkspaceWidth) * width;
-                const docStampY = height - ((finalStampTop / actualWorkspaceHeight) * height) - docStampH;
+                const docStampX = stampLeft * scaleX;
+                const docStampY = height - (stampTop * scaleY) - docStampH;
                 
-                // FIXED: Draws your Digital Stamp safely on the matching dynamic multi-page variable target
                 targetExportPage.drawImage(stampImageObject, {
                     x: docStampX,
                     y: docStampY,
@@ -1246,7 +1237,7 @@
                     }
                 }
 
-                if (isStampPlaced && stampImgDataUrl) {
+                               if (isStampPlaced && stampImgDataUrl) {
                     const stampImageObject = await pdfDoc.embedPng(stampImgDataUrl);
 
                     const stampLeftStyle = isStampLocked ? (stampPosX - 60) : (parseFloat(stampMarker.style.left) || (stampPosX - 60));
@@ -1292,7 +1283,33 @@
         } catch (previewError) {
             alert("Preview Canvas Render Failure: " + previewError.message);
         }
-    };
+    }; // SECURE PREVIEW BUTTON HANDLER CLOSING ACCORDION BRACKET
+
+    // =========================================================================
+    // PLACED SAFELY OUTSIDE: FIXED MULTI-PAGE RENDER INITIALIZER
+    // =========================================================================
+    function renderPdfToViewport(file) {
+        const reader = new FileReader();
+        const pdfFrame = document.getElementById('pdf-frame');
+        const imgFrame = document.getElementById('image-frame');
+        
+        imgFrame.style.display = 'none';
+        pdfFrame.style.display = 'block';
+        
+        reader.onload = function(e) {
+            const blobUrl = URL.createObjectURL(file);
+            pdfFrame.src = blobUrl;
+            
+            const typedarray = new Uint8Array(e.target.result);
+            pdfjsLib.getDocument(typedarray).promise.then(function(pdf) {
+                pdfDocumentInstance = pdf;
+                // FIXED: Automatically tracks your dynamic active viewing context indices
+                currentActivePageIndex = 0; 
+                setupQROverlay(150, 150);
+            });
+        };
+        reader.readAsArrayBuffer(file);
+    }
 </script>
 </body>
 </html>
