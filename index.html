@@ -836,7 +836,7 @@
             }
         }
 
-        try {
+               try {
             const docInstance = await PDFLib.PDFDocument.create();
             const targetPage = docInstance.addPage([595.28, 841.89]); 
             const { width, height } = targetPage.getSize();
@@ -844,37 +844,67 @@
             const boldFont = await docInstance.embedFont(PDFLib.StandardFonts.HelveticaBold);
             const regularFont = await docInstance.embedFont(PDFLib.StandardFonts.Helvetica);
             
-            const bName = document.getElementById('bizName').value.toUpperCase() || "HARIOM SALES";
-            const bProp = document.getElementById('bizProprietor').value || "Hariom Tejwani";
-            const bMob1 = document.getElementById('bizMob1').value || "1234567890";
-            const bMob2 = document.getElementById('bizMob2').value || "1234567890";
-            const bEmail = document.getElementById('bizEmail').value || "";
-            const bGst = document.getElementById('bizGst').value || "22AFYPTxxxxxxxx";
-            const bAddr = document.getElementById('bizAddress').value || "Ward No. 50, Sindai Bajar Chowk, Kawardha (C.G.), 491995";
-            const bDateValue = document.getElementById('bizDate').value.trim() || "__ / __ / 20__";
+            // 🌟 FIXED: Extracted with trim() to catch empty or space-only input inputs correctly
+            const bName = document.getElementById('bizName').value.toUpperCase().trim();
+            const bProp = document.getElementById('bizProprietor').value.trim();
+            const bMob1 = document.getElementById('bizMob1').value.trim();
+            const bMob2 = document.getElementById('bizMob2').value.trim();
+            const bEmail = document.getElementById('bizEmail').value.trim();
+            const bGst = document.getElementById('bizGst').value.trim();
+            const bAddr = document.getElementById('bizAddress').value.trim();
+            const bDateValue = document.getElementById('bizDate').value.trim();
 
-            let topY = height - 50;
-            if (bGst) targetPage.drawText(`GSTIN: ${bGst}`, { x: 40, y: topY, size: 10, font: boldFont });
-            targetPage.drawText(bProp, { x: width - 180, y: topY, size: 11, font: boldFont });
-            
-            topY -= 14;
-            targetPage.drawText(`Mo. ${bMob1}`, { x: width - 180, y: topY, size: 10, font: boldFont });
-            topY -= 12;
-            targetPage.drawText(bMob2, { x: width - 159, y: topY, size: 10, font: boldFont });
-            
-            if (bEmail) {
-                topY -= 12;
-                targetPage.drawText(bEmail, { x: width - 180, y: topY, size: 9, font: regularFont });
+            // 🌟 FIXED: Dynamic baseline position marker prevents empty space layout gaps
+            let rightSideTextY = height - 50;
+
+            // 1. Draw GSTIN on the Left only if the box has content data values
+            if (bGst !== "") {
+                targetPage.drawText(`GSTIN: ${bGst}`, { x: 40, y: height - 50, size: 10, font: boldFont });
             }
 
-            targetPage.drawText(bName, { x: 40, y: height - 95, size: 28, font: boldFont });
+            // 2. Draw Proprietor Name on the Right side if filled
+            if (bProp !== "") {
+                targetPage.drawText(bProp, { x: width - 180, y: rightSideTextY, size: 11, font: boldFont });
+                rightSideTextY -= 14; // Shift dynamic coordinate down only if text was printed
+            }
+
+            // 3. Draw Mobile 1 on the Right side if filled
+            if (bMob1 !== "") {
+                targetPage.drawText(`Mo. ${bMob1}`, { x: width - 180, y: rightSideTextY, size: 10, font: boldFont });
+                rightSideTextY -= 12; // Shift dynamic coordinate down only if text was printed
+            }
+
+            // 4. Draw Mobile 2 on the Right side if filled
+            if (bMob2 !== "") {
+                targetPage.drawText(`    ${bMob2}`, { x: width - 180, y: rightSideTextY, size: 10, font: boldFont });
+                rightSideTextY -= 12; // Shift dynamic coordinate down only if text was printed
+            }
+
+            // 5. Draw Email ID on the Right side if filled
+            if (bEmail !== "") {
+                targetPage.drawText(bEmail, { x: width - 180, y: rightSideTextY, size: 9, font: regularFont });
+            }
+
+            // 6. Draw Main Business Brand Title Headline if filled
+            if (bName !== "") {
+                targetPage.drawText(bName, { x: 40, y: height - 95, size: 28, font: boldFont });
+            }
             
-            let addrY = height - 112;
-            targetPage.drawText(bAddr, { x: 40, y: addrY, size: 10, font: boldFont });
-            targetPage.drawText(`Date:  ${bDateValue}`, { x: width - 150, y: addrY, size: 10, font: boldFont });
+            // 7. Draw Address and Invoice Date line parameters safely if filled
+            let subHeaderY = height - 112;
+            
+            if (bAddr !== "") {
+                targetPage.drawText(bAddr, { x: 40, y: subHeaderY, size: 10, font: boldFont });
+            }
+            if (bDateValue !== "") {
+                targetPage.drawText(`Date:  ${bDateValue}`, { x: width - 150, y: subHeaderY, size: 10, font: boldFont });
+            } else {
+                // Default fallback if Date box is completely empty
+                targetPage.drawText(`Date:  __ / __ / 20__`, { x: width - 150, y: subHeaderY, size: 10, font: boldFont });
+            }
 
+            // Solid horizontal boundary line break below the header data blocks
             targetPage.drawLine({ start: { x: 40, y: height - 122 }, end: { x: width - 40, y: height - 122 }, strokeWidth: 1.5 });
-
             let clientY = height - 150;
             targetPage.drawText("Mr./Mrs. __________________________________________ Mo. _____________________", { x: 40, y: clientY, size: 11, font: boldFont });
             clientY -= 22;
