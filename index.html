@@ -1140,8 +1140,7 @@
         document.getElementById('downloadBtn').style.display = 'block';
     }
         // LIVE VIEWPORT PREVIEW MATRIX COMPILATION ENGINE
-    document.getElementById('previewBtn').onclick = async () => {
-            document.getElementById('previewBtn').onclick = async () => {
+        document.getElementById('previewBtn').onclick = async () => {
         try {
             if (!originalBytes) return alert("Select or Generate PDF First");
 
@@ -1292,6 +1291,10 @@
             alert("Preview Canvas Render Failure: " + previewError.message);
         }
     };
+
+    // =========================================================================
+    // PASTED COMPLETELY AND CLEANLY TO RE-ESTABLISH RENDER FUNCTIONS
+    // =========================================================================
     function renderPdfToViewport(file) {
         const reader = new FileReader();
         const pdfFrame = document.getElementById('pdf-frame');
@@ -1307,7 +1310,6 @@
             const typedarray = new Uint8Array(e.target.result);
             pdfjsLib.getDocument(typedarray).promise.then(function(pdf) {
                 pdfDocumentInstance = pdf;
-                // FIXED: Automatically tracks your dynamic active viewing context indices
                 currentActivePageIndex = 0; 
                 setupQROverlay(150, 150);
             });
