@@ -24,10 +24,8 @@
         }
         #pdf-frame { width: 100%; height: 100%; border: none; display: none; min-height: 640px; }
         
-        /* SECURE SURFACE NOTATION ELEMENT FOR RENDERING INCOMING JPEG ATTACHMENT STRATA */
         #image-frame { width: 100%; height: auto; max-height: 100%; object-fit: contain; display: none; min-height: 640px; border: none; pointer-events: none; }
         
-        /* QR MARKER */
         #qr-marker { 
             position: absolute; width: 80px; height: 80px; 
             background: white; border: 2px solid var(--primary); 
@@ -35,7 +33,6 @@
             z-index: 2000; cursor: move; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.2);
             resize: both; 
             overflow: hidden; 
-            /* NEW MATRIX ADDITION: Forces the bounding box to maintain a perfect square aspect ratio */
             aspect-ratio: 1 / 1 !important;
         }
         
@@ -56,7 +53,6 @@
         #qr-graphic-target img {
             width: 100% !important;
             height: 100% !important;
-            /* CHANGED back to contain to keep your pixel matrix scale high resolution and crisp */
             object-fit: contain !important;
             display: block !important;
         }
@@ -64,7 +60,6 @@
         #qr-marker span { font-size: 10px; font-weight: bold; color: var(--primary); pointer-events: none; }
         #click-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1000; display: none; background: rgba(0,0,0,0.01); }
 
-        /* ON-SCREEN NOTIFICATION STYLING */
         #on-screen-note {
             position: fixed; top: 40px; left: 50%; transform: translateX(-50%);
             background: rgba(15, 23, 42, 0.9); color: white; padding: 12px 24px;
@@ -73,7 +68,6 @@
             pointer-events: none;
         }
 
-        /* GENERATE PDF CONFIGURATION SYSTEM STYLING */
         .gen-pdf-box {
             margin-top: 20px;
             padding-top: 15px;
@@ -141,7 +135,6 @@
             font-weight: 400;
         }
 
-        /* GEAR SETTING AND SIDEBAR PANEL STYLING */
         .settings-icon {
             position: absolute; top: 30px; right: 30px; font-size: 24px; cursor: pointer; z-index: 4000; transition: transform 0.3s;
         }
@@ -157,7 +150,6 @@
         .btn-red { background: #dc2626; color: white; width: 100%; margin-top: 10px; }
         .btn-red:hover { background: #b91c1c; }
         
-        /* MODIFIED: ADAPTED STAMP MARKER SYSTEM SUPPORTING EXPANSIVE TRANSFORM OVERLAYS EXTREMITIES LIKE THE QR DECORATOR */
                 #stamp-marker {
             position: absolute; width: 120px; height: 120px; border: 2px dashed #dc2626; display: none;
             align-items: center; justify-content: center; z-index: 2005; cursor: move;
@@ -178,9 +170,7 @@
         .zoom-btn:hover { background: #475569; }
         .zoom-display { color: white; font-size: 11px; font-weight: 600; align-self: center; padding: 0 6px; min-width: 42px; text-align: center; }
 
-        /* ELITE PREMIUM RESPONSIVE WORKSPACE MEDIA QUERY LAYOUT MATRIX */
         @media (max-width: 1024px) {
-            /* Transitions sidebar layout flow onto a unified top-to-bottom stack */
             body {
                 flex-direction: column !important;
                 overflow-y: auto !important;
@@ -188,7 +178,6 @@
                 padding: 12px !important;
             }
 
-            /* Compresses your control form area panels into a matching layout row format */
             .sidebar-panel-container, 
             #settingsPanel,
             div[style*="width: 30%"], 
@@ -199,17 +188,15 @@
                 box-sizing: border-box !important;
             }
 
-            /* Prevents the preview workspace from collapsing or breaking on narrow screens */
             #dropzone,
             #workspace-scaler,
             div[style*="width: 70%"],
             div[style*="width: 75%"] {
                 width: 100% !important;
-                height: 500px !important; /* Locks stable depth constraints for mobile screens */
+                height: 500px !important;
                 box-sizing: border-box !important;
             }
 
-            /* Scales typography sizes dynamically to preserve premium readability */
             #upload-placeholder-prompt h3 {
                 font-size: 16px !important;
             }
@@ -229,7 +216,6 @@
 <div class="settings-panel" id="settingsPanel">
     <h4>Configuration Panel</h4>
     
-    <!-- 🏵️ DIGITAL STAMP INTERFACE CHANNEL SECTION -->
     <div class="settings-option-item" id="digitalStampOptionMenu">🏵️ Digital Stamp</div>
     
     <div class="stamp-form" id="stampFormArea">
@@ -265,10 +251,8 @@
         <button id="lockStampBtn" class="btn btn-red">📍 Place Stamp Position</button>
     </div>
 
-    <!-- 🏢 BUSINESS DETAILS INTERFACE CHANNEL SECTION (PLACED SAFELY INSIDE THE PANEL CONTAINER CLOSURE) -->
     <div class="settings-option-item" id="businessDetailsOptionMenu" style="margin-top: 10px;">🏢 Business Details</div>
 
-    <!-- Locate this container panel in your HTML layout block -->
 <div class="stamp-form" id="businessFormArea">
     <div class="input-group"><label>Business Name</label><input type="text" id="bizName" placeholder="e.g., NADIM ENTERPRISE"></div>
     <div class="input-group"><label>Proprietor Name</label><input type="text" id="bizProprietor" placeholder="e.g., NADIM"></div>
@@ -278,11 +262,10 @@
     <div class="input-group"><label>GST Number</label><input type="text" id="bizGst" placeholder="22AFYPTxxxxxxxx"></div>
     <div class="input-group"><label>Business Address</label><input type="text" id="bizAddress" placeholder="Building 1290, Gali no 4..."></div>
     
-    <!-- 📅 ADD THIS NEW CUSTOM INPUT LAYER HERE -->
     <div class="input-group"><label>Invoice Date</label><input type="text" id="bizDate" placeholder="e.g., 17/05/2026 or leave blank"></div>
 </div>
 
-</div> <!-- SECURE PANEL CLOSING BOUNDARY TAG -->
+</div>
     
 <div class="container">
     <div class="header">
@@ -326,11 +309,8 @@
                <div class="preview-area" id="dropzone">
             <div id="workspace-scaler" style="position: relative;">
                 
-                <!-- 📥 ADDED INITIALIZATION UPLOAD PROMPT PANEL -->
-                                <!-- ELITE PREMIUM INITIALIZATION UPLOAD PROMPT PANEL (PERFECTLY CENTERED) -->
                 <div id="upload-placeholder-prompt" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; padding: 40px; pointer-events: none; user-select: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 100%; max-width: 500px; z-index: 10; box-sizing: border-box;">
                     
-                    <!-- Ultra-Premium Radiant Glowing Icon Container -->
                     <div style="width: 84px; height: 84px; background: radial-gradient(circle, rgba(59, 130, 246, 0.2) 0%, rgba(59, 130, 246, 0.03) 70%); border: 1px solid rgba(59, 130, 246, 0.4); border-radius: 24px; display: flex; align-items: center; justify-content: center; margin-bottom: 24px; box-shadow: 0 12px 24px -6px rgba(59, 130, 246, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.1); backdrop-filter: blur(4px);">
                         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
@@ -339,7 +319,6 @@
                         </svg>
                     </div>
                     
-                    <!-- Elite Typography Design Frame -->
                     <h3 style="color: #ffffff; font-size: 20px; font-weight: 600; margin: 0 0 10px 0; letter-spacing: -0.02em; text-shadow: 0 2px 4px rgba(0,0,0,0.3); line-height: 1.3;">
                         Upload your Invoice PDF or Paste Clipboard Screenshot
                     </h3>
@@ -348,14 +327,12 @@
                         Drop a transaction document anywhere over this blank viewport container panel surface area to initialize branding matrices.
                     </p>
                     
-                    <!-- Premium Accent Minimal Subtle Sub-Label Badge -->
                     <div style="margin-top: 24px; display: flex; align-items: center; gap: 8px; background: rgba(255, 255, 255, 0.04); padding: 6px 14px; border-radius: 100px; border: 1px solid rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px);">
                         <span style="display: inline-block; width: 6px; height: 6px; background-color: #10b981; border-radius: 50%; box-shadow: 0 0 8px #10b981;"></span>
                         <span style="color: #64748b; font-size: 11px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase;">Ready for Secure Import</span>
                     </div>
                 </div>
 
-                <!-- Substrate view frames remain safe underneath -->
                 <iframe id="pdf-frame"></iframe>
                 <img id="image-frame" alt="Invoice Preview Surface Substrate Layer">
                 <div id="click-overlay"></div>
@@ -389,7 +366,6 @@
     const stampOptionMenu = document.getElementById('digitalStampOptionMenu');
     const stampFormArea = document.getElementById('stampFormArea');
     
-    // FIXED: Added missing multi-page tracking variables globally so the preview engine doesn't crash
     let currentActivePageIndex = 0; 
     const lockStampBtn = document.getElementById('lockStampBtn');
 
@@ -483,23 +459,18 @@
 
         document.getElementById('click-overlay').style.display = 'none';
         
-        // FIXED: Displays both your Preview and Download buttons when the asset layout overlay is clicked
         document.getElementById('previewBtn').style.display = 'block';
         document.getElementById('downloadBtn').style.display = 'block';
         note.style.display = 'none';
     };
 
-    // Dragging/Resize Mechanics
-    // PERFECTED DRIFT-FREE DRAGGING MECHANICS WITH TWIN ENTER-LOCKS
         let isDragging = false;
     let offsetX = 0, offsetY = 0;
     let stampOffsetX = 0, stampOffsetY = 0;
     let isQrLocked = false; 
     let isStampLocked = false; 
 
-    // ==========================================
-    // DESKTOP MOUSE DRAGGING ENGINE LOGIC PATHS
-    // ==========================================
+
     marker.onmousedown = (e) => { 
         if (isQrLocked) return; 
         if (e.offsetX < marker.clientWidth - 15 && e.offsetY < marker.clientHeight - 15) {
@@ -539,9 +510,6 @@
         isStampDragging = false;
     };
 
-    // ==========================================
-    // MOBILE TOUCH DRAGGING ENGINE LOGIC PATHS
-    // ==========================================
     marker.ontouchstart = (e) => {
         if (isQrLocked) return;
         isDragging = true;
@@ -588,7 +556,6 @@
         isStampDragging = false;
     });
 
-    // TWIN LOCK LISTENER FOR BOTH QR CODE AND STAMP LAYOUTS
     window.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
             if (!originalBytes) return;
@@ -597,7 +564,6 @@
             
             if (marker.style.display === 'flex' && !isQrLocked) {
                 isQrLocked = true;
-                // FIXED: Adding back the 40px baseline offset recovers the exact visual center position for your PDF translation math matrix
                 posX = (parseFloat(marker.style.left) || posX) + 40;
                 posY = (parseFloat(marker.style.top) || posY) + 40;
                 marker.style.borderColor = "#059669"; 
@@ -607,7 +573,6 @@
             
             if (stampMarker.style.display === 'flex' && !isStampLocked) {
                 isStampLocked = true;
-                // FIXED: Adding back the 60px baseline offset recovers the exact visual center position for your PDF translation math matrix
                 stampPosX = (parseFloat(stampMarker.style.left) || stampPosX) + 60;
                 stampPosY = (parseFloat(stampMarker.style.top) || stampPosY) + 60;
                 stampMarker.style.borderStyle = "solid"; 
@@ -617,7 +582,6 @@
             }
             
                         if (toastMessage !== "") {
-                // Automatically exposes your layout actions buttons
                 document.getElementById('previewBtn').style.display = 'block';
                 document.getElementById('downloadBtn').style.display = 'block';
 
@@ -626,11 +590,10 @@
                 toast.style.display = 'block';
                 setTimeout(() => { toast.style.display = 'none'; }, 3000);
 
-                // FIXED: Triggers the entire live preview engine automatically when Enter is pressed!
                 setTimeout(() => {
                     const previewBtn = document.getElementById('previewBtn');
                     if (previewBtn) previewBtn.click();
-                }, 50); // Small 50ms delay to guarantee tracking styles finish updating in memory first
+                }, 50);
             }
         }
     });
@@ -651,17 +614,14 @@
             const qrImgDataUrl = liveCanvasElement.toDataURL('image/png');
             const pdfDoc = await PDFLib.PDFDocument.load(originalBytes);
             
-            // FIXED: Safe dynamic multi-page tracking references
             const pagesCollection = pdfDoc.getPages();
             const targetExportPage = pagesCollection[currentActivePageIndex] || pagesCollection[0];
 
             const qrImage = await pdfDoc.embedPng(qrImgDataUrl);
             
-            // FIXED: Correctly gets the dimensions of the active target page without crashing
             const { width, height } = targetExportPage.getSize();
             const preview = document.getElementById('workspace-scaler');
             
-            // FIXED: Dynamically references the unscaled loaded content layer instead of volatile viewport bounds
             const pdfFrameNode = document.getElementById('pdf-frame');
             const imgFrameNode = document.getElementById('image-frame');
             
@@ -672,7 +632,6 @@
                 actualWorkspaceWidth = pdfFrameNode.offsetWidth;
                 actualWorkspaceHeight = pdfFrameNode.offsetHeight;
             } else if (imgFrameNode && imgFrameNode.style.display === 'block') {
-                // FIXED: Bypasses volatile element layout box models completely to read pristine file data values
                 actualWorkspaceWidth = imgFrameNode.naturalWidth;
                 actualWorkspaceHeight = imgFrameNode.naturalHeight;
             } else {
@@ -680,7 +639,6 @@
                 actualWorkspaceHeight = preview.offsetHeight;
             }
 
-            // FIXED: Automatically checks if locked and normalizes screen clicks into true raw image pixel resolution vectors
             const currentResponsiveLayoutScaleFactorX = imgFrameNode.offsetWidth / actualWorkspaceWidth;
             const currentResponsiveLayoutScaleFactorY = imgFrameNode.offsetHeight / actualWorkspaceHeight;
 
@@ -692,10 +650,8 @@
             const finalSquareSize = Math.max(finalQrWidth, finalQrHeight);
 
                         const pdfX = (finalLeftPos / actualWorkspaceWidth) * width;
-            // FIXED: Pure relative ratio calculation matches your text block borders with perfect accuracy
             const pdfY = height - (finalTopPos / actualWorkspaceHeight) * height - finalSquareSize;
 
-            // FIXED: Draws your QR code safely on your dynamic multi-page variable target
             targetExportPage.drawImage(qrImage, {
                 x: pdfX,
                 y: pdfY,
@@ -703,7 +659,6 @@
                 height: finalSquareSize
             });
             
-            // FIXED: Correctly separates the stamp conditional layer outside the QR drawing engine parameters
             if (isStampPlaced && stampImgDataUrl) {
                 const stampImageObject = await pdfDoc.embedPng(stampImgDataUrl);
 
@@ -723,7 +678,6 @@
                 const docStampX = (finalStampLeft / actualWorkspaceWidth) * width;
                 const docStampY = height - ((finalStampTop / actualWorkspaceHeight) * height) - docStampH;
                 
-                // FIXED: Draws your Digital Stamp safely on the matching dynamic multi-page variable target
                 targetExportPage.drawImage(stampImageObject, {
                     x: docStampX,
                     y: docStampY,
@@ -844,7 +798,6 @@
             const boldFont = await docInstance.embedFont(PDFLib.StandardFonts.HelveticaBold);
             const regularFont = await docInstance.embedFont(PDFLib.StandardFonts.Helvetica);
             
-            // 🌟 FIXED: Extracted with trim() to catch empty or space-only input inputs correctly
             const bName = document.getElementById('bizName').value.toUpperCase().trim();
             const bProp = document.getElementById('bizProprietor').value.trim();
             const bMob1 = document.getElementById('bizMob1').value.trim();
@@ -854,43 +807,35 @@
             const bAddr = document.getElementById('bizAddress').value.trim();
             const bDateValue = document.getElementById('bizDate').value.trim();
 
-            // 🌟 FIXED: Dynamic baseline position marker prevents empty space layout gaps
             let rightSideTextY = height - 50;
 
-            // 1. Draw GSTIN on the Left only if the box has content data values
             if (bGst !== "") {
                 targetPage.drawText(`GSTIN: ${bGst}`, { x: 40, y: height - 50, size: 10, font: boldFont });
             }
 
-            // 2. Draw Proprietor Name on the Right side if filled
             if (bProp !== "") {
                 targetPage.drawText(bProp, { x: width - 180, y: rightSideTextY, size: 11, font: boldFont });
-                rightSideTextY -= 14; // Shift dynamic coordinate down only if text was printed
+                rightSideTextY -= 14;
             }
 
-            // 3. Draw Mobile 1 on the Right side if filled
             if (bMob1 !== "") {
                 targetPage.drawText(`Mo. ${bMob1}`, { x: width - 180, y: rightSideTextY, size: 10, font: boldFont });
-                rightSideTextY -= 12; // Shift dynamic coordinate down only if text was printed
+                rightSideTextY -= 12;
             }
 
-            // 4. Draw Mobile 2 on the Right side if filled
             if (bMob2 !== "") {
                 targetPage.drawText(`    ${bMob2}`, { x: width - 180, y: rightSideTextY, size: 10, font: boldFont });
                 rightSideTextY -= 12; // Shift dynamic coordinate down only if text was printed
             }
 
-            // 5. Draw Email ID on the Right side if filled
             if (bEmail !== "") {
                 targetPage.drawText(bEmail, { x: width - 180, y: rightSideTextY, size: 9, font: regularFont });
             }
 
-            // 6. Draw Main Business Brand Title Headline if filled
             if (bName !== "") {
                 targetPage.drawText(bName, { x: 40, y: height - 95, size: 28, font: boldFont });
             }
             
-            // 7. Draw Address and Invoice Date line parameters safely if filled
             let subHeaderY = height - 112;
             
             if (bAddr !== "") {
@@ -899,7 +844,6 @@
             if (bDateValue !== "") {
                 targetPage.drawText(`Date:  ${bDateValue}`, { x: width - 150, y: subHeaderY, size: 10, font: boldFont });
             } else {
-                // Default fallback if Date box is completely empty
                 targetPage.drawText(`Date:  __ / __ / 20__`, { x: width - 150, y: subHeaderY, size: 10, font: boldFont });
             }
 
@@ -958,15 +902,12 @@
             const sgstValue = subTotalCost * 0.09;
             const absoluteGrandTotal = subTotalCost + cgstValue + sgstValue;
 
-            // 🌟 FIXED SUMMARY BORDERS (MATCHES THE ATTACHED IMAGE SPECIFICATION EXTENTS)
             targetPage.drawLine({ start: { x: colX.rate, y: tableBottomY - 20 }, end: { x: colX.end, y: tableBottomY - 20 }, strokeWidth: 1 });
             targetPage.drawLine({ start: { x: colX.rate, y: tableBottomY - 40 }, end: { x: colX.end, y: tableBottomY - 40 }, strokeWidth: 1 });
             targetPage.drawLine({ start: { x: colX.rate, y: tableBottomY - 60 }, end: { x: colX.end, y: tableBottomY - 60 }, strokeWidth: 1 });
             
-            // Outer bottom envelope container baseline frame line
             targetPage.drawLine({ start: { x: tableLeftX, y: tableBottomY - 80 }, end: { x: colX.end, y: tableBottomY - 80 }, strokeWidth: 1 });
 
-            // Text calculations anchors layout placements 
             targetPage.drawText("SubTotal", { x: colX.rate + 6, y: tableBottomY - 14, size: 10, font: boldFont });
             targetPage.drawText(subTotalCost.toFixed(2), { x: colX.amt + 15, y: tableBottomY - 14, size: 11, font: boldFont });
 
@@ -979,7 +920,6 @@
             targetPage.drawText("Total", { x: colX.rate + 6, y: tableBottomY - 74, size: 12, font: boldFont });
             targetPage.drawText(absoluteGrandTotal.toFixed(2), { x: colX.amt + 15, y: tableBottomY - 74, size: 12, font: boldFont });
 
-            // 🌟 AUTOMATED INDIAN NUMBER TO WORDS PARSER STRATA PLACEMENT
             const wordsTranslationString = convertAmountToWords(absoluteGrandTotal);
             targetPage.drawText(`In words:  ${wordsTranslationString}`, { x: tableLeftX + 5, y: tableBottomY - 74, size: 10, font: boldFont });
             
@@ -1012,7 +952,6 @@
         stampFormArea.style.display = stampFormArea.style.display === 'block' ? 'none' : 'block';
     };
 
-    // --- ADD THIS PORTION RIGHT HERE ---
     const businessOptionMenu = document.getElementById('businessDetailsOptionMenu');
     const businessFormArea = document.getElementById('businessFormArea');
 
@@ -1117,7 +1056,6 @@
             const randomCoordX = Math.random() * 480;
             const randomCoordY = Math.random() * 480;
             if (bufferCtx.getImageData(randomCoordX, randomCoordY, 1, 1).data[3] > 0) {
-                // FIXED: Changed ctx to bufferCtx to properly clear pixel data for the erosion effect
                 bufferCtx.clearRect(randomCoordX, randomCoordY, Math.random() * 2 + 1, Math.random() * 2 + 1);
             }
         }
@@ -1125,15 +1063,12 @@
             const randomSpreadX = Math.random() * 480;
             const randomSpreadY = Math.random() * 480;
             if (bufferCtx.getImageData(randomSpreadX, randomSpreadY, 1, 1).data[3] === 0) {
-                // FIXED: Changed ctx to bufferCtx to safely render scattered ink noise spray
                 bufferCtx.globalAlpha = Math.random() * 0.4;
                 bufferCtx.fillRect(randomSpreadX, randomSpreadY, 1.5, 1.5);
             }
         }
-        // FIXED: Safely reset the baseline alpha channel on the active buffer context
         bufferCtx.globalAlpha = 1.0;
 
-        // FIXED: Swapped canvas to stampGraphicBufferCanvas to extract your valid PNG base64 string
         stampImgDataUrl = stampGraphicBufferCanvas.toDataURL('image/png');
 
         stampMarker.innerHTML = `<img src="${stampImgDataUrl}" style="width:100%; height:100%; pointer-events:none;" />`;
@@ -1150,7 +1085,6 @@
         stampPosX = (e.clientX - rect.left) / currentZoomScale; 
         stampPosY = (e.clientY - rect.top) / currentZoomScale;
         
-        // FIX: Replaced dynamic clientWidth (which is 0 when hidden) with a solid 60px baseline offset to center the stamp on click
                 stampMarker.style.left = (stampPosX - 60) + 'px';
         stampMarker.style.top = (stampPosY - 60) + 'px';
         stampMarker.style.display = 'flex';
@@ -1158,13 +1092,11 @@
         isStampPlaced = true;
         document.getElementById('click-overlay-stamp').style.display = 'none';
         
-        // FIXED: Exposes both your Live Preview and Download options when placing ONLY a stamp
         document.getElementById('previewBtn').style.display = 'block';
         document.getElementById('downloadBtn').style.display = 'block';
         note.style.display = 'none';
     };
 
-    // FIX: Prevents dragging when locked, tracks correct bounding box offsets, and mirrors the exact working logic of your QR code marker
     stampMarker.onmousedown = (e) => { 
         if (isStampLocked) return; 
         if (e.offsetX < stampMarker.clientWidth - 15 && e.offsetY < stampMarker.clientHeight - 15) {
@@ -1193,7 +1125,6 @@
         originalBytes = await fileObj.arrayBuffer();
         const generatedObjectUrl = URL.createObjectURL(new Blob([originalBytes], {type: fileObj.type}));
         
-        // 🌟 FIXED: Hides the visual guide layout prompt instantly upon file buffer initialization
         const initialPromptNode = document.getElementById('upload-placeholder-prompt');
         if (initialPromptNode) initialPromptNode.style.display = 'none';
         
@@ -1212,7 +1143,6 @@
         document.getElementById('previewBtn').style.display = 'block';
         document.getElementById('downloadBtn').style.display = 'block';
     }
-        // LIVE VIEWPORT PREVIEW MATRIX COMPILATION ENGINE
     document.getElementById('previewBtn').onclick = async () => {
         try {
             if (!originalBytes) return alert("Select or Generate PDF First");
@@ -1282,7 +1212,6 @@
             } else {
                 const pdfDoc = await PDFLib.PDFDocument.load(originalBytes);
                 
-                // FIXED: Reads your new global variable safely right here
                 const pagesCollection = pdfDoc.getPages();
                 const safePageIndex = (typeof currentActivePageIndex !== 'undefined') ? currentActivePageIndex : 0;
                 const targetExportPage = pagesCollection[safePageIndex] || pagesCollection[0];
@@ -1364,7 +1293,6 @@
             alert("Preview Canvas Render Failure: " + previewError.message);
         }
         };
-    // 🌟 PERFECT: Pure standalone function structure with no stray outer brackets
     function convertAmountToWords(amount) {
         const sglDigit = ["Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"],
             dblDigit = ["Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"],
