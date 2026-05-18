@@ -821,7 +821,7 @@
         document.getElementById('charCounter').innerText = "0/35";
     };
 
-                        document.getElementById('makePdfBtn').onclick = async () => {
+                            document.getElementById('makePdfBtn').onclick = async () => {
         if (productsList.length === 0) {
             const nameField = document.getElementById('prodName').value.trim();
             const priceField = parseFloat(document.getElementById('prodPrice').value || 0);
@@ -853,7 +853,6 @@
             const bAddr = document.getElementById('bizAddress').value || "Ward No. 50, Sindai Bajar Chowk, Kawardha (C.G.), 491995";
             const bDateValue = document.getElementById('bizDate').value.trim() || "__ / __ / 20__";
 
-            // Header Meta Data Setup
             let topY = height - 50;
             if (bGst) targetPage.drawText(`GSTIN: ${bGst}`, { x: 40, y: topY, size: 10, font: boldFont });
             targetPage.drawText(bProp, { x: width - 180, y: topY, size: 11, font: boldFont });
@@ -881,7 +880,7 @@
             clientY -= 22;
             targetPage.drawText("Address ____________________________________________________________________", { x: 40, y: clientY, size: 11, font: boldFont });
 
-            // Table Structure
+            // Table Grid Coordinate Configuration
             const tableTopY = height - 200;
             const tableBottomY = 160; 
             const tableLeftX = 40;
@@ -893,13 +892,13 @@
 
             const colX = { no: 40, part: 75, qty: 340, rate: 410, amt: 480, end: width - 40 };
 
-            // FIXED: Explicit structural keys passed into each array mapping coordinate loop execution path
+            // Full Height Column Seperators
             targetPage.drawLine({ start: { x: colX.no, y: tableTopY }, end: { x: colX.no, y: tableBottomY }, strokeWidth: 1 });
             targetPage.drawLine({ start: { x: colX.part, y: tableTopY }, end: { x: colX.part, y: tableBottomY }, strokeWidth: 1 });
             targetPage.drawLine({ start: { x: colX.qty, y: tableTopY }, end: { x: colX.qty, y: tableBottomY }, strokeWidth: 1 });
-            targetPage.drawLine({ start: { x: colX.rate, y: tableTopY }, end: { x: colX.rate, y: tableBottomY }, strokeWidth: 1 });
-            targetPage.drawLine({ start: { x: colX.amt, y: tableTopY }, end: { x: colX.amt, y: tableBottomY }, strokeWidth: 1 });
-            targetPage.drawLine({ start: { x: colX.end, y: tableTopY }, end: { x: colX.end, y: tableBottomY }, strokeWidth: 1 });
+            targetPage.drawLine({ start: { x: colX.rate, y: tableTopY }, end: { x: colX.rate, y: tableBottomY - 80 }, strokeWidth: 1 }); // Extended downwards to cover lower totals rows
+            targetPage.drawLine({ start: { x: colX.amt, y: tableTopY }, end: { x: colX.amt, y: tableBottomY - 80 }, strokeWidth: 1 }); // Extended downwards to cover lower totals rows
+            targetPage.drawLine({ start: { x: colX.end, y: tableTopY }, end: { x: colX.end, y: tableBottomY - 80 }, strokeWidth: 1 }); // Extended downwards to cover lower totals rows
 
             targetPage.drawText("No.", { x: colX.no + 10, y: tableTopY - 17, size: 11, font: boldFont });
             targetPage.drawText("Particular", { x: colX.part + 10, y: tableTopY - 17, size: 11, font: boldFont });
@@ -929,12 +928,13 @@
             const sgstValue = subTotalCost * 0.09;
             const absoluteGrandTotal = subTotalCost + cgstValue + sgstValue;
 
+            // ========================================================
+            // 🌟 FIXED SUMMARY BORDERS (MATCHES ATTACHED SNIPPET IMAGE)
+            // ========================================================
             targetPage.drawLine({ start: { x: colX.rate, y: tableBottomY - 20 }, end: { x: colX.end, y: tableBottomY - 20 }, strokeWidth: 1 });
             targetPage.drawLine({ start: { x: colX.rate, y: tableBottomY - 40 }, end: { x: colX.end, y: tableBottomY - 40 }, strokeWidth: 1 });
             targetPage.drawLine({ start: { x: colX.rate, y: tableBottomY - 60 }, end: { x: colX.end, y: tableBottomY - 60 }, strokeWidth: 1 });
             targetPage.drawLine({ start: { x: tableLeftX, y: tableBottomY - 80 }, end: { x: colX.end, y: tableBottomY - 80 }, strokeWidth: 1 });
-
-            targetPage.drawLine({ start: { x: colX.amt, y: tableBottomY }, end: { x: colX.amt, y: tableBottomY - 80 }, strokeWidth: 1 });
 
             targetPage.drawText("SubTotal", { x: colX.rate + 6, y: tableBottomY - 14, size: 10, font: boldFont });
             targetPage.drawText(subTotalCost.toFixed(2), { x: colX.amt + 15, y: tableBottomY - 14, size: 11, font: boldFont });
@@ -948,7 +948,12 @@
             targetPage.drawText("Total", { x: colX.rate + 6, y: tableBottomY - 74, size: 12, font: boldFont });
             targetPage.drawText(absoluteGrandTotal.toFixed(2), { x: colX.amt + 15, y: tableBottomY - 74, size: 12, font: boldFont });
 
-            targetPage.drawText("In words: __________________________________________________", { x: tableLeftX + 5, y: tableBottomY - 74, size: 10, font: regularFont });
+            // ========================================================
+            // 🌟 DYNAMIC AUTOMATED NUMBER TO WORDS INJECTION
+            // ========================================================
+            const wordsTranslationString = convertAmountToWords(absoluteGrandTotal);
+            targetPage.drawText(`In words:  ${wordsTranslationString}`, { x: tableLeftX + 5, y: tableBottomY - 74, size: 10, font: boldFont });
+            
             targetPage.drawText("Signature", { x: width - 110, y: tableBottomY - 120, size: 11, font: boldFont });
 
             const amountInput = document.getElementById('amount');
@@ -1329,7 +1334,38 @@
         } catch (previewError) {
             alert("Preview Canvas Render Failure: " + previewError.message);
         }
-    };
+           
+    function convertAmountToWords(amount) {
+        const sglDigit = ["Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"],
+            dblDigit = ["Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"],
+            tensPlace = ["", "Ten", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"],
+            handleTens = (num) => num < 10 ? sglDigit[num] : num < 20 ? dblDigit[num - 10] : tensPlace[Math.floor(num / 10)] + (num % 10 !== 0 ? " " + sglDigit[num % 10] : ""),
+            convertLessThanThousand = (num) => {
+                let out = "";
+                if (num >= 100) { out += sglDigit[Math.floor(num / 100)] + " Hundred"; num %= 100; if (num > 0) out += " and "; }
+                if (num > 0) out += handleTens(num);
+                return out || "Zero";
+            };
+
+        let rupees = Math.floor(amount);
+        let paisa = Math.round((amount - rupees) * 100);
+        let words = "";
+
+        if (rupees === 0) {
+            words = "Zero Rupees";
+        } else {
+            if (rupees >= 10000000) { words += convertLessThanThousand(Math.floor(rupees / 10000000)) + " Crore "; rupees %= 10000000; }
+            if (rupees >= 100000) { words += convertLessThanThousand(Math.floor(rupees / 100000)) + " Lakh "; rupees %= 100000; }
+            if (rupees >= 1000) { words += convertLessThanThousand(Math.floor(rupees / 1000)) + " Thousand "; rupees %= 1000; }
+            if (rupees > 0) words += convertLessThanThousand(rupees);
+            words += " Rupees";
+        }
+
+        if (paisa > 0) {
+            words += " and " + handleTens(paisa) + " Paisa";
+        }
+        return words.replace(/\s+/g, ' ').trim() + " Only";
+    }
 </script>
 </body>
 </html>
