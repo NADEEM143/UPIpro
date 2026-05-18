@@ -408,24 +408,44 @@ let pdfDocumentInstance = null; // 🌟 FIXED: Added missing global PDF tracking
     const zoomInBtn = document.getElementById('zoomInBtn');
     const zoomOutBtn = document.getElementById('zoomOutBtn');
     const zoomValueLabel = document.getElementById('zoomValueLabel');
-
-        window.onload = () => {
-    ['payeeName', 'vpa', 'amount', 'stampCompany', 'stampApprover', 'stampDate', 'stampColor', 'stampShape', 'bizName', 'bizProprietor', 'bizMob1', 'bizMob2', 'bizEmail', 'bizGst', 'bizAddress', 'bizDate'].forEach(id => {
+    window.onload = () => {
+        // Safe list containing every single interactive input ID present in your sidebars and menus
+        const allInputIds = ['payeeName', 'vpa', 'amount', 'stampCompany', 'stampApprover', 'stampDate', 'stampColor', 'stampShape', 'bizName', 'bizProprietor', 'bizMob1', 'bizMob2', 'bizEmail', 'bizGst', 'bizAddress', 'bizDate', 'custName', 'custMob', 'custAddress'];
+        
+        allInputIds.forEach(id => {
             const targetInputElement = document.getElementById(id);
+            
+            // 🌟 CRITICAL FIX: If any element hasn't loaded or is missing in the HTML, skip it cleanly instead of crashing the entire script!
             if (!targetInputElement) return;
             
-            if (localStorage.getItem(id)) {
+            // Restore saved memory
+            if (localStorage.getItem(id) !== null) {
                 targetInputElement.value = localStorage.getItem(id);
+            } else if (targetInputElement.value) {
+                // If local storage is empty but HTML has a default (like NADIM ENTERPRISE), save it now
+                localStorage.setItem(id, targetInputElement.value);
             }
+            
+            // Handle updates safely
             targetInputElement.oninput = () => {
                 localStorage.setItem(id, targetInputElement.value);
             };
+            
             if (targetInputElement.tagName === 'SELECT') {
                 targetInputElement.onchange = () => {
                     localStorage.setItem(id, targetInputElement.value);
                 };
             }
         });
+        
+        // Handle fallback dates safely without interrupting the loop above
+        const stampDateEl = document.getElementById('stampDate');
+        if (stampDateEl && !stampDateEl.value) {
+            const currentDateIsoString = new Date().toISOString().split('T')[0];
+            stampDateEl.value = currentDateIsoString;
+            localStorage.setItem('stampDate', currentDateIsoString);
+        }
+    };
         
         if (!document.getElementById('stampDate').value) {
             const currentDateIsoString = new Date().toISOString().split('T')[0];
