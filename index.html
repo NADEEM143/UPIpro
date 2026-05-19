@@ -901,16 +901,32 @@
                         const cgstValue = subTotalCost * 0.09;
             const sgstValue = subTotalCost * 0.09;
             
+            // 🌟 ROUNDING MULTIPLIER: Forces standard integer mathematical precision
             const rawGrandTotal = subTotalCost + cgstValue + sgstValue;
             const absoluteGrandTotal = Math.round(rawGrandTotal);
 
-
-            targetPage.drawLine({ start: { x: colX.rate, y: tableBottomY - 20 }, end: { x: colX.end, y: tableBottomY - 20 }, strokeWidth: 1 });
-            targetPage.drawLine({ start: { x: colX.rate, y: tableBottomY - 40 }, end: { x: colX.end, y: tableBottomY - 40 }, strokeWidth: 1 });
-            targetPage.drawLine({ start: { x: colX.rate, y: tableBottomY - 60 }, end: { x: colX.end, y: tableBottomY - 60 }, strokeWidth: 1 });
-            
+            // ========================================================
+            // 🌟 FIXED BOX GRID BORDERS (MATCHES YOUR ATTACHED IMAGE)
+            // ========================================================
+            // Connects the horizontal line breaks all the way across to the left boundary wall (tableLeftX)
+                        // ========================================================
+            // 🌟 FIXED BOX GRID BORDERS (MATCHES YOUR ATTACHED IMAGE)
+            // ========================================================
+            // Horizontal line boxes running completely across to the left boundary wall
+                     // ========================================================
+            // 🌟 FIXED SUMMARY BORDERS (MATCHES YOUR ATTACHED IMAGE)
+            // ========================================================
+            // Horizontal lines running completely across to the left boundary wall
+            targetPage.drawLine({ start: { x: tableLeftX, y: tableBottomY - 20 }, end: { x: colX.end, y: tableBottomY - 20 }, strokeWidth: 1 });
+            targetPage.drawLine({ start: { x: tableLeftX, y: tableBottomY - 40 }, end: { x: colX.end, y: tableBottomY - 40 }, strokeWidth: 1 });
+            targetPage.drawLine({ start: { x: tableLeftX, y: tableBottomY - 60 }, end: { x: colX.end, y: tableBottomY - 60 }, strokeWidth: 1 });
             targetPage.drawLine({ start: { x: tableLeftX, y: tableBottomY - 80 }, end: { x: colX.end, y: tableBottomY - 80 }, strokeWidth: 1.5 });
 
+            // 🌟 FIXED VERTICAL DIVIDERS: Draws clean single vertical borders to seal text cells
+            targetPage.drawLine({ start: { x: colX.rate, y: tableBottomY }, end: { x: colX.rate, y: tableBottomY - 80 }, strokeWidth: 1 });
+            targetPage.drawLine({ start: { x: colX.amt, y: tableBottomY }, end: { x: colX.amt, y: tableBottomY - 80 }, strokeWidth: 1 });
+
+            // Text calculations anchors layout labels (Keeps sub-costs clear)
             targetPage.drawText("SubTotal", { x: colX.rate + 6, y: tableBottomY - 14, size: 10, font: boldFont });
             targetPage.drawText(subTotalCost.toFixed(2), { x: colX.amt + 15, y: tableBottomY - 14, size: 11, font: boldFont });
 
@@ -922,22 +938,27 @@
 
             targetPage.drawText("Total", { x: colX.rate + 6, y: tableBottomY - 74, size: 12, font: boldFont });
             
-            targetPage.drawText(absoluteGrandTotal.toFixed(2), { x: colX.amt + 15, y: tableBottomY - 74, size: 12, font: boldFont });
+            // 🌟 FIXED NO PAISA LAYOUT: Converts absolute rounded integer to a string (Shows 30 instead of 29.50)
+            targetPage.drawText(absoluteGrandTotal.toString(), { x: colX.amt + 15, y: tableBottomY - 74, size: 12, font: boldFont });
 
-
+            // ========================================================
+            // 🌟 DYNAMIC AUTOMATED NUMBER TO WORDS INJECTION
+            // ========================================================
             const wordsTranslationString = convertAmountToWords(absoluteGrandTotal);
             
             let safeWordsString = wordsTranslationString;
-            if (safeWordsString.length > 58) {
-                safeWordsString = safeWordsString.substring(0, 56) + "... Only";
+            if (safeWordsString.length > 52) {
+                safeWordsString = safeWordsString.substring(0, 50) + "... Only";
             }
             
-            targetPage.drawText(`In words:  ${safeWordsString}`, { x: tableLeftX + 5, y: tableBottomY - 74, size: 9, font: boldFont });
+            // Positioned inside its own clean box compartment on the bottom-left area
+            targetPage.drawText(`In words:  ${safeWordsString}`, { x: tableLeftX + 8, y: tableBottomY - 74, size: 9, font: boldFont });
             
             targetPage.drawText("Signature", { x: width - 110, y: tableBottomY - 120, size: 11, font: boldFont });
 
+            // Sync total cost value back to form inputs without decimals
             const amountInput = document.getElementById('amount');
-            amountInput.value = absoluteGrandTotal.toFixed(2);
+            amountInput.value = absoluteGrandTotal.toString();
             amountInput.dispatchEvent(new Event('input'));
 
             originalBytes = await docInstance.save();
