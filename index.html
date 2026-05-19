@@ -397,8 +397,24 @@
     const zoomOutBtn = document.getElementById('zoomOutBtn');
     const zoomValueLabel = document.getElementById('zoomValueLabel');
 
-        window.onload = () => {
-    ['payeeName', 'vpa', 'amount', 'stampCompany', 'stampApprover', 'stampDate', 'stampColor', 'stampShape', 'bizName', 'bizProprietor', 'bizMob1', 'bizMob2', 'bizEmail', 'bizGst', 'bizAddress', 'bizDate'].forEach(id => {
+            window.onload = () => {
+        // Compute today's date in local time zone explicitly
+        const todayObj = new Date();
+        const yyyy = todayObj.getFullYear();
+        const mm = String(todayObj.getMonth() + 1).padStart(2, '0');
+        const dd = String(todayObj.getDate()).padStart(2, '0');
+        
+        // 1. Target ISO Format for HTML5 <input type="date"> (YYYY-MM-DD)
+        const localDateIso = `${yyyy}-${mm}-${dd}`;
+        
+        // 2. Target Display Format for standard Text fields (DD/MM/YYYY)
+        const localDateDisplay = `${dd}/${mm}/${yyyy}`;
+
+        // Force overwrite the persistent cache files immediately on initialization lifecycle
+        localStorage.setItem('stampDate', localDateIso);
+        localStorage.setItem('bizDate', localDateDisplay);
+
+        ['payeeName', 'vpa', 'amount', 'stampCompany', 'stampApprover', 'stampDate', 'stampColor', 'stampShape', 'bizName', 'bizProprietor', 'bizMob1', 'bizMob2', 'bizEmail', 'bizGst', 'bizAddress', 'bizDate'].forEach(id => {
             const targetInputElement = document.getElementById(id);
             if (!targetInputElement) return;
             
@@ -414,11 +430,13 @@
                 };
             }
         });
-        
-        if (!document.getElementById('stampDate').value) {
-            const currentDateIsoString = new Date().toISOString().split('T')[0];
-            document.getElementById('stampDate').value = currentDateIsoString;
-            localStorage.setItem('stampDate', currentDateIsoString);
+
+        // Enforce synchronization constraints explicitly to active element nodes
+        if (document.getElementById('stampDate')) {
+            document.getElementById('stampDate').value = localDateIso;
+        }
+        if (document.getElementById('bizDate')) {
+            document.getElementById('bizDate').value = localDateDisplay;
         }
     };
 
