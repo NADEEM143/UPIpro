@@ -898,15 +898,18 @@
                 itemY -= 22;
             });
 
-            const cgstValue = subTotalCost * 0.09;
+                        const cgstValue = subTotalCost * 0.09;
             const sgstValue = subTotalCost * 0.09;
-            const absoluteGrandTotal = subTotalCost + cgstValue + sgstValue;
+            
+            const rawGrandTotal = subTotalCost + cgstValue + sgstValue;
+            const absoluteGrandTotal = Math.round(rawGrandTotal);
+
 
             targetPage.drawLine({ start: { x: colX.rate, y: tableBottomY - 20 }, end: { x: colX.end, y: tableBottomY - 20 }, strokeWidth: 1 });
             targetPage.drawLine({ start: { x: colX.rate, y: tableBottomY - 40 }, end: { x: colX.end, y: tableBottomY - 40 }, strokeWidth: 1 });
             targetPage.drawLine({ start: { x: colX.rate, y: tableBottomY - 60 }, end: { x: colX.end, y: tableBottomY - 60 }, strokeWidth: 1 });
             
-            targetPage.drawLine({ start: { x: tableLeftX, y: tableBottomY - 80 }, end: { x: colX.end, y: tableBottomY - 80 }, strokeWidth: 1 });
+            targetPage.drawLine({ start: { x: tableLeftX, y: tableBottomY - 80 }, end: { x: colX.end, y: tableBottomY - 80 }, strokeWidth: 1.5 });
 
             targetPage.drawText("SubTotal", { x: colX.rate + 6, y: tableBottomY - 14, size: 10, font: boldFont });
             targetPage.drawText(subTotalCost.toFixed(2), { x: colX.amt + 15, y: tableBottomY - 14, size: 11, font: boldFont });
@@ -918,12 +921,20 @@
             targetPage.drawText(sgstValue.toFixed(2), { x: colX.amt + 15, y: tableBottomY - 54, size: 11, font: regularFont });
 
             targetPage.drawText("Total", { x: colX.rate + 6, y: tableBottomY - 74, size: 12, font: boldFont });
+            
             targetPage.drawText(absoluteGrandTotal.toFixed(2), { x: colX.amt + 15, y: tableBottomY - 74, size: 12, font: boldFont });
 
+
             const wordsTranslationString = convertAmountToWords(absoluteGrandTotal);
-            targetPage.drawText(`In words:  ${wordsTranslationString}`, { x: tableLeftX + 5, y: tableBottomY - 74, size: 10, font: boldFont });
             
-            targetPage.drawText("Signature or Stamp", { x: width - 110, y: tableBottomY - 120, size: 11, font: boldFont });
+            let safeWordsString = wordsTranslationString;
+            if (safeWordsString.length > 58) {
+                safeWordsString = safeWordsString.substring(0, 56) + "... Only";
+            }
+            
+            targetPage.drawText(`In words:  ${safeWordsString}`, { x: tableLeftX + 5, y: tableBottomY - 74, size: 9, font: boldFont });
+            
+            targetPage.drawText("Signature", { x: width - 110, y: tableBottomY - 120, size: 11, font: boldFont });
 
             const amountInput = document.getElementById('amount');
             amountInput.value = absoluteGrandTotal.toFixed(2);
