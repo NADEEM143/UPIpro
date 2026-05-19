@@ -870,9 +870,12 @@
             targetPage.drawLine({ start: { x: colX.qty, y: tableTopY }, end: { x: colX.qty, y: tableBottomY }, strokeWidth: 1 });
             
             // 🌟 FIXED: Vertical column separation bars extend cleanly straight to the baseline grid boundaries
-            targetPage.drawLine({ start: { x: colX.rate, y: tableTopY }, end: { x: colX.rate, y: tableBottomY - 80 }, strokeWidth: 1 }); 
-            targetPage.drawLine({ start: { x: colX.amt, y: tableTopY }, end: { x: colX.amt, y: tableBottomY - 80 }, strokeWidth: 1 }); 
-            targetPage.drawLine({ start: { x: colX.end, y: tableTopY }, end: { x: colX.end, y: tableBottomY - 80 }, strokeWidth: 1 }); 
+            // Extends the vertical division bars all the way to tableBottomY - 80 so they seal the outer boxes completely
+targetPage.drawLine({ start: { x: tableLeftX, y: tableTopY }, end: { x: tableLeftX, y: tableBottomY - 80 }, strokeWidth: 1 });
+targetPage.drawLine({ start: { x: colX.rate, y: tableTopY }, end: { x: colX.rate, y: tableBottomY - 80 }, strokeWidth: 1 }); 
+targetPage.drawLine({ start: { x: colX.amt, y: tableTopY }, end: { x: colX.amt, y: tableBottomY - 80 }, strokeWidth: 1 }); 
+targetPage.drawLine({ start: { x: colX.end, y: tableTopY }, end: { x: colX.end, y: tableBottomY - 80 }, strokeWidth: 1 }); 
+
 
             targetPage.drawText("No.", { x: colX.no + 10, y: tableTopY - 17, size: 11, font: boldFont });
             targetPage.drawText("Particular", { x: colX.part + 10, y: tableTopY - 17, size: 11, font: boldFont });
@@ -899,8 +902,10 @@
             });
 
             const cgstValue = subTotalCost * 0.09;
-            const sgstValue = subTotalCost * 0.09;
-            const absoluteGrandTotal = subTotalCost + cgstValue + sgstValue;
+const sgstValue = subTotalCost * 0.09;
+// Round up or down to the nearest clean whole number
+const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
+
 
             targetPage.drawLine({ start: { x: colX.rate, y: tableBottomY - 20 }, end: { x: colX.end, y: tableBottomY - 20 }, strokeWidth: 1 });
             targetPage.drawLine({ start: { x: colX.rate, y: tableBottomY - 40 }, end: { x: colX.end, y: tableBottomY - 40 }, strokeWidth: 1 });
@@ -918,7 +923,7 @@
             targetPage.drawText(sgstValue.toFixed(2), { x: colX.amt + 15, y: tableBottomY - 54, size: 11, font: regularFont });
 
             targetPage.drawText("Total", { x: colX.rate + 6, y: tableBottomY - 74, size: 12, font: boldFont });
-            targetPage.drawText(absoluteGrandTotal.toFixed(2), { x: colX.amt + 15, y: tableBottomY - 74, size: 12, font: boldFont });
+            targetPage.drawText(absoluteGrandTotal.toFixed(0), { x: colX.amt + 15, y: tableBottomY - 74, size: 12, font: boldFont });
 
             const wordsTranslationString = convertAmountToWords(absoluteGrandTotal);
             targetPage.drawText(`In words:  ${wordsTranslationString}`, { x: tableLeftX + 5, y: tableBottomY - 74, size: 10, font: boldFont });
