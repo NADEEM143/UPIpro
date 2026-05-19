@@ -284,6 +284,19 @@
 
             <div class="gen-pdf-box">
                 <h3>Generate PDF Option</h3>
+                <!-- PASTE THIS IN THE SIDEBAR UNDER THE 'Generate PDF Option' HEADER -->
+<div class="input-group">
+    <label>Customer Name</label>
+    <input type="text" id="custName" placeholder="e.g., John Doe">
+</div>
+<div class="input-group">
+    <label>Customer Mobile</label>
+    <input type="text" id="custMob" placeholder="e.g., 9876543210">
+</div>
+<div class="input-group">
+    <label>Customer Address</label>
+    <input type="text" id="custAddress" placeholder="e.g., Ward No. 5, Main Street">
+</div>
                 <div class="input-group">
                     <label>Product Name <span class="char-counter-label" id="charCounter">0/35</span></label>
                     <input type="text" id="prodName" placeholder="Product name" maxlength="35">
@@ -806,6 +819,10 @@
             const bGst = document.getElementById('bizGst').value.trim();
             const bAddr = document.getElementById('bizAddress').value.trim();
             const bDateValue = document.getElementById('bizDate').value.trim();
+            const cName = document.getElementById('custName').value.trim();
+            const cMob = document.getElementById('custMob').value.trim();
+            const cAddr = document.getElementById('custAddress').value.trim();
+
 
             let rightSideTextY = height - 50;
 
@@ -848,11 +865,21 @@
             }
 
             // Solid horizontal boundary line break below the header data blocks
-            targetPage.drawLine({ start: { x: 40, y: height - 122 }, end: { x: width - 40, y: height - 122 }, strokeWidth: 1.5 });
-            let clientY = height - 150;
-            targetPage.drawText("Mr./Mrs. __________________________________________ Mo. _____________________", { x: 40, y: clientY, size: 11, font: boldFont });
-            clientY -= 22;
-            targetPage.drawText("Address ____________________________________________________________________", { x: 40, y: clientY, size: 11, font: boldFont });
+            // Solid horizontal boundary line break below the header data blocks
+targetPage.drawLine({ start: { x: 40, y: height - 122 }, end: { x: width - 40, y: height - 122 }, strokeWidth: 1.5 });
+let clientY = height - 150;
+
+// Dynamic customer metrics rendering strings
+targetPage.drawText(`Mr./Mrs. ${cName}`, { x: 40, y: clientY, size: 11, font: boldFont });
+targetPage.drawText(`Mo. ${cMob}`, { x: width - 220, y: clientY, size: 11, font: boldFont });
+
+// Draw structural baseline underlines under dynamic values for a clean look
+targetPage.drawLine({ start: { x: 90, y: clientY - 3 }, end: { x: width - 250, y: clientY - 3 }, strokeWidth: 1 });
+targetPage.drawLine({ start: { x: width - 195, y: clientY - 3 }, end: { x: width - 40, y: clientY - 3 }, strokeWidth: 1 });
+
+clientY -= 22;
+targetPage.drawText(`Address ${cAddr}`, { x: 40, y: clientY, size: 11, font: boldFont });
+targetPage.drawLine({ start: { x: 95, y: clientY - 3 }, end: { x: width - 40, y: clientY - 3 }, strokeWidth: 1 });
 
             const tableTopY = height - 200;
             const tableBottomY = 160; 
