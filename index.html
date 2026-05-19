@@ -159,18 +159,7 @@
         #stamp-marker span { font-size: 9px; font-weight: bold; color: #dc2626; pointer-events: none; text-align: center; }
         #click-overlay-stamp { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1005; display: none; background: rgba(0,0,0,0.01); }
 
-        .zoom-controls-bar {
-            position: absolute; bottom: 20px; right: 20px; display: flex; gap: 6px; z-index: 3500;
-            background: rgba(15, 23, 42, 0.85); padding: 6px; border-radius: 10px; backdrop-filter: blur(4px);
-        }
-        .zoom-btn {
-            background: #334155; color: white; border: none; padding: 6px 12px; font-size: 14px;
-            font-weight: bold; border-radius: 6px; cursor: pointer; transition: 0.1s; min-width: 36px;
-        }
-        .zoom-btn:hover { background: #475569; }
-        .zoom-display { color: white; font-size: 11px; font-weight: 600; align-self: center; padding: 0 6px; min-width: 42px; text-align: center; }
-
-        @media (max-width: 1024px) {
+                @media (max-width: 1024px) {
             body {
                 flex-direction: column !important;
                 overflow-y: auto !important;
@@ -319,7 +308,7 @@
             </div>
         </div>
         
-               <div class="preview-area" id="dropzone">
+                       <div class="preview-area" id="dropzone">
             <div id="workspace-scaler" style="position: relative;">
                 
                 <div id="upload-placeholder-prompt" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; padding: 40px; pointer-events: none; user-select: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 100%; max-width: 500px; z-index: 10; box-sizing: border-box;">
@@ -331,6 +320,20 @@
                             <line x1="12" y1="3" x2="12" y2="15"/>
                         </svg>
                     </div>
+                    
+                    <h3 style="color: #ffffff; font-size: 20px; font-weight: 600; margin: 0 0 10px 0; letter-spacing: -0.02em; text-shadow: 0 2px 4px rgba(0,0,0,0.3); line-height: 1.3;">
+                        Upload your Invoice PDF or Paste Clipboard Screenshot
+                    </h3>
+                    
+                    <p style="color: #94a3b8; font-size: 13px; max-width: 380px; margin: 0; line-height: 1.6; font-weight: 400; letter-spacing: 0.01em; padding: 0 10px;">
+                        Drop a transaction document anywhere over this blank viewport container panel surface area to initialize branding matrices.
+                    </p>
+                    
+                    <div style="margin-top: 24px; display: flex; align-items: center; gap: 8px; background: rgba(255, 255, 255, 0.04); padding: 6px 14px; border-radius: 100px; border: 1px solid rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px);">
+                        <span style="display: inline-block; width: 6px; height: 6px; background-color: #10b981; border-radius: 50%; box-shadow: 0 0 8px #10b981;"></span>
+                        <span style="color: #64748b; font-size: 11px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase;">Ready for Secure Import</span>
+                    </div>
+                </div>
                     
                     <h3 style="color: #ffffff; font-size: 20px; font-weight: 600; margin: 0 0 10px 0; letter-spacing: -0.02em; text-shadow: 0 2px 4px rgba(0,0,0,0.3); line-height: 1.3;">
                         Upload your Invoice PDF or Paste Clipboard Screenshot
@@ -392,10 +395,6 @@
     const stampMarker = document.getElementById('stamp-marker');
 
     let currentZoomScale = 1.0;
-    const workspaceScaler = document.getElementById('workspace-scaler');
-    const zoomInBtn = document.getElementById('zoomInBtn');
-    const zoomOutBtn = document.getElementById('zoomOutBtn');
-    const zoomValueLabel = document.getElementById('zoomValueLabel');
 
             window.onload = () => {
         // Compute today's date in local time zone explicitly
@@ -439,17 +438,6 @@
             document.getElementById('bizDate').value = localDateDisplay;
         }
     };
-
-        const applyZoomMatrixTransformation = (zoomFactorIncrement) => {
-        currentZoomScale = Math.max(0.5, Math.min(2.0, currentZoomScale + zoomFactorIncrement));
-        workspaceScaler.style.transform = `scale(${currentZoomScale})`;
-        zoomValueLabel.innerText = `${Math.round(currentZoomScale * 100)}%`;
-        workspaceScaler.style.width = `${100 / currentZoomScale}%`;
-        workspaceScaler.style.height = `${100 / currentZoomScale}%`;
-    };
-
-    zoomInBtn.onclick = () => applyZoomMatrixTransformation(0.1);
-    zoomOutBtn.onclick = () => applyZoomMatrixTransformation(-0.1);
 
     document.getElementById('fileInput').onchange = async (e) => {
         const file = e.target.files[0];
