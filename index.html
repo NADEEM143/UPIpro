@@ -438,27 +438,86 @@
         await handleIncomingDocumentBufferChannels(file);
     };
 
-            document.getElementById('lockBtn').onclick = () => {
+                // ... Your existing document.getElementById('lockBtn').onclick code lives right above this ...
+    document.getElementById('lockBtn').onclick = () => {
         if(!originalBytes) return alert("Select or Generate PDF First");
-        
         note.innerText = "📍 Click on the document to place your QR";
         note.style.display = 'block';
         document.getElementById('click-overlay').style.display = 'block';
-        
         setTimeout(() => { note.style.display = 'none'; }, 4000);
     };
 
-    // --- Hardened Point-and-Click UPI QR Asset Inserter Pipeline ---    // ... Your custom document.getElementById('click-overlay').onclick block lives right above this ...
+// =========================================================================
+// 📥 REMOVE YOUR OLD "click-overlay" BLOCK AND PASTE THIS ENTIRE NEW ONE HERE:
+// =========================================================================
     document.getElementById('click-overlay').onclick = (e) => {
-        // ... (this is the click overlay code we verified earlier)
-    };
+        const rect = document.getElementById('workspace-scaler').getBoundingClientRect();
+        
+        // Compute 1:1 pixel projection positions
+        posX = (e.clientX - rect.left); 
+        posY = (e.clientY - rect.top);
+        
+        const halfMarkerWidth = marker.clientWidth / 2 || 40;
+        const halfMarkerHeight = marker.clientHeight / 2 || 40;
+        
+        marker.style.left = (posX - halfMarkerWidth) + 'px'; 
+        marker.style.top = (posY - halfMarkerHeight) + 'px';
+        marker.style.display = 'flex';
+        
+        // Extract sidebar values safely
+        const name = document.getElementById('payeeName').value || "Merchant";
+        const vpa = document.getElementById('vpa').value || "merchant@upi";
+        const amt = document.getElementById('amount').value || "0";
+        
+        // Build the compliant retail transaction deep-link string
+        const uniqueTxnRefId = "INV" + Date.now(); 
+        let upiString = `upi://pay?pa=${vpa}&pn=${encodeURIComponent(name)}&cu=INR&tr=${uniqueTxnRefId}&mc=0000&mode=02&purpose=00`;
+        
+        if (parseFloat(amt) > 0) {
+            upiString += `&am=${parseFloat(amt).toFixed(2)}`;
+        }
+        
+        const liveTarget = document.getElementById('qr-graphic-target');
+        if (liveTarget) {
+            liveTarget.innerHTML = ""; 
+            liveTarget.style.display = "block"; 
+            
+            // --- 🌟 FIXED: Fire direct EasyQRCode engine matrix parameters ---
+            try {
+                if (typeof EasyQRCode !== 'undefined') {
+                    new EasyQRCode(liveTarget, {
+                        text: upiString,
+                        width: 120,
+                        height: 120,
+                        colorDark: "#000000",
+                        colorLight: "#ffffff",
+                        correctLevel: EasyQRCode.CorrectLevel.H
+                    });
+                } else if (typeof QRCode !== 'undefined') {
+                    new QRCode(liveTarget, { text: upiString, width: 120, height: 120 });
+                } else {
+                    liveTarget.innerText = "QR Engine Error";
+                }
+            } catch (err) {
+                console.error("QR drawing processing exception:", err);
+            }
+        }
 
+        document.getElementById('click-overlay').style.display = 'none';
+        
+        const previewBtn = document.getElementById('previewBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        if (previewBtn) previewBtn.style.display = 'block';
+        if (downloadBtn) downloadBtn.style.display = 'block';
+        
+        if (note) note.style.display = 'none';
+    };
 // =========================================================================
-// 📥 REMOVE THE OLD DRIFTING DRAG-AND-DROP CODE AND PASTE THIS ENTIRE LOGIC HERE:
-// =========================================================================
-    // --- 📍 RESTORED: Core Mouse Click Offset Captures ---
+
+    // ... Your restored marker.onmousedown and drag tracking functions live right below this ...
     marker.onmousedown = (e) => { 
         if (isQrLocked) return; 
+        // ...
         if (e.offsetX < marker.clientWidth - 15 && e.offsetY < marker.clientHeight - 15) {
             isDragging = true; 
             offsetX = e.clientX - marker.getBoundingClientRect().left;
