@@ -785,6 +785,25 @@
             document.getElementById('bizDate').value = localDateDisplay;
         }
     };
+    const dropdownMenuNode = document.getElementById('industryProfileSelect');
+if (dropdownMenuNode) {
+    dropdownMenuNode.onchange = (e) => {
+        const selectedIndustryKey = e.target.value;
+        if (!selectedIndustryKey || !INDUSTRY_PROFILES[selectedIndustryKey]) return;
+
+        const profileData = INDUSTRY_PROFILES[selectedIndustryKey];
+
+        // Deep copy the preset inventory items to active state arrays
+        productsList = JSON.parse(JSON.stringify(profileData.defaultItems));
+
+        // Refresh on-screen elements immediately
+        renderProductsPreviewWorkspace();
+        
+        // Auto-compile document sheets to clear out placeholders
+        const compileBtn = document.getElementById('makePdfBtn');
+        if (compileBtn) compileBtn.click();
+    };
+}
 
         const applyZoomMatrixTransformation = (zoomFactorIncrement) => {
         currentZoomScale = Math.max(0.5, Math.min(2.0, currentZoomScale + zoomFactorIncrement));
@@ -1398,395 +1417,38 @@ targetPage.drawLine({ start: { x: 95, y: clientY - 3 }, end: { x: width - 40, y:
     };
 
     // --- 6. Configuration Dropdown Navigation Menu Triggers ---
+        // --- 6. Configuration Panel Click Management Triggers ---
     gearIcon.onclick = (e) => {
         e.stopPropagation();
         settingsPanel.style.display = settingsPanel.style.display === 'block' ? 'none' : 'block';
     };
 
-    document.onclick = () => { if(settingsPanel) settingsPanel.style.display = 'none'; };
-    if(settingsPanel) settingsPanel.onclick = (e) => e.stopPropagation();
+    document.onclick = () => { 
+        if (settingsPanel) settingsPanel.style.display = 'none'; 
+    };
+    
+    if (settingsPanel) {
+        settingsPanel.onclick = (e) => e.stopPropagation();
+    }
 
     stampOptionMenu.onclick = (e) => {
         e.stopPropagation();
         stampFormArea.style.display = stampFormArea.style.display === 'block' ? 'none' : 'block';
-        if(businessFormArea) businessFormArea.style.display = 'none';
+        const bizFormAreaNode = document.getElementById('businessFormArea');
+        if (bizFormAreaNode) bizFormAreaNode.style.display = 'none';
     };
 
-    if (businessOptionMenu && businessFormArea) {
-        businessOptionMenu.onclick = (e) => {
+    const businessOptionMenuNode = document.getElementById('businessDetailsOptionMenu');
+    const businessFormAreaNode = document.getElementById('businessFormArea');
+    if (businessOptionMenuNode && businessFormAreaNode) {
+        businessOptionMenuNode.onclick = (e) => {
             e.stopPropagation();
-            businessFormArea.style.display = businessFormArea.style.display === 'block' ? 'none' : 'block';
+            businessFormAreaNode.style.display = businessFormAreaNode.style.display === 'block' ? 'none' : 'block';
             stampFormArea.style.display = 'none';
         };
     }
 
-        ctx.clearRect(0, 0, 480, 480);
-        
-        const stampGraphicBufferCanvas = document.createElement('canvas');
-        stampGraphicBufferCanvas.width = 480;
-        stampGraphicBufferCanvas.height = 480;
-        const bufferCtx = stampGraphicBufferCanvas.getContext('2d');
-
-        bufferCtx.strokeStyle = selectedInkColor;
-        bufferCtx.fillStyle = selectedInkColor;
-        bufferCtx.textAlign = 'center';
-        bufferCtx.textBaseline = 'middle';
-
-        if (selectedShape === 'circle') {
-            bufferCtx.lineWidth = 8;
-            bufferCtx.beginPath(); bufferCtx.arc(240, 240, 200, 0, Math.PI * 2); bufferCtx.stroke();
-            bufferCtx.lineWidth = 3;
-            bufferCtx.beginPath(); bufferCtx.arc(240, 240, 184, 0, Math.PI * 2); bufferCtx.stroke();
-
-            bufferCtx.font = 'bold 26px "Courier New", monospace';
-            bufferCtx.fillText(comp.toUpperCase().substring(0, 22), 240, 150);
-            bufferCtx.font = '22px "Courier New", monospace';
-            bufferCtx.fillText("APPROVED BY:", 240, 220);
-            bufferCtx.font = 'bold 24px "Courier New", monospace';
-            bufferCtx.fillText(appr.substring(0, 18), 240, 260);
-            bufferCtx.font = 'bold 22px "Courier New", monospace';
-            bufferCtx.fillText(dateV, 240, 330);
-            stampMarker.style.borderRadius = '50%';
-        } 
-        else if (selectedShape === 'oval') {
-            bufferCtx.lineWidth = 8;
-            bufferCtx.beginPath(); bufferCtx.ellipse(240, 240, 220, 140, 0, 0, Math.PI * 2); bufferCtx.stroke();
-            bufferCtx.lineWidth = 3;
-            bufferCtx.beginPath(); bufferCtx.ellipse(240, 240, 206, 126, 0, 0, Math.PI * 2); bufferCtx.stroke();
-
-            bufferCtx.font = 'bold 26px "Courier New", monospace';
-            bufferCtx.fillText(comp.toUpperCase().substring(0, 24), 240, 170);
-            bufferCtx.font = '20px "Courier New", monospace';
-            bufferCtx.fillText("APPROVED BY: " + appr.substring(0, 14), 240, 230);
-            bufferCtx.font = 'bold 22px "Courier New", monospace';
-            bufferCtx.fillText(dateV, 240, 280);
-            stampMarker.style.borderRadius = '50%';
-        } 
-        else if (selectedShape === 'rectangular') {
-            bufferCtx.lineWidth = 8;
-            bufferCtx.strokeRect(30, 110, 420, 260);
-            bufferCtx.lineWidth = 3;
-            bufferCtx.strokeRect(42, 122, 396, 236);
-
-            bufferCtx.font = 'bold 28px "Courier New", monospace';
-            bufferCtx.fillText(comp.toUpperCase().substring(0, 26), 240, 180);
-            bufferCtx.font = '22px "Courier New", monospace';
-            bufferCtx.fillText("APPROVED BY: " + appr.substring(0, 16), 240, 240);
-            bufferCtx.font = 'bold 24px "Courier New", monospace';
-            bufferCtx.fillText(dateV, 240, 290);
-            stampMarker.style.borderRadius = '0px';
-        } 
-        else if (selectedShape === 'square') {
-            bufferCtx.lineWidth = 8;
-            bufferCtx.strokeRect(50, 50, 380, 380);
-            bufferCtx.lineWidth = 3;
-            bufferCtx.strokeRect(62, 62, 356, 356);
-
-            bufferCtx.font = 'bold 26px "Courier New", monospace';
-            bufferCtx.fillText(comp.toUpperCase().substring(0, 22), 240, 140);
-            bufferCtx.font = '22px "Courier New", monospace';
-            bufferCtx.fillText("APPROVED BY:", 240, 210);
-            bufferCtx.font = 'bold 24px "Courier New", monospace';
-            bufferCtx.fillText(appr.substring(0, 18), 240, 260);
-            bufferCtx.font = 'bold 22px "Courier New", monospace';
-            bufferCtx.fillText(dateV, 240, 330);
-            stampMarker.style.borderRadius = '8px';
-        }
-
-        ctx.drawImage(stampGraphicBufferCanvas, 0, 0);
-        ctx.fillStyle = selectedInkColor;
-        
-                for (let idx = 0; idx < 1200; idx++) {
-            const randomCoordX = Math.random() * 480;
-            const randomCoordY = Math.random() * 480;
-            if (bufferCtx.getImageData(randomCoordX, randomCoordY, 1, 1).data[3] > 0) {
-                bufferCtx.clearRect(randomCoordX, randomCoordY, Math.random() * 2 + 1, Math.random() * 2 + 1);
-            }
-        }
-        for (let idx = 0; idx < 450; idx++) {
-            const randomSpreadX = Math.random() * 480;
-            const randomSpreadY = Math.random() * 480;
-            if (bufferCtx.getImageData(randomSpreadX, randomSpreadY, 1, 1).data[3] === 0) {
-                bufferCtx.globalAlpha = Math.random() * 0.4;
-                bufferCtx.fillRect(randomSpreadX, randomSpreadY, 1.5, 1.5);
-            }
-        }
-        bufferCtx.globalAlpha = 1.0;
-
-        stampImgDataUrl = stampGraphicBufferCanvas.toDataURL('image/png');
-
-        stampMarker.innerHTML = `<img src="${stampImgDataUrl}" style="width:100%; height:100%; pointer-events:none;" />`;
-        stampMarker.style.borderColor = selectedInkColor;
-
-        settingsPanel.style.display = 'none';
-        note.innerText = "🏵️ Click on the document to place your Digital Stamp";
-        note.style.display = 'block';
-        document.getElementById('click-overlay-stamp').style.display = 'block';
-    };
-
-    document.getElementById('click-overlay-stamp').onclick = (e) => {
-        const rect = document.getElementById('workspace-scaler').getBoundingClientRect();
-        stampPosX = (e.clientX - rect.left) / currentZoomScale; 
-        stampPosY = (e.clientY - rect.top) / currentZoomScale;
-        
-                stampMarker.style.left = (stampPosX - 60) + 'px';
-        stampMarker.style.top = (stampPosY - 60) + 'px';
-        stampMarker.style.display = 'flex';
-        
-        isStampPlaced = true;
-        document.getElementById('click-overlay-stamp').style.display = 'none';
-        
-        document.getElementById('previewBtn').style.display = 'block';
-        document.getElementById('downloadBtn').style.display = 'block';
-        note.style.display = 'none';
-    };
-
-    stampMarker.onmousedown = (e) => { 
-        if (isStampLocked) return; 
-        if (e.offsetX < stampMarker.clientWidth - 15 && e.offsetY < stampMarker.clientHeight - 15) {
-            isStampDragging = true; 
-            stampOffsetX = e.clientX - stampMarker.getBoundingClientRect().left;
-            stampOffsetY = e.clientY - stampMarker.getBoundingClientRect().top;
-        }
-    };
-
-    document.addEventListener('paste', async (e) => {
-        const clipboardItems = (e.clipboardData || e.originalEvent.clipboardData).items;
-        for (let i = 0; i < clipboardItems.length; i++) {
-            if (clipboardItems[i].type.indexOf('image') !== -1) {
-                const capturedImageBlob = clipboardItems[i].getAsFile();
-                await handleIncomingDocumentBufferChannels(capturedImageBlob);
-                
-                const dataTransferInstance = new DataTransfer();
-                dataTransferInstance.items.add(capturedImageBlob);
-                document.getElementById('fileInput').files = dataTransferInstance.files;
-                break;
-            }
-        }
-    });
-
-        async function handleIncomingDocumentBufferChannels(fileObj) {
-        originalBytes = await fileObj.arrayBuffer();
-        const generatedObjectUrl = URL.createObjectURL(new Blob([originalBytes], {type: fileObj.type}));
-        
-        const initialPromptNode = document.getElementById('upload-placeholder-prompt');
-        if (initialPromptNode) initialPromptNode.style.display = 'none';
-        
-        if (fileObj.type === "application/pdf") {
-            document.getElementById('image-frame').style.display = 'none';
-            document.getElementById('image-frame').src = "";
-            document.getElementById('pdf-frame').src = generatedObjectUrl;
-            document.getElementById('pdf-frame').style.display = 'block';
-        } else if (fileObj.type.startsWith("image/")) {
-            document.getElementById('pdf-frame').style.display = 'none';
-            document.getElementById('pdf-frame').src = "";
-            document.getElementById('image-frame').src = generatedObjectUrl;
-            document.getElementById('image-frame').style.display = 'block';
-        }
-        
-        document.getElementById('previewBtn').style.display = 'block';
-        document.getElementById('downloadBtn').style.display = 'block';
-    }
-    document.getElementById('previewBtn').onclick = async () => {
-        try {
-            if (!originalBytes) return alert("Select or Generate PDF First");
-
-            const liveQrContainer = document.getElementById('qr-graphic-target');
-            const preview = document.getElementById('workspace-scaler');
-            const pdfFrameNode = document.getElementById('pdf-frame');
-            const imgFrameNode = document.getElementById('image-frame');
-
-                        if (imgFrameNode && imgFrameNode.style.display === 'block') {
-                const canvas = document.createElement('canvas');
-                canvas.width = imgFrameNode.naturalWidth;
-                canvas.height = imgFrameNode.naturalHeight;
-                const ctx = canvas.getContext('2d');
-
-                ctx.drawImage(imgFrameNode, 0, 0);
-
-                const actualWorkspaceWidth = imgFrameNode.naturalWidth;
-                const actualWorkspaceHeight = imgFrameNode.naturalHeight;
-                const scaleFactorX = preview.offsetWidth / actualWorkspaceWidth;
-                const scaleFactorY = preview.offsetHeight / actualWorkspaceHeight;
-
-                if (liveQrContainer && liveQrContainer.style.display === "block") {
-                    const liveCanvasElement = liveQrContainer.querySelector('canvas');
-                    if (liveCanvasElement) {
-                        const markerLeftStyleRaw = isQrLocked ? (posX - 40) : (parseFloat(marker.style.left) || (posX - 40));
-                        const markerTopStyleRaw = isQrLocked ? (posY - 40) : (parseFloat(marker.style.top) || (posY - 40));
-
-                        const imgX = markerLeftStyleRaw / scaleFactorX;
-                        const imgY = markerTopStyleRaw / scaleFactorY;
-                        const imgW = marker.clientWidth / scaleFactorX;
-                        const imgH = marker.clientHeight / scaleFactorY;
-                        const squareSize = Math.max(imgW, imgH);
-
-                        ctx.drawImage(liveCanvasElement, imgX, imgY, squareSize, squareSize);
-                    }
-                }
-
-                if (isStampPlaced && stampImgDataUrl) {
-                    const tempStampImg = new Image();
-                    tempStampImg.src = stampImgDataUrl;
-                    await new Promise(resolve => tempStampImg.onload = resolve);
-
-                    const stampLeftStyleRaw = isStampLocked ? (stampPosX - 60) : (parseFloat(stampMarker.style.left) || (stampPosX - 60));
-                    const stampTopStyleRaw = isStampLocked ? (stampPosY - 60) : (parseFloat(stampMarker.style.top) || (stampPosY - 60));
-
-                    const stampX = stampLeftStyleRaw / scaleFactorX;
-                    const stampY = stampTopStyleRaw / scaleFactorY;
-                    let stampW = stampMarker.clientWidth / scaleFactorX;
-                    let stampH = stampMarker.clientHeight / scaleFactorY;
-
-                    const currentSelectedShapeType = document.getElementById('stampShape').value;
-                    if (currentSelectedShapeType === 'circle' || currentSelectedShapeType === 'square') {
-                        const unifiedSize = Math.max(stampW, stampH);
-                        stampW = unifiedSize;
-                        stampH = unifiedSize;
-                    }
-
-                    ctx.drawImage(tempStampImg, stampX, stampY, stampW, stampH);
-                }
-
-                imgFrameNode.src = canvas.toDataURL('image/png');
-                
-                marker.style.display = 'none';
-                stampMarker.style.display = 'none';
-
-            } else {
-                const pdfDoc = await PDFLib.PDFDocument.load(originalBytes);
-                
-                const pagesCollection = pdfDoc.getPages();
-                const safePageIndex = (typeof currentActivePageIndex !== 'undefined') ? currentActivePageIndex : 0;
-                const targetExportPage = pagesCollection[safePageIndex] || pagesCollection[0];
-                
-                const { width, height } = targetExportPage.getSize();
-
-                let actualWorkspaceWidth = pdfFrameNode.offsetWidth || preview.offsetWidth;
-                let actualWorkspaceHeight = pdfFrameNode.offsetHeight || preview.offsetHeight;
-
-                if (liveQrContainer && liveQrContainer.style.display === "block") {
-                    const liveCanvasElement = liveQrContainer.querySelector('canvas');
-                    if (liveCanvasElement) {
-                        const qrImgDataUrl = liveCanvasElement.toDataURL('image/png');
-                        const qrImage = await pdfDoc.embedPng(qrImgDataUrl);
-
-                        const markerLeftStyle = isQrLocked ? (posX - 40) : (parseFloat(marker.style.left) || (posX - 40));
-                        const markerTopStyle = isQrLocked ? (posY - 40) : (parseFloat(marker.style.top) || (posY - 40));
-
-                        const finalQrWidth = (marker.clientWidth / actualWorkspaceWidth) * width;
-                        const finalQrHeight = (marker.clientHeight / actualWorkspaceHeight) * height;
-                        const finalSquareSize = Math.max(finalQrWidth, finalQrHeight);
-
-                        const pdfX = (markerLeftStyle / actualWorkspaceWidth) * width;
-                        const pdfY = height - (markerTopStyle / actualWorkspaceHeight) * height - finalSquareSize;
-
-                        targetExportPage.drawImage(qrImage, {
-                            x: pdfX,
-                            y: pdfY,
-                            width: finalSquareSize,
-                            height: finalSquareSize
-                        });
-                    }
-                }
-
-                if (isStampPlaced && stampImgDataUrl) {
-                    const stampImageObject = await pdfDoc.embedPng(stampImgDataUrl);
-
-                    const stampLeftStyle = isStampLocked ? (stampPosX - 60) : (parseFloat(stampMarker.style.left) || (stampPosX - 60));
-                    const stampTopStyle = isStampLocked ? (stampPosY - 60) : (parseFloat(stampMarker.style.top) || (stampPosY - 60));
-
-                    let docStampW = (stampMarker.clientWidth / actualWorkspaceWidth) * width;
-                    let docStampH = (stampMarker.clientHeight / actualWorkspaceHeight) * height;
-
-                    const currentSelectedShapeType = document.getElementById('stampShape').value;
-                    if (currentSelectedShapeType === 'circle' || currentSelectedShapeType === 'square') {
-                        const unifiedSquareDimensionValue = Math.max(docStampW, docStampH);
-                        docStampW = unifiedSquareDimensionValue;
-                        docStampH = unifiedSquareDimensionValue;
-                    }
-
-                    const docStampX = (stampLeftStyle / actualWorkspaceWidth) * width;
-                    const docStampY = height - (stampTopStyle / actualWorkspaceHeight) * height - docStampH;
-
-                    targetExportPage.drawImage(stampImageObject, {
-                        x: docStampX,
-                        y: docStampY,
-                        width: docStampW,
-                        height: docStampH
-                    });
-                }
-
-                const previewPdfBytes = await pdfDoc.save();
-                const previewBlobUrl = URL.createObjectURL(new Blob([previewPdfBytes], { type: 'application/pdf' }));
-
-                marker.style.display = 'none';
-                stampMarker.style.display = 'none';
-
-                document.getElementById('image-frame').style.display = 'none';
-                pdfFrameNode.src = previewBlobUrl;
-                pdfFrameNode.style.display = 'block';
-            }
-
-            const toast = document.getElementById('on-screen-note');
-            if (toast) {
-                toast.innerText = "👁️ Preview Loaded! Verification Surface Updated.";
-                toast.style.display = 'block';
-                setTimeout(() => { toast.style.display = 'none'; }, 3000);
-            }
-
-        } catch (previewError) {
-            alert("Preview Canvas Render Failure: " + previewError.message);
-        }
-    };
-
-    function convertAmountToWords(amount) {
-        const sglDigit = ["Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"],
-            dblDigit = ["Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"],
-            tensPlace = ["", "Ten", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"],
-            handleTens = (num) => num < 10 ? sglDigit[num] : num < 20 ? dblDigit[num - 10] : tensPlace[Math.floor(num / 10)] + (num % 10 !== 0 ? " " + sglDigit[num % 10] : ""),
-            convertLessThanThousand = (num) => {
-                let out = "";
-                if (num >= 100) { out += sglDigit[Math.floor(num / 100)] + " Hundred"; num %= 100; if (num > 0) out += " and "; }
-                if (num > 0) out += handleTens(num);
-                return out || "Zero";
-            };
-
-        let rupees = Math.floor(amount);
-        let paisa = Math.round((amount - rupees) * 100);
-        let words = "";
-
-        if (rupees === 0) {
-            words = "Zero Rupees";
-        } else {
-            if (rupees >= 10000000) { words += convertLessThanThousand(Math.floor(rupees / 10000000)) + " Crore "; rupees %= 10000000; }
-            if (rupees >= 100000) { words += convertLessThanThousand(Math.floor(rupees / 100000)) + " Lakh "; rupees %= 100000; }
-            if (rupees >= 1000) { words += convertLessThanThousand(Math.floor(rupees / 1000)) + " Thousand "; rupees %= 1000; }
-            if (rupees > 0) words += convertLessThanThousand(rupees);
-            words += " Rupees";
-        }
-
-        if (paisa > 0) {
-            words += " and " + handleTens(paisa) + " Paisa";
-        }
-        return words.replace(/\s+/g, ' ').trim() + " Only";
-    }
-
-    gearIcon.onclick = () => {
-        settingsPanel.style.display = settingsPanel.style.display === 'block' ? 'none' : 'block';
-    };
-
-    stampOptionMenu.onclick = () => {
-        stampFormArea.style.display = stampFormArea.style.display === 'block' ? 'none' : 'block';
-    };
-
-    const businessOptionMenu = document.getElementById('businessDetailsOptionMenu');
-    const businessFormArea = document.getElementById('businessFormArea');
-
-    businessOptionMenu.onclick = () => {
-        businessFormArea.style.display = businessFormArea.style.display === 'block' ? 'none' : 'block';
-    };
-
+    // --- 7. Digital Signature Rubber Stamp Rendering Engine ---
     lockStampBtn.onclick = () => {
         if (!originalBytes) return alert("Select or Generate PDF First");
         
@@ -1798,87 +1460,92 @@ targetPage.drawLine({ start: { x: 95, y: clientY - 3 }, end: { x: width - 40, y:
         
         if (!comp || !appr || !dateV) return alert("Please fill all stamp info fields (Company Name, Approved By, Date)");
 
-        const canvas = document.createElement('canvas');
-        canvas.width = 480; 
-        canvas.height = 480;
-        const ctx = canvas.getContext('2d');
+        try {
+            const canvas = document.createElement('canvas');
+            canvas.width = 480; 
+            canvas.height = 480;
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, 480, 480);
+            
+            const stampGraphicBufferCanvas = document.createElement('canvas');
+            stampGraphicBufferCanvas.width = 480;
+            stampGraphicBufferCanvas.height = 480;
+            const bufferCtx = stampGraphicBufferCanvas.getContext('2d');
 
-        ctx.clearRect(0, 0, 480, 480);
-        
-        const stampGraphicBufferCanvas = document.createElement('canvas');
-        stampGraphicBufferCanvas.width = 480;
-        stampGraphicBufferCanvas.height = 480;
-        const bufferCtx = stampGraphicBufferCanvas.getContext('2d');
+            bufferCtx.strokeStyle = selectedInkColor;
+            bufferCtx.fillStyle = selectedInkColor;
+            bufferCtx.textAlign = 'center';
+            bufferCtx.textBaseline = 'middle';
 
-        bufferCtx.strokeStyle = selectedInkColor;
-        bufferCtx.fillStyle = selectedInkColor;
-        bufferCtx.textAlign = 'center';
-        bufferCtx.textBaseline = 'middle';
+            bufferCtx.translate(240, 240);
+            bufferCtx.rotate((Math.random() * 1.6 - 0.8) * Math.PI / 180);
+            bufferCtx.translate(-240, -240);
 
-        bufferCtx.translate(240, 240);
-        bufferCtx.rotate((Math.random() * 1.6 - 0.8) * Math.PI / 180);
-        bufferCtx.translate(-240, -240);
+            const [y, m, d] = dateV.split('-');
+            const displayDate = `${d}/${m}/${y}`;
 
-        const [y, m, d] = dateV.split('-');
-        const displayDate = `${d}/${m}/${y}`;
+            if (selectedShape === 'circle') {
+                bufferCtx.lineWidth = 8; bufferCtx.beginPath(); bufferCtx.arc(240, 240, 200, 0, Math.PI * 2); bufferCtx.stroke();
+                bufferCtx.lineWidth = 3; bufferCtx.beginPath(); bufferCtx.arc(240, 240, 184, 0, Math.PI * 2); bufferCtx.stroke();
+                bufferCtx.font = 'bold 26px "Courier New", monospace'; bufferCtx.fillText(comp.toUpperCase().substring(0, 22), 240, 150);
+                bufferCtx.font = '22px "Courier New", monospace'; bufferCtx.fillText("APPROVED BY:", 240, 220);
+                bufferCtx.font = 'bold 24px "Courier New", monospace'; bufferCtx.fillText(appr.substring(0, 18), 240, 260);
+                bufferCtx.font = 'bold 22px "Courier New", monospace'; bufferCtx.fillText(displayDate, 240, 330);
+                stampMarker.style.borderRadius = '50%'; stampMarker.style.width = '120px'; stampMarker.style.height = '120px';
+            } 
+            else if (selectedShape === 'oval') {
+                bufferCtx.lineWidth = 8; bufferCtx.beginPath(); bufferCtx.ellipse(240, 240, 220, 140, 0, 0, Math.PI * 2); bufferCtx.stroke();
+                bufferCtx.lineWidth = 3; bufferCtx.beginPath(); bufferCtx.ellipse(240, 240, 206, 126, 0, 0, Math.PI * 2); bufferCtx.stroke();
+                bufferCtx.font = 'bold 26px "Courier New", monospace'; bufferCtx.fillText(comp.toUpperCase().substring(0, 24), 240, 170);
+                bufferCtx.font = '20px "Courier New", monospace'; bufferCtx.fillText("APPROVED BY: " + appr.substring(0, 14), 240, 230);
+                bufferCtx.font = 'bold 22px "Courier New", monospace'; bufferCtx.fillText(displayDate, 240, 280);
+                stampMarker.style.borderRadius = '50%'; stampMarker.style.width = '150px'; stampMarker.style.height = '100px';
+            } 
+            else if (selectedShape === 'rectangular') {
+                bufferCtx.lineWidth = 8; bufferCtx.strokeRect(30, 110, 420, 260);
+                bufferCtx.lineWidth = 3; bufferCtx.strokeRect(42, 122, 396, 236);
+                bufferCtx.font = 'bold 28px "Courier New", monospace'; bufferCtx.fillText(comp.toUpperCase().substring(0, 26), 240, 180);
+                bufferCtx.font = '22px "Courier New", monospace'; bufferCtx.fillText("APPROVED BY: " + appr.substring(0, 16), 240, 240);
+                bufferCtx.font = 'bold 24px "Courier New", monospace'; bufferCtx.fillText(displayDate, 240, 290);
+                stampMarker.style.borderRadius = '4px'; stampMarker.style.width = '150px'; stampMarker.style.height = '100px';
+            } 
+            else if (selectedShape === 'square') {
+                bufferCtx.lineWidth = 8; bufferCtx.strokeRect(50, 50, 380, 380);
+                bufferCtx.lineWidth = 3; bufferCtx.strokeRect(62, 62, 356, 356);
+                bufferCtx.font = 'bold 26px "Courier New", monospace'; bufferCtx.fillText(comp.toUpperCase().substring(0, 22), 240, 140);
+                bufferCtx.font = '22px "Courier New", monospace'; bufferCtx.fillText("APPROVED BY:", 240, 210);
+                bufferCtx.font = 'bold 24px "Courier New", monospace'; bufferCtx.fillText(appr.substring(0, 18), 240, 260);
+                bufferCtx.font = 'bold 22px "Courier New", monospace'; bufferCtx.fillText(displayDate, 240, 330);
+                stampMarker.style.borderRadius = '12px'; stampMarker.style.width = '120px'; stampMarker.style.height = '120px';
+            }
 
-        if (selectedShape === 'circle') {
-            bufferCtx.lineWidth = 8; bufferCtx.beginPath(); bufferCtx.arc(240, 240, 200, 0, Math.PI * 2); bufferCtx.stroke();
-            bufferCtx.lineWidth = 3; bufferCtx.beginPath(); bufferCtx.arc(240, 240, 184, 0, Math.PI * 2); bufferCtx.stroke();
-            bufferCtx.font = 'bold 26px "Courier New", monospace'; bufferCtx.fillText(comp.toUpperCase().substring(0, 22), 240, 150);
-            bufferCtx.font = '22px "Courier New", monospace'; bufferCtx.fillText("APPROVED BY:", 240, 220);
-            bufferCtx.font = 'bold 24px "Courier New", monospace'; bufferCtx.fillText(appr.substring(0, 18), 240, 260);
-            bufferCtx.font = 'bold 22px "Courier New", monospace'; bufferCtx.fillText(displayDate, 240, 330);
-            stampMarker.style.borderRadius = '50%'; stampMarker.style.width = '120px'; stampMarker.style.height = '120px';
-        } 
-        else if (selectedShape === 'oval') {
-            bufferCtx.lineWidth = 8; bufferCtx.beginPath(); bufferCtx.ellipse(240, 240, 220, 140, 0, 0, Math.PI * 2); bufferCtx.stroke();
-            bufferCtx.lineWidth = 3; bufferCtx.beginPath(); bufferCtx.ellipse(240, 240, 206, 126, 0, 0, Math.PI * 2); bufferCtx.stroke();
-            bufferCtx.font = 'bold 26px "Courier New", monospace'; bufferCtx.fillText(comp.toUpperCase().substring(0, 24), 240, 170);
-            bufferCtx.font = '20px "Courier New", monospace'; bufferCtx.fillText("APPROVED BY: " + appr.substring(0, 14), 240, 230);
-            bufferCtx.font = 'bold 22px "Courier New", monospace'; bufferCtx.fillText(displayDate, 240, 280);
-            stampMarker.style.borderRadius = '50%'; stampMarker.style.width = '150px'; stampMarker.style.height = '100px';
-        } 
-        else if (selectedShape === 'rectangular') {
-            bufferCtx.lineWidth = 8; bufferCtx.strokeRect(30, 110, 420, 260);
-            bufferCtx.lineWidth = 3; bufferCtx.strokeRect(42, 122, 396, 236);
-            bufferCtx.font = 'bold 28px "Courier New", monospace'; bufferCtx.fillText(comp.toUpperCase().substring(0, 26), 240, 180);
-            bufferCtx.font = '22px "Courier New", monospace'; bufferCtx.fillText("APPROVED BY: " + appr.substring(0, 16), 240, 240);
-            bufferCtx.font = 'bold 24px "Courier New", monospace'; bufferCtx.fillText(displayDate, 240, 290);
-            stampMarker.style.borderRadius = '4px'; stampMarker.style.width = '150px'; stampMarker.style.height = '100px';
-        } 
-        else if (selectedShape === 'square') {
-            bufferCtx.lineWidth = 8; bufferCtx.strokeRect(50, 50, 380, 380);
-            bufferCtx.lineWidth = 3; bufferCtx.strokeRect(62, 62, 356, 356);
-            bufferCtx.font = 'bold 26px "Courier New", monospace'; bufferCtx.fillText(comp.toUpperCase().substring(0, 22), 240, 140);
-            bufferCtx.font = '22px "Courier New", monospace'; bufferCtx.fillText("APPROVED BY:", 240, 210);
-            bufferCtx.font = 'bold 24px "Courier New", monospace'; bufferCtx.fillText(appr.substring(0, 18), 240, 260);
-            bufferCtx.font = 'bold 22px "Courier New", monospace'; bufferCtx.fillText(displayDate, 240, 330);
-            stampMarker.style.borderRadius = '12px'; stampMarker.style.width = '120px'; stampMarker.style.height = '120px';
+            ctx.drawImage(stampGraphicBufferCanvas, 0, 0);
+            
+            // Micro-Bleed Vintage Noise Application Loop
+            ctx.globalCompositeOperation = 'destination-out';
+            for (let idx = 0; idx < 1200; idx++) {
+                const randomCoordX = Math.random() * 480;
+                const randomCoordY = Math.random() * 480;
+                ctx.beginPath(); 
+                ctx.arc(randomCoordX, randomCoordY, Math.random() * 1.5 + 0.5, 0, Math.PI * 2); 
+                ctx.fill();
+            }
+            ctx.globalCompositeOperation = 'source-over';
+
+            bufferCtx.globalAlpha = 1.0;
+            stampImgDataUrl = stampGraphicBufferCanvas.toDataURL('image/png');
+
+            stampMarker.innerHTML = `<img src="${stampImgDataUrl}" style="width:100%; height:100%; pointer-events:none;" />`;
+            stampMarker.style.borderColor = selectedInkColor;
+
+            settingsPanel.style.display = 'none';
+            note.innerText = "🏵️ Click on the document to place your Digital Stamp";
+            note.style.display = 'block';
+            document.getElementById('click-overlay-stamp').style.display = 'block';
+            
+        } catch (err) {
+            alert("Stamp Render Exception: " + err.message);
         }
-
-        ctx.drawImage(stampGraphicBufferCanvas, 0, 0);
-        
-        ctx.globalCompositeOperation = 'destination-out';
-        for (let idx = 0; idx < 1200; idx++) {
-            const randomCoordX = Math.random() * 480;
-            const randomCoordY = Math.random() * 480;
-            ctx.beginPath(); 
-            ctx.arc(randomCoordX, randomCoordY, Math.random() * 1.5 + 0.5, 0, Math.PI * 2); 
-            ctx.fill();
-        }
-        ctx.globalCompositeOperation = 'source-over';
-
-        bufferCtx.globalAlpha = 1.0;
-        stampImgDataUrl = stampGraphicBufferCanvas.toDataURL('image/png');
-
-        stampMarker.innerHTML = `<img src="${stampImgDataUrl}" style="width:100%; height:100%; pointer-events:none;" />`;
-        stampMarker.style.borderColor = selectedInkColor;
-
-        settingsPanel.style.display = 'none';
-        note.innerText = "🏵️ Click on the document to place your Digital Stamp";
-        note.style.display = 'block';
-        document.getElementById('click-overlay-stamp').style.display = 'block';
     };
 
     document.getElementById('click-overlay-stamp').onclick = (e) => {
@@ -1900,4 +1567,3 @@ targetPage.drawLine({ start: { x: 95, y: clientY - 3 }, end: { x: width - 40, y:
 </script>
 </body>
 </html>
-
