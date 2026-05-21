@@ -439,16 +439,17 @@
     };
 
                 // ... Your existing document.getElementById('lockBtn').onclick code lives right above this ...
-         document.getElementById('lockBtn').onclick = () => {
+    document.getElementById('lockBtn').onclick = () => {
         if(!originalBytes) return alert("Select or Generate PDF First");
-        
         note.innerText = "📍 Click on the document to place your QR";
         note.style.display = 'block';
         document.getElementById('click-overlay').style.display = 'block';
-        
         setTimeout(() => { note.style.display = 'none'; }, 4000);
     };
 
+// =========================================================================
+// 📥 REMOVE YOUR OLD "click-overlay" BLOCK AND PASTE THIS ENTIRE NEW ONE HERE:
+// =========================================================================
         // --- 📍 FIXED: Unified EasyQRCode Pipeline with Dynamic Scaling ---
     document.getElementById('click-overlay').onclick = (e) => {
         const rect = document.getElementById('workspace-scaler').getBoundingClientRect();
@@ -539,14 +540,9 @@
         if (note) note.style.display = 'none';
     };
 
+// =========================================================================
 
-        let isDragging = false;
-    let offsetX = 0, offsetY = 0;
-    let stampOffsetX = 0, stampOffsetY = 0;
-    let isQrLocked = false; 
-    let isStampLocked = false; 
-
-
+    // ... Your restored marker.onmousedown and drag tracking functions live right below this ...
     marker.onmousedown = (e) => { 
         if (isQrLocked) return; 
         // ...
