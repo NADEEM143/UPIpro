@@ -1596,7 +1596,7 @@ targetPage.drawLine({ start: { x: 95, y: clientY - 3 }, end: { x: width - 40, y:
             const pdfFrameNode = document.getElementById('pdf-frame');
             const imgFrameNode = document.getElementById('image-frame');
 
-            if (imgFrameNode && imgFrameNode.style.display === 'block') {
+                        if (imgFrameNode && imgFrameNode.style.display === 'block') {
                 const canvas = document.createElement('canvas');
                 canvas.width = imgFrameNode.naturalWidth;
                 canvas.height = imgFrameNode.naturalHeight;
@@ -1729,14 +1729,17 @@ targetPage.drawLine({ start: { x: 95, y: clientY - 3 }, end: { x: width - 40, y:
             }
 
             const toast = document.getElementById('on-screen-note');
-            toast.innerText = "👁️ Preview Loaded! Verification Surface Updated.";
-            toast.style.display = 'block';
-            setTimeout(() => { toast.style.display = 'none'; }, 3000);
+            if (toast) {
+                toast.innerText = "👁️ Preview Loaded! Verification Surface Updated.";
+                toast.style.display = 'block';
+                setTimeout(() => { toast.style.display = 'none'; }, 3000);
+            }
 
         } catch (previewError) {
             alert("Preview Canvas Render Failure: " + previewError.message);
         }
-        };
+    };
+
     function convertAmountToWords(amount) {
         const sglDigit = ["Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"],
             dblDigit = ["Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"],
@@ -1768,6 +1771,133 @@ targetPage.drawLine({ start: { x: 95, y: clientY - 3 }, end: { x: width - 40, y:
         }
         return words.replace(/\s+/g, ' ').trim() + " Only";
     }
+
+    gearIcon.onclick = () => {
+        settingsPanel.style.display = settingsPanel.style.display === 'block' ? 'none' : 'block';
+    };
+
+    stampOptionMenu.onclick = () => {
+        stampFormArea.style.display = stampFormArea.style.display === 'block' ? 'none' : 'block';
+    };
+
+    const businessOptionMenu = document.getElementById('businessDetailsOptionMenu');
+    const businessFormArea = document.getElementById('businessFormArea');
+
+    businessOptionMenu.onclick = () => {
+        businessFormArea.style.display = businessFormArea.style.display === 'block' ? 'none' : 'block';
+    };
+
+    lockStampBtn.onclick = () => {
+        if (!originalBytes) return alert("Select or Generate PDF First");
+        
+        const comp = document.getElementById('stampCompany').value.trim();
+        const appr = document.getElementById('stampApprover').value.trim();
+        const dateV = document.getElementById('stampDate').value;
+        const selectedInkColor = document.getElementById('stampColor').value;
+        const selectedShape = document.getElementById('stampShape').value;
+        
+        if (!comp || !appr || !dateV) return alert("Please fill all stamp info fields (Company Name, Approved By, Date)");
+
+        const canvas = document.createElement('canvas');
+        canvas.width = 480; 
+        canvas.height = 480;
+        const ctx = canvas.getContext('2d');
+
+        ctx.clearRect(0, 0, 480, 480);
+        
+        const stampGraphicBufferCanvas = document.createElement('canvas');
+        stampGraphicBufferCanvas.width = 480;
+        stampGraphicBufferCanvas.height = 480;
+        const bufferCtx = stampGraphicBufferCanvas.getContext('2d');
+
+        bufferCtx.strokeStyle = selectedInkColor;
+        bufferCtx.fillStyle = selectedInkColor;
+        bufferCtx.textAlign = 'center';
+        bufferCtx.textBaseline = 'middle';
+
+        bufferCtx.translate(240, 240);
+        bufferCtx.rotate((Math.random() * 1.6 - 0.8) * Math.PI / 180);
+        bufferCtx.translate(-240, -240);
+
+        const [y, m, d] = dateV.split('-');
+        const displayDate = `${d}/${m}/${y}`;
+
+        if (selectedShape === 'circle') {
+            bufferCtx.lineWidth = 8; bufferCtx.beginPath(); bufferCtx.arc(240, 240, 200, 0, Math.PI * 2); bufferCtx.stroke();
+            bufferCtx.lineWidth = 3; bufferCtx.beginPath(); bufferCtx.arc(240, 240, 184, 0, Math.PI * 2); bufferCtx.stroke();
+            bufferCtx.font = 'bold 26px "Courier New", monospace'; bufferCtx.fillText(comp.toUpperCase().substring(0, 22), 240, 150);
+            bufferCtx.font = '22px "Courier New", monospace'; bufferCtx.fillText("APPROVED BY:", 240, 220);
+            bufferCtx.font = 'bold 24px "Courier New", monospace'; bufferCtx.fillText(appr.substring(0, 18), 240, 260);
+            bufferCtx.font = 'bold 22px "Courier New", monospace'; bufferCtx.fillText(displayDate, 240, 330);
+            stampMarker.style.borderRadius = '50%'; stampMarker.style.width = '120px'; stampMarker.style.height = '120px';
+        } 
+        else if (selectedShape === 'oval') {
+            bufferCtx.lineWidth = 8; bufferCtx.beginPath(); bufferCtx.ellipse(240, 240, 220, 140, 0, 0, Math.PI * 2); bufferCtx.stroke();
+            bufferCtx.lineWidth = 3; bufferCtx.beginPath(); bufferCtx.ellipse(240, 240, 206, 126, 0, 0, Math.PI * 2); bufferCtx.stroke();
+            bufferCtx.font = 'bold 26px "Courier New", monospace'; bufferCtx.fillText(comp.toUpperCase().substring(0, 24), 240, 170);
+            bufferCtx.font = '20px "Courier New", monospace'; bufferCtx.fillText("APPROVED BY: " + appr.substring(0, 14), 240, 230);
+            bufferCtx.font = 'bold 22px "Courier New", monospace'; bufferCtx.fillText(displayDate, 240, 280);
+            stampMarker.style.borderRadius = '50%'; stampMarker.style.width = '150px'; stampMarker.style.height = '100px';
+        } 
+        else if (selectedShape === 'rectangular') {
+            bufferCtx.lineWidth = 8; bufferCtx.strokeRect(30, 110, 420, 260);
+            bufferCtx.lineWidth = 3; bufferCtx.strokeRect(42, 122, 396, 236);
+            bufferCtx.font = 'bold 28px "Courier New", monospace'; bufferCtx.fillText(comp.toUpperCase().substring(0, 26), 240, 180);
+            bufferCtx.font = '22px "Courier New", monospace'; bufferCtx.fillText("APPROVED BY: " + appr.substring(0, 16), 240, 240);
+            bufferCtx.font = 'bold 24px "Courier New", monospace'; bufferCtx.fillText(displayDate, 240, 290);
+            stampMarker.style.borderRadius = '4px'; stampMarker.style.width = '150px'; stampMarker.style.height = '100px';
+        } 
+        else if (selectedShape === 'square') {
+            bufferCtx.lineWidth = 8; bufferCtx.strokeRect(50, 50, 380, 380);
+            bufferCtx.lineWidth = 3; bufferCtx.strokeRect(62, 62, 356, 356);
+            bufferCtx.font = 'bold 26px "Courier New", monospace'; bufferCtx.fillText(comp.toUpperCase().substring(0, 22), 240, 140);
+            bufferCtx.font = '22px "Courier New", monospace'; bufferCtx.fillText("APPROVED BY:", 240, 210);
+            bufferCtx.font = 'bold 24px "Courier New", monospace'; bufferCtx.fillText(appr.substring(0, 18), 240, 260);
+            bufferCtx.font = 'bold 22px "Courier New", monospace'; bufferCtx.fillText(displayDate, 240, 330);
+            stampMarker.style.borderRadius = '12px'; stampMarker.style.width = '120px'; stampMarker.style.height = '120px';
+        }
+
+        ctx.drawImage(stampGraphicBufferCanvas, 0, 0);
+        
+        ctx.globalCompositeOperation = 'destination-out';
+        for (let idx = 0; idx < 1200; idx++) {
+            const randomCoordX = Math.random() * 480;
+            const randomCoordY = Math.random() * 480;
+            ctx.beginPath(); 
+            ctx.arc(randomCoordX, randomCoordY, Math.random() * 1.5 + 0.5, 0, Math.PI * 2); 
+            ctx.fill();
+        }
+        ctx.globalCompositeOperation = 'source-over';
+
+        bufferCtx.globalAlpha = 1.0;
+        stampImgDataUrl = stampGraphicBufferCanvas.toDataURL('image/png');
+
+        stampMarker.innerHTML = `<img src="${stampImgDataUrl}" style="width:100%; height:100%; pointer-events:none;" />`;
+        stampMarker.style.borderColor = selectedInkColor;
+
+        settingsPanel.style.display = 'none';
+        note.innerText = "🏵️ Click on the document to place your Digital Stamp";
+        note.style.display = 'block';
+        document.getElementById('click-overlay-stamp').style.display = 'block';
+    };
+
+    document.getElementById('click-overlay-stamp').onclick = (e) => {
+        const rect = document.getElementById('workspace-scaler').getBoundingClientRect();
+        stampPosX = (e.clientX - rect.left) / currentZoomScale; 
+        stampPosY = (e.clientY - rect.top) / currentZoomScale;
+        
+        stampMarker.style.left = (stampPosX - 60) + 'px';
+        stampMarker.style.top = (stampPosY - 60) + 'px';
+        stampMarker.style.display = 'flex';
+        
+        isStampPlaced = true;
+        document.getElementById('click-overlay-stamp').style.display = 'none';
+        
+        document.getElementById('previewBtn').style.display = 'block';
+        document.getElementById('downloadBtn').style.display = 'block';
+        note.style.display = 'none';
+    };
 </script>
 </body>
 </html>
+
