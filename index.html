@@ -449,37 +449,96 @@
         setTimeout(() => { note.style.display = 'none'; }, 4000);
     };
 
+        // --- 📍 FIXED: Unified EasyQRCode Pipeline with Dynamic Scaling ---
     document.getElementById('click-overlay').onclick = (e) => {
         const rect = document.getElementById('workspace-scaler').getBoundingClientRect();
-        posX = (e.clientX - rect.left) / currentZoomScale; 
-        posY = (e.clientY - rect.top) / currentZoomScale;
         
-        marker.style.left = (posX - 40) + 'px'; marker.style.top = (posY - 40) + 'px';
+        // Compute direct 1:1 projection positions (Old drifting currentZoomScale removed)
+        posX = (e.clientX - rect.left); 
+        posY = (e.clientY - rect.top);
+        
+        const halfMarkerWidth = marker.clientWidth / 2 || 40;
+        const halfMarkerHeight = marker.clientHeight / 2 || 40;
+        
+        marker.style.left = (posX - halfMarkerWidth) + 'px'; 
+        marker.style.top = (posY - halfMarkerHeight) + 'px';
         marker.style.display = 'flex';
         
-        // --- THIS PART INJECTS THE REAL LIVE QR ---
-               const name = document.getElementById('payeeName').value;
-        const vpa = document.getElementById('vpa').value;
-        const amt = document.getElementById('amount').value;
+        // Extract merchant profile data elements safely
+        const name = document.getElementById('payeeName').value || "Merchant";
+        const vpa = document.getElementById('vpa').value || "merchant@upi";
+        const amt = document.getElementById('amount').value || "0";
         
-        // Generates an automated unique daily transaction reference ID to pass NPCI retail guidelines
+        // Build the compliant retail transaction deep-link string
         const uniqueTxnRefId = "INV" + Date.now(); 
-        const upi = `upi://pay?pa=${vpa}&pn=${encodeURIComponent(name)}&cu=INR&am=${parseFloat(amt || 0).toFixed(2)}&tr=${uniqueTxnRefId}&mc=0000&mode=02&purpose=00`;
+        let upiString = `upi://pay?pa=${vpa}&pn=${encodeURIComponent(name)}&cu=INR&tr=${uniqueTxnRefId}&mc=0000&mode=02&purpose=00`;
+        
+        if (parseFloat(amt) > 0) {
+            upiString += `&am=${parseFloat(amt).toFixed(2)}`;
+        }
         
         const liveTarget = document.getElementById('qr-graphic-target');
-        liveTarget.innerHTML = ""; 
-        liveTarget.style.display = "block"; 
-        
-        new QRCode(liveTarget, { text: upi, width: 120, height: 120 });
+        if (liveTarget) {
+            // Force strict absolute sub-pixel layout constraints onto the graphic container
+            liveTarget.innerHTML = ""; 
+            liveTarget.style.display = "block"; 
+            liveTarget.style.position = "absolute";
+            liveTarget.style.top = "0";
+            liveTarget.style.left = "0";
+            liveTarget.style.width = "100%";
+            liveTarget.style.height = "100%";
+            liveTarget.style.boxSizing = "border-box";
+            
+            try {
+                // Safely checks your script libraries to prevent crash initialization faults
+                if (typeof EasyQRCode !== 'undefined') {
+                    new EasyQRCode(liveTarget, {
+                        text: upiString,
+                        width: 240, // Generates sharp higher resolution base details matrix
+                        height: 240,
+                        colorDark: "#000000",
+                        colorLight: "#ffffff",
+                        correctLevel: EasyQRCode.CorrectLevel.H
+                    });
 
-        // ------------------------------------------
+                    // Forces the internal library assets to auto-scale tracking the box resizing limits
+                    setTimeout(() => {
+                        const internalSvgImg = liveTarget.querySelector('img, canvas, svg');
+                        if (internalSvgImg) {
+                            internalSvgImg.style.width = "100%";
+                            internalSvgImg.style.height = "100%";
+                            internalSvgImg.style.objectFit = "contain";
+                            internalSvgImg.style.display = "block";
+                        }
+                    }, 20);
+
+                } else if (typeof QRCode !== 'undefined') {
+                    new QRCode(liveTarget, { text: upiString, width: 120, height: 120 });
+                    setTimeout(() => {
+                        const internalImg = liveTarget.querySelector('img, canvas');
+                        if (internalImg) {
+                            internalImg.style.width = "100%";
+                            internalImg.style.height = "100%";
+                        }
+                    }, 20);
+                } else {
+                    liveTarget.innerText = "QR Engine Error";
+                }
+            } catch (err) {
+                console.error("QR drawing processing exception:", err);
+            }
+        }
 
         document.getElementById('click-overlay').style.display = 'none';
         
-        document.getElementById('previewBtn').style.display = 'block';
-        document.getElementById('downloadBtn').style.display = 'block';
-        note.style.display = 'none';
+        const previewBtn = document.getElementById('previewBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        if (previewBtn) previewBtn.style.display = 'block';
+        if (downloadBtn) downloadBtn.style.display = 'block';
+        
+        if (note) note.style.display = 'none';
     };
+
 
         let isDragging = false;
     let offsetX = 0, offsetY = 0;
