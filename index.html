@@ -346,11 +346,12 @@
                     </div>
                 </div>
 
-                <iframe id="pdf-frame"></iframe>
+                               <iframe id="pdf-frame"></iframe>
                 <img id="image-frame" alt="Invoice Preview Surface Substrate Layer">
                 <div id="click-overlay"></div>
                 <div id="click-overlay-stamp" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1005; display: none; background: rgba(0,0,0,0.01);"></div>
                 
+                <!-- Interactive Asset Placement Holders Matrix -->
                 <div id="qr-marker">
                     <div style="font-size:18px;">🎯</div>
                     <span>DRAG & RESIZE</span>
@@ -360,16 +361,12 @@
                 <div id="stamp-marker">
                     <span>STAMP PLACEHOLDER</span>
                 </div>
-            </div>
+                
+            </div> <!-- 1. Closes #workspace-scaler cleanly -->
+        </section> <!-- 2. Closes your main preview panel container safely -->
+    </main> <!-- 3. Closes .main-layout grid structural parent safely -->
+</div> <!-- 4. Closes the main parent .container layout safely -->
 
-            <div class="zoom-controls-bar">
-                <button class="zoom-btn" id="zoomOutBtn">−</button>
-                <div class="zoom-display" id="zoomValueLabel">100%</div>
-                <button class="zoom-btn" id="zoomInBtn">+</button>
-            </div>
-        </div>
-    </div>
-</div>
 
 <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/easyqrcodejs@4.6.2/dist/easy.qrcode.min.js"></script>
