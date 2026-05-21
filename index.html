@@ -905,18 +905,21 @@
                 rightSideTextY -= 12;
             }
 
-            if (bMob2 !== "") {
+                       if (bMob2 !== "") {
                 targetPage.drawText(`    ${bMob2}`, { x: width - 180, y: rightSideTextY, size: 10, font: boldFont });
-                rightSideTextY -= 12; // Shift dynamic coordinate down only if text was printed
+                rightSideTextY -= 12; // Shift dynamic coordinate down safely
             }
 
+            // --- FIXED: Email now matches mobile number bold styling and size perfectly ---
             if (bEmail !== "") {
-                targetPage.drawText(bEmail, { x: width - 180, y: rightSideTextY, size: 9, font: regularFont });
+                targetPage.drawText(bEmail, { x: width - 180, y: rightSideTextY, size: 10, font: boldFont });
             }
 
+            // --- Unified Company Business Name Header ---
             if (bName !== "") {
-                targetPage.drawText(bName, { x: 40, y: height - 95, size: 28, font: boldFont });
+                targetPage.drawText(bName, { x: 40, y: height - 95, size: 24, font: boldFont });
             }
+
             
             let subHeaderY = height - 112;
             
