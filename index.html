@@ -438,7 +438,7 @@
         await handleIncomingDocumentBufferChannels(file);
     };
 
-        document.getElementById('lockBtn').onclick = () => {
+            document.getElementById('lockBtn').onclick = () => {
         if(!originalBytes) return alert("Select or Generate PDF First");
         
         note.innerText = "📍 Click on the document to place your QR";
@@ -448,7 +448,67 @@
         setTimeout(() => { note.style.display = 'none'; }, 4000);
     };
 
-        // --- Hardened Mouse Position Drag Tracking (Zoom Variable Removed) ---
+    // --- Hardened Point-and-Click UPI QR Asset Inserter Pipeline ---
+    document.getElementById('click-overlay').onclick = (e) => {
+        const rect = document.getElementById('workspace-scaler').getBoundingClientRect();
+        
+        // Compute precise point projections locked to a stable 1:1 ratio
+        posX = (e.clientX - rect.left); 
+        posY = (e.clientY - rect.top);
+        
+        // Center the marker precisely at your click/touch point location
+        const halfMarkerWidth = marker.clientWidth / 2 || 40;
+        const halfMarkerHeight = marker.clientHeight / 2 || 40;
+        
+        marker.style.left = (posX - halfMarkerWidth) + 'px'; 
+        marker.style.top = (posY - halfMarkerHeight) + 'px';
+        marker.style.display = 'flex';
+        
+        // Extract merchant profile data elements safely
+        const name = document.getElementById('payeeName').value || "Merchant";
+        const vpa = document.getElementById('vpa').value || "merchant@upi";
+        const amt = document.getElementById('amount').value || "0";
+        
+        // Generate automated transaction metadata string
+        const uniqueTxnRefId = "INV" + Date.now(); 
+        let upiString = `upi://pay?pa=${vpa}&pn=${encodeURIComponent(name)}&cu=INR&tr=${uniqueTxnRefId}&mc=0000&mode=02&purpose=00`;
+        
+        if (parseFloat(amt) > 0) {
+            upiString += `&am=${parseFloat(amt).toFixed(2)}`;
+        }
+        
+        const liveTarget = document.getElementById('qr-graphic-target');
+        if (liveTarget) {
+            liveTarget.innerHTML = ""; 
+            liveTarget.style.display = "block"; 
+            
+            // --- Auto-Switching Vector Graphic QR Engine ---
+            try {
+                if (typeof EasyQRCode !== 'undefined') {
+                    new EasyQRCode(liveTarget, { text: upiString, width: 120, height: 120, correctLevel: EasyQRCode.CorrectLevel.H });
+                } else if (typeof QRCode !== 'undefined') {
+                    new QRCode(liveTarget, { text: upiString, width: 120, height: 120 });
+                } else {
+                    console.error("No compatible QR code generation library detected on this page.");
+                    liveTarget.innerText = "QR Engine Missing";
+                }
+            } catch (err) {
+                console.error("QR Code library execution failure:", err);
+            }
+        }
+
+        // Reset visibility wrappers smoothly
+        document.getElementById('click-overlay').style.display = 'none';
+        
+        const previewBtn = document.getElementById('previewBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        if (previewBtn) previewBtn.style.display = 'block';
+        if (downloadBtn) downloadBtn.style.display = 'block';
+        
+        if (note) note.style.display = 'none';
+    };
+
+    // --- Hardened Mouse Position Drag Tracking (Zoom Variable Removed) ---
     window.onmousemove = (e) => {
         const rect = document.getElementById('workspace-scaler').getBoundingClientRect();
         
