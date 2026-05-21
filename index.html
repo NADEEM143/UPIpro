@@ -1011,18 +1011,50 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
             targetPage.drawText("CGST  9%", { x: colX.rate + 6, y: tableBottomY - 34, size: 10, font: regularFont });
             targetPage.drawText(cgstValue.toFixed(2), { x: colX.amt + 15, y: tableBottomY - 34, size: 11, font: regularFont });
 
+                        // ... [Your existing CGST and SGST text values are printed right above this] ...
             targetPage.drawText("SGST  9%", { x: colX.rate + 6, y: tableBottomY - 54, size: 10, font: regularFont });
             targetPage.drawText(sgstValue.toFixed(2), { x: colX.amt + 15, y: tableBottomY - 54, size: 11, font: regularFont });
 
+            // =========================================================================
+            // 📥 REMOVE YOUR OLD TOTALS & WORDS BLOCK AND PASTE THIS NEW SNIPPET HERE:
+            // =========================================================================
+            // --- 5. Amount To Words Calculation String Call (Auto-Scaling) ---
+            const wordsTranslationString = `In words:  ${convertAmountToWords(absoluteGrandTotal)}`;
+            
+            // Default base font size configuration
+            let wordsFontSize = 10; 
+            
+            // Define your maximum safe drawing boundary line width (Left table column box width)
+            const maxAllowedTextWidth = colX.rate - tableLeftX - 15; 
+            
+            // Calculate actual text width dynamically based on font metric systems
+            let currentWordsWidth = boldFont.widthOfTextAtSize(wordsTranslationString, wordsFontSize);
+            
+            // Loop to dynamically shrink font size downward if text overflows the border width limit
+            while (currentWordsWidth > maxAllowedTextWidth && wordsFontSize > 6) {
+                wordsFontSize -= 0.5;
+                currentWordsWidth = boldFont.widthOfTextAtSize(wordsTranslationString, wordsFontSize);
+            }
+
+            // Draw the string using the dynamically computed safe font scale factor bounds
+            targetPage.drawText(wordsTranslationString, { 
+                x: tableLeftX + 5, 
+                y: tableBottomY - 74, 
+                size: wordsFontSize, 
+                font: boldFont 
+            });
+            
+            // --- 7. Render Final Summary Calculation Labels Safely ---
             targetPage.drawText("Total", { x: colX.rate + 6, y: tableBottomY - 74, size: 12, font: boldFont });
             targetPage.drawText(absoluteGrandTotal.toFixed(0), { x: colX.amt + 15, y: tableBottomY - 74, size: 12, font: boldFont });
+            // =========================================================================
 
-            const wordsTranslationString = convertAmountToWords(absoluteGrandTotal);
-            targetPage.drawText(`In words:  ${wordsTranslationString}`, { x: tableLeftX + 5, y: tableBottomY - 74, size: 10, font: boldFont });
+            // Your existing signature setup or file generation lines continue right below it:
+            targetPage.drawText("Signature or Stamp", { x: width - 140, y: tableBottomY - 120, size: 10, font: boldFont });
             
-            targetPage.drawText("Signature or Stamp", { x: width - 110, y: tableBottomY - 120, size: 11, font: boldFont });
-
             const amountInput = document.getElementById('amount');
+            // ...
+
             amountInput.value = absoluteGrandTotal.toFixed(2);
             amountInput.dispatchEvent(new Event('input'));
 
