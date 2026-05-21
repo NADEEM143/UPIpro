@@ -431,16 +431,6 @@
         }
     };
 
-        const applyZoomMatrixTransformation = (zoomFactorIncrement) => {
-        currentZoomScale = Math.max(0.5, Math.min(2.0, currentZoomScale + zoomFactorIncrement));
-        workspaceScaler.style.transform = `scale(${currentZoomScale})`;
-        zoomValueLabel.innerText = `${Math.round(currentZoomScale * 100)}%`;
-        workspaceScaler.style.width = `${100 / currentZoomScale}%`;
-        workspaceScaler.style.height = `${100 / currentZoomScale}%`;
-    };
-
-    zoomInBtn.onclick = () => applyZoomMatrixTransformation(0.1);
-    zoomOutBtn.onclick = () => applyZoomMatrixTransformation(-0.1);
 
     document.getElementById('fileInput').onchange = async (e) => {
         const file = e.target.files[0];
