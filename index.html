@@ -371,45 +371,40 @@
 <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/easyqrcodejs@4.6.2/dist/easy.qrcode.min.js"></script>
 <script>
-        const gearIcon = document.getElementById('gearIcon');
+    // --- 🌟 RESTORED: Unified Global Architecture State Variables ---
+    const currentZoomScale = 1.0; // Hardened locked baseline ratio mapping multiplier
+    let originalBytes = null;
+    let productsList = [];
+    
+    // Core placement interaction coordinate states
+    let posX = 100, posY = 100, isQrPlaced = false, isDragging = false;
+    let stampPosX = 250, stampPosY = 100, isStampPlaced = false, isStampDragging = false;
+    let stampImgDataUrl = null, isQrLocked = false, isStampLocked = false;
+    let offsetX = 0, offsetY = 0, stampOffsetX = 0, stampOffsetY = 0;
+    let currentActivePageIndex = 0;
+
+    // Element Target Caches
+    const gearIcon = document.getElementById('gearIcon');
     const settingsPanel = document.getElementById('settingsPanel');
     const stampOptionMenu = document.getElementById('digitalStampOptionMenu');
     const stampFormArea = document.getElementById('stampFormArea');
-    
-    let currentActivePageIndex = 0; 
     const lockStampBtn = document.getElementById('lockStampBtn');
-
-    let originalBytes, posX = 0, posY = 0;
     const marker = document.getElementById('qr-marker');
-    const note = document.getElementById('on-screen-note');
-    
-    let productsList = [];
-
-    let stampPosX = 0, stampPosY = 0, stampImgDataUrl = null, isStampPlaced = false, isStampDragging = false;
     const stampMarker = document.getElementById('stamp-marker');
+    const note = document.getElementById('on-screen-note');
 
-    let currentZoomScale = 1.0;
-    const workspaceScaler = document.getElementById('workspace-scaler');
-    const zoomInBtn = document.getElementById('zoomInBtn');
-    const zoomOutBtn = document.getElementById('zoomOutBtn');
-    const zoomValueLabel = document.getElementById('zoomValueLabel');
-
-            window.onload = () => {
-        // Compute today's date in local time zone explicitly
+    // --- System-Wide Local Initialization Lifecycle Sync ---
+    window.onload = () => {
         const todayObj = new Date();
         const yyyy = todayObj.getFullYear();
         const mm = String(todayObj.getMonth() + 1).padStart(2, '0');
         const dd = String(todayObj.getDate()).padStart(2, '0');
         
-        // 1. Target ISO Format for HTML5 <input type="date"> (YYYY-MM-DD)
         const localDateIso = `${yyyy}-${mm}-${dd}`;
-        
-        // 2. Target Display Format for standard Text fields (DD/MM/YYYY)
         const localDateDisplay = `${dd}/${mm}/${yyyy}`;
 
-        // Force overwrite the persistent cache files immediately on initialization lifecycle
-        localStorage.setItem('stampDate', localDateIso);
-        localStorage.setItem('bizDate', localDateDisplay);
+        if (!localStorage.getItem('stampDate')) localStorage.setItem('stampDate', localDateIso);
+        if (!localStorage.getItem('bizDate')) localStorage.setItem('bizDate', localDateDisplay);
 
         ['payeeName', 'vpa', 'amount', 'stampCompany', 'stampApprover', 'stampDate', 'stampColor', 'stampShape', 'bizName', 'bizProprietor', 'bizMob1', 'bizMob2', 'bizEmail', 'bizGst', 'bizAddress', 'bizDate'].forEach(id => {
             const targetInputElement = document.getElementById(id);
@@ -428,11 +423,10 @@
             }
         });
 
-        // Enforce synchronization constraints explicitly to active element nodes
-        if (document.getElementById('stampDate')) {
+        if (document.getElementById('stampDate') && !document.getElementById('stampDate').value) {
             document.getElementById('stampDate').value = localDateIso;
         }
-        if (document.getElementById('bizDate')) {
+        if (document.getElementById('bizDate') && !document.getElementById('bizDate').value) {
             document.getElementById('bizDate').value = localDateDisplay;
         }
     };
