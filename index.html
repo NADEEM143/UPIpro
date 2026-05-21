@@ -279,24 +279,76 @@
             <div class="input-group"><label>Amount</label><input type="number" id="amount"></div>
             
             <button id="lockBtn" class="btn btn-blue">📍 Set QR Position</button>
-            <button id="previewBtn" class="btn btn-orange" style="margin-top: 10px; display: none;">👁️ Preview Document</button>
-            <button id="downloadBtn" class="btn btn-green">⚡ Download PDF</button>
+                   <div class="sidebar">
+            
+            <div class="input-group">
+                <label>1. Select PDF / Image</label>
+                <input type="file" id="fileInput" accept="application/pdf, image/jpeg, image/jpg, image/png">
+            </div>
+            <div class="input-group"><label>Name</label><input type="text" id="payeeName"></div>
+            <div class="input-group"><label>UPI ID</label><input type="text" id="vpa"></div>
+            <div class="input-group"><label>Amount</label><input type="number" id="amount"></div>
 
+            <!-- 2. Dynamic Industry Profile Selection Module -->
+            <div class="input-group" style="margin-top: 20px; padding-top: 15px; border-top: 1px dashed var(--border);">
+                <label style="color: var(--primary);">Select Industry Template Profile</label>
+                <select id="industryProfileSelect">
+                    <option value="">-- Generic Invoice Standard --</option>
+                    <option value="technician">🛠️ Technical & Repair Services</option>
+                    <option value="carpentry">🪵 Carpentry & Woodwork</option>
+                    <option value="interior_design">📐 Interior Design Studio</option>
+                    <option value="packers_movers">📦 Packers & Movers Logistics</option>
+                    <option value="real_estate">🏢 Real Estate Brokerage</option>
+                    <option value="hotel">🏨 Hotel & Accommodation Stay</option>
+                    <option value="restaurant">🍔 Restaurant & Cafe Billing</option>
+                    <option value="event_planner">🎉 Event Planner & Stage Decor</option>
+                    <option value="catering">🍽️ Catering Food Services</option>
+                    <option value="photography">📸 Photography & Videography</option>
+                    <option value="it_developer">💻 Freelance Software Engineer</option>
+                    <option value="digital_marketing">🚀 Digital Marketing Agency</option>
+                    <option value="graphic_designer">🎨 Graphic Assets Design</option>
+                    <option value="chartered_accountant">📊 Chartered Accountant (CA)</option>
+                    <option value="advocate">⚖️ Advocate & Legal Services</option>
+                    <option value="automobile_garage">🚗 Automobile Repair Garage</option>
+                    <option value="car_rental">🚕 Travel & Car Rental Fleet</option>
+                    <option value="logistics">✈️ Air Freight & Courier Services</option>
+                    <option value="coaching_classes">🎓 Academic Coaching & Tutors</option>
+                    <option value="gym">🏋️ Gym Membership & Fitness</option>
+                    <option value="doctor_clinic">🩺 Doctor Clinic & Diagnosis</option>
+                    <option value="salon_spa">💆 Salon & Beauty Wellness Spa</option>
+                    <option value="grocery_wholesale">🍏 Wholesale FMCG Groceries</option>
+                    <option value="hardware_retail">🔩 Electricals & Hardware Retail</option>
+                    <option value="apparel_garments">👔 Apparel Fashion & Garments</option>
+                    <option value="printing_press">🖨️ Printing Press & Flex Banners</option>
+                    <option value="building_materials">🧱 Building Material & Cement Supply</option>
+                    <option value="housekeeping">🧹 Commercial Deep Cleaning</option>
+                    <option value="security_agency">🛡️ Private Security Guard Patrol</option>
+                    <option value="computer_amc">🔌 Computer & CCTV Maintenance AMC</option>
+                </select>
+            </div>
+            
+            <button id="lockBtn" class="btn btn-blue" style="margin-top: 5px;">📍 Set QR Position</button>
+
+            <!-- 3. Customer Information Management -->
             <div class="gen-pdf-box">
                 <h3>Generate PDF</h3>
-                <!-- PASTE THIS IN THE SIDEBAR UNDER THE 'Generate PDF' HEADER -->
-<div class="input-group">
-    <label>Customer Name</label>
-    <input type="text" id="custName" placeholder="e.g., Nadim Ahmad">
-</div>
-<div class="input-group">
-    <label>Customer Mobile</label>
-    <input type="text" id="custMob" placeholder="e.g., 9876543210">
-</div>
-<div class="input-group">
-    <label>Customer Address</label>
-    <input type="text" id="custAddress" placeholder="e.g., Ward No. 5, Main Street">
-</div>
+                <div class="input-group">
+                    <label>Customer Name</label>
+                    <input type="text" id="custName" placeholder="e.g., Nadim Ahmad">
+                </div>
+                <div class="input-group">
+                    <label>Customer Mobile</label>
+                    <input type="text" id="custMob" placeholder="e.g., 9876543210">
+                </div>
+                <div class="input-group">
+                    <label>Customer Address</label>
+                    <input type="text" id="custAddress" placeholder="e.g., Ward No. 5, Main Street">
+                </div>
+            </div>
+
+            <!-- 4. Dynamic Product Catalog Array Line Item Inventory -->
+            <div class="gen-pdf-box" style="margin-top: 15px; padding-top: 15px;">
+                <h3>Add Invoice Products</h3>
                 <div class="input-group">
                     <label>Product Name <span class="char-counter-label" id="charCounter">0/35</span></label>
                     <input type="text" id="prodName" placeholder="Product name" maxlength="35">
@@ -310,6 +362,14 @@
                     <input type="number" id="prodQty" placeholder="1" value="1">
                 </div>
                 <button id="addProductBtn" class="btn btn-purple">➕ Add Product</button>
+            </div>
+
+            <!-- 5. Output Summary Workspace Previews & Final Compile Actions -->
+            <div class="action-buttons-row" style="margin-top: 20px; display: flex; flex-direction: column; gap: 10px;">
+                <button id="previewBtn" class="btn btn-orange" style="display: none; width: 100%;">👁️ Preview Document</button>
+                <button id="downloadBtn" class="btn btn-green" style="width: 100%;">⚡ Download PDF</button>
+            </div>
+        </div>
                 <div id="productPreviewArea" class="product-preview-list" style="display: none;"></div>
 
                 <div class="action-buttons-row">
@@ -374,6 +434,292 @@
 <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/easyqrcodejs@4.6.2/dist/easy.qrcode.min.js"></script>
 <script>
+    const INDUSTRY_PROFILES = {
+    // --- Home & Maintenance Services ---
+    technician: {
+        themeColor: '#0284c7', // Professional Blue
+        particularsLabel: 'Service Description / Parts',
+        terms: 'Warranty valid for 30 days on replaced hardware components.',
+        defaultItems: [
+            { name: 'On-Site Diagnostic & Inspection Fee', price: 1500, qty: 1 },
+            { name: 'Technical Repair Labor Charge', price: 1200, qty: 1 }
+        ]
+    },
+    carpentry: {
+        themeColor: '#b45309', // Timber Amber
+        particularsLabel: 'Woodwork / Material & Labor',
+        terms: '50% advance paint/polish material costs non-refundable.',
+        defaultItems: [
+            { name: 'Custom Modular Cabinet Fitting Labor', price: 8500, qty: 1 },
+            { name: 'Premium Hydraulic Soft-Close Hinges', price: 450, qty: 4 }
+        ]
+    },
+    interior_design: {
+        themeColor: '#4d7c0f', // Olive Green
+        particularsLabel: 'Design Module / Consultation',
+        terms: '3D Render revisions capped at maximum 3 cycles.',
+        defaultItems: [
+            { name: '2D Layout Space Planning Fees', price: 15000, qty: 1 },
+            { name: 'Site Supervision & Vendor Coordination Visit', price: 2500, qty: 2 }
+        ]
+    },
+    packers_movers: {
+        themeColor: '#0369a1', // Sky Blue
+        particularsLabel: 'Logistics / Packaging Services',
+        terms: 'Insurance claims for breakable items subject to verification.',
+        defaultItems: [
+            { name: 'Local Shifting Loading & Unloading Labor', price: 6500, qty: 1 },
+            { name: 'Heavy-Duty 5-Ply Corrugated Packing Boxes', price: 120, qty: 15 }
+        ]
+    },
+    real_estate: {
+        themeColor: '#1d4ed8', // Royal Blue
+        particularsLabel: 'Brokerage / Consultation Profile',
+        terms: 'Brokerage service fee is fixed at 1 month rent value.',
+        defaultItems: [
+            { name: 'Property Rental Lease Consultation Fee', price: 12000, qty: 1 },
+            { name: 'Legal Lease Agreement Draft Setup Charges', price: 1500, qty: 1 }
+        ]
+    },
+
+    // --- Hospitality, Food & Events ---
+    hotel: {
+        themeColor: '#854d0e', // Luxury Amber
+        particularsLabel: 'Room Type / Guest Amenities',
+        terms: 'Check-out time is strictly 11:00 AM. Room charges non-refundable.',
+        defaultItems: [
+            { name: 'Deluxe Double Bed Executive Room Stay', price: 4500, qty: 2 },
+            { name: 'In-Room Dining Extra Amenity Charges', price: 850, qty: 1 }
+        ]
+    },
+    restaurant: {
+        themeColor: '#dc2626', // Crimson Red
+        particularsLabel: 'Food Menu Items & Surcharges',
+        terms: 'Complies with localized luxury restaurant guidelines.',
+        defaultItems: [
+            { name: 'Premium Continental Buffet Platters', price: 1200, qty: 4 },
+            { name: 'Fresh Mocktails & Dessert Platter Combo', price: 350, qty: 4 }
+        ]
+    },
+    event_planner: {
+        themeColor: '#6d28d9', // Deep Purple
+        particularsLabel: 'Event Decor & Stage Layouts',
+        terms: 'Cancellation updates within 7 days forfeit full security token.',
+        defaultItems: [
+            { name: 'Main Stage Floral Layout & Backdrop Decor', price: 45000, qty: 1 },
+            { name: 'Professional JBL Sound & Moving LED Rentals', price: 18000, qty: 1 }
+        ]
+    },
+    catering: {
+        themeColor: '#be123c', // Rose Wine
+        particularsLabel: 'Catering Menu / Service Counter',
+        terms: 'Final guest plate count verification locked 48 hours prior.',
+        defaultItems: [
+            { name: 'Premium Multi-Cuisine Food Menu (Per Plate)', price: 950, qty: 100 },
+            { name: 'Live Chaat & Dessert Counter Installations', price: 12000, qty: 1 }
+        ]
+    },
+    photography: {
+        themeColor: '#0f172a', // Slate Dark
+        particularsLabel: 'Media Coverage / Editing Services',
+        terms: 'Raw master frames shared post final balance settlement.',
+        defaultItems: [
+            { name: 'Cinematic Wedding HD Video Coverage (Day 1)', price: 35000, qty: 1 },
+            { name: 'Premium Matte Finish Printed Photo Album', price: 15000, qty: 1 }
+        ]
+    },
+
+    // --- Digital, Professional & Creative Services ---
+    it_developer: {
+        themeColor: '#0f766e', // Teal Tech
+        particularsLabel: 'Software SLA Module / Programming',
+        terms: 'Post-launch technical bug fixes valid for 90 days.',
+        defaultItems: [
+            { name: 'Custom React Web Application Development Milestone', price: 65000, qty: 1 },
+            { name: 'REST API Infrastructure & Database Setup', price: 25000, qty: 1 }
+        ]
+    },
+    digital_marketing: {
+        themeColor: '#4338ca', // Indigo
+        particularsLabel: 'Marketing Channel / Ad Campaigns',
+        terms: 'Meta/Google raw ad budget spends billed directly to client.',
+        defaultItems: [
+            { name: 'Monthly Social Media Management retainer', price: 20000, qty: 1 },
+            { name: 'Search Engine Optimization (SEO) Keyword Audit', price: 12000, qty: 1 }
+        ]
+    },
+    graphic_designer: {
+        themeColor: '#db2777', // Magenta Pink
+        particularsLabel: 'Creative Design Asset Packages',
+        terms: 'Vector source open-files transferred on close of invoice.',
+        defaultItems: [
+            { name: 'Corporate Brand Identity & Logo Styling Pack', price: 15000, qty: 1 },
+            { name: 'High-Res Marketing Banner Social Layouts', price: 1200, qty: 5 }
+        ]
+    },
+    chartered_accountant: {
+        themeColor: '#1e3a8a', // Navy Law
+        particularsLabel: 'Financial Consult / Reconciliation',
+        terms: 'Tax assessments rely strictly on self-declared user parameters.',
+        defaultItems: [
+            { name: 'Annual Corporate Income Tax Return (ITR) Filing', price: 8500, qty: 1 },
+            { name: 'Quarterly GST Reconciliation & Auditing SLA', price: 4500, qty: 1 }
+        ]
+    },
+    advocate: {
+        themeColor: '#111827', // Obsidian Black
+        particularsLabel: 'Legal Draft / Court Appearances',
+        terms: 'Retainer excludes physical court stamp documentation duty fees.',
+        defaultItems: [
+            { name: 'Legal Demand Notice Draft & Dispatch Fees', price: 5000, qty: 1 },
+            { name: 'Honorable High Court Representation Hearing', price: 15000, qty: 1 }
+        ]
+    },
+
+    // --- Transport, Logistics & Automotive ---
+    automobile_garage: {
+        themeColor: '#475569', // Iron Grey
+        particularsLabel: 'Automotive Spares & Mechanical Labor',
+        terms: 'Discarded spare parts discarded if uncollected within 48h.',
+        defaultItems: [
+            { name: 'Synthetic Engine Oil Flush & General Service', price: 3800, qty: 1 },
+            { name: 'Front Wheel Brake Pad Replacement Kit', price: 2200, qty: 1 }
+        ]
+    },
+    car_rental: {
+        themeColor: '#a16207', // Mustard Gold
+        particularsLabel: 'Vehicle Rental / Route Allowances',
+        terms: 'Toll gates, state taxes, parking fees payable on actuals.',
+        defaultItems: [
+            { name: 'Outstation Luxury Sedan Rental (Per Km Metric)', price: 14, qty: 450 },
+            { name: 'Night Shift Driver Welfare Outstation Allowance', price: 500, qty: 2 }
+        ]
+    },
+    logistics: {
+        themeColor: '#e11d48', // Express Red
+        particularsLabel: 'Consignment / Parcel Handling',
+        terms: 'Weight metrics computed on volumetric values if higher.',
+        defaultItems: [
+            { name: 'Bulk Commercial Air Cargo Freight Consignment', price: 85, qty: 250 },
+            { name: 'Doorstep Courier Handling & Safe-Transit Surcharge', price: 450, qty: 1 }
+        ]
+    },
+
+    // --- Education, Health & Wellness ---
+    coaching_classes: {
+        themeColor: '#059669', // Emerald Green
+        particularsLabel: 'Academic Batches / Study Material',
+        terms: 'Monthly academic subscription tuition fees are non-refundable.',
+        defaultItems: [
+            { name: 'Class 10 Advanced Mathematics Tuition Module', price: 3500, qty: 1 },
+            { name: 'Comprehensive MCQ Test Series Preparation Guide', price: 750, qty: 1 }
+        ]
+    },
+    gym: {
+        themeColor: '#ea580c', // Safety Orange
+        particularsLabel: 'Fitness Package / Locker Access',
+        terms: 'Membership freeze allowances capped at 7 days max per year.',
+        defaultItems: [
+            { name: 'Gold Tier Gym Membership Annual Subscription', price: 14000, qty: 1 },
+            { name: 'Personal Certified Bodybuilding Trainer (10 Sessions)', price: 6000, qty: 1 }
+        ]
+    },
+    doctor_clinic: {
+        themeColor: '#0891b2', // Clinical Cyan
+        particularsLabel: 'Consultation Profile / Lab Analysis',
+        terms: 'Follow-up valid for 7 days from original diagnostic stamp.',
+        defaultItems: [
+            { name: 'Senior Consultant Physician Checkup Fee', price: 800, qty: 1 },
+            { name: 'Complete Blood Count (CBC) Lab Report Profile', price: 650, qty: 1 }
+        ]
+    },
+    salon_spa: {
+        themeColor: '#db2777', // Rose Pink
+        particularsLabel: 'Grooming / Spa Wellness Therapy',
+        terms: 'Prior booking updates required 3 hours before slot window.',
+        defaultItems: [
+            { name: 'Premium Hair Keratin Nourishment Treatment', price: 4500, qty: 1 },
+            { name: 'Deep-Tissue Aromatherapy Stress Relief Session', price: 2500, qty: 1 }
+        ]
+    },
+
+    // --- Retail, Wholesale & Manufacturing ---
+    grocery_wholesale: {
+        themeColor: '#16a34a', // Leaf Green
+        particularsLabel: 'FMCG Goods / Inventory Crates',
+        terms: 'Damaged packages must be verified immediately upon delivery.',
+        defaultItems: [
+            { name: 'Premium Basmati Rice Wholesale Crates (25 Kg)', price: 2150, qty: 10 },
+            { name: 'Refined Cold-Pressed Sunflower Oil Cans (15L)', price: 1850, qty: 5 }
+        ]
+    },
+    hardware_retail: {
+        themeColor: '#d97706', // Copper Orange
+        particularsLabel: 'Industrial Tools / Wiring Conduits',
+        terms: 'Electrical wire cut loops cut to order are non-returnable.',
+        defaultItems: [
+            { name: 'Heavy-Duty Submersible Water Pump Set (1.5 HP)', price: 11500, qty: 1 },
+            { name: 'FR PVC Insulated Copper Wire Spools (100m)', price: 2450, qty: 3 }
+        ]
+    },
+    apparel_garments: {
+        themeColor: '#7c3aed', // Purple Fashion
+        particularsLabel: 'Garment Stock / Custom Tailoring',
+        terms: 'Alteration requests accepted within 7 days of retail purchase.',
+        defaultItems: [
+            { name: 'Premium Italian Fabric Slim-Fit Luxury Suit', price: 18500, qty: 1 },
+            { name: 'Custom Blazers Master Tailoring & Styling Fees', price: 3500, qty: 1 }
+        ]
+    },
+    printing_press: {
+        themeColor: '#0284c7', // Cyan Ink
+        particularsLabel: 'Print Matrix / Flex Vinyl Stocks',
+        terms: 'Proofs approved by customer are final. Prints non-refundable.',
+        defaultItems: [
+            { name: 'Large Scale Glossy Frontlit Flex Banner (Sq. Ft.)', price: 45, qty: 500 },
+            { name: 'Premium Textured Corporate Visiting Cards Box', price: 650, qty: 5 }
+        ]
+    },
+    building_materials: {
+        themeColor: '#94a3b8', // Cement Grey
+        particularsLabel: 'Raw Consignments / Offloading Labor',
+        terms: 'Demurrage charges applicable if truck unloading lags past 2 hours.',
+        defaultItems: [
+            { name: 'Premium Grade 53 OPC Cement Bags', price: 430, qty: 150 },
+            { name: 'Deformed High-Yield Fe-550 TMT Steel Bars (Ton)', price: 62000, qty: 1.5 }
+        ]
+    },
+
+    // --- Commercial Services & Security ---
+    housekeeping: {
+        themeColor: '#06b6d4', // Aqua Clean
+        particularsLabel: 'Janitorial Services / Specialized Kits',
+        terms: 'Stain removal treatments subject to fabric texture limitations.',
+        defaultItems: [
+            { name: 'Corporate Office Carpet Deep Extraction Cleaning', price: 12500, qty: 1 },
+            { name: 'Eco-Friendly Industrial Disinfectant Liquid Kit', price: 3500, qty: 1 }
+        ]
+    },
+    security_agency: {
+        themeColor: '#1e293b', // Security Midnight
+        particularsLabel: 'Guard Deployment / Guard Patrols',
+        terms: 'Emergency backup guard relief requests require 12h notice.',
+        defaultItems: [
+            { name: 'Unarmed Industrial Security Guard Shift (Monthly)', price: 18500, qty: 3 },
+            { name: 'Night Patrol Electronic Supervisor Verification', price: 2500, qty: 1 }
+        ]
+    },
+    computer_amc: {
+        themeColor: '#2563eb', // Network Blue
+        particularsLabel: 'AMC Hardware Contracts / Routing IT',
+        terms: 'Excludes internal mechanical replacement costs for burned chips.',
+        defaultItems: [
+            { name: 'Annual Maintenance Contract (AMC) Per Workstation', price: 1500, qty: 25 },
+            { name: 'Managed Dual-Band Wi-Fi Router Gateway Deployment', price: 6500, qty: 1 }
+        ]
+    }
+};
+
         const gearIcon = document.getElementById('gearIcon');
     const settingsPanel = document.getElementById('settingsPanel');
     const stampOptionMenu = document.getElementById('digitalStampOptionMenu');
@@ -812,8 +1158,39 @@
         document.getElementById('prodQty').value = "1";
         document.getElementById('charCounter').innerText = "0/35";
     };
+    // --- Dynamic Industry Template Routing Engine ---
+document.getElementById('industryProfileSelect').onchange = (e) => {
+    const selectedKey = e.target.value;
+    
+    // Fallback protection if user returns back to Generic Standard option
+    if (!selectedKey || !INDUSTRY_PROFILES[selectedKey]) {
+        productsList = [];
+        renderProductsPreviewWorkspace();
+        return;
+    }
 
-                            document.getElementById('makePdfBtn').onclick = async () => {
+    const targetProfile = INDUSTRY_PROFILES[selectedKey];
+
+    // 1. Deep copy the default industry products array into active storage memory
+    productsList = JSON.parse(JSON.stringify(targetProfile.defaultItems));
+
+    // 2. Automatically sync up basic company layout details fields if present
+    const compField = document.getElementById('stampCompany');
+    const bizField = document.getElementById('bizName');
+    if (compField && bizField && !compField.value.trim()) {
+        compField.value = bizField.value || selectedKey.toUpperCase().replace('_', ' ');
+    }
+
+    // 3. Force update visual text items and render calculations on active page
+    renderProductsPreviewWorkspace();
+    
+    // 4. Programmatically click your existing core document generation button 
+    // to refresh the iframe workspace canvas view instantly!
+    const makePdfBtn = document.getElementById('makePdfBtn');
+    if (makePdfBtn) makePdfBtn.click();
+};
+
+    document.getElementById('makePdfBtn').onclick = async () => {
         if (productsList.length === 0) {
             const nameField = document.getElementById('prodName').value.trim();
             const priceField = parseFloat(document.getElementById('prodPrice').value || 0);
@@ -923,48 +1300,60 @@ targetPage.drawLine({ start: { x: 95, y: clientY - 3 }, end: { x: width - 40, y:
             
             // 🌟 FIXED: Vertical column separation bars extend cleanly straight to the baseline grid boundaries
             // Extends the vertical division bars all the way to tableBottomY - 80 so they seal the outer boxes completely
-targetPage.drawLine({ start: { x: tableLeftX, y: tableTopY }, end: { x: tableLeftX, y: tableBottomY - 80 }, strokeWidth: 1 });
-targetPage.drawLine({ start: { x: colX.rate, y: tableTopY }, end: { x: colX.rate, y: tableBottomY - 80 }, strokeWidth: 1 }); 
-targetPage.drawLine({ start: { x: colX.amt, y: tableTopY }, end: { x: colX.amt, y: tableBottomY - 80 }, strokeWidth: 1 }); 
-targetPage.drawLine({ start: { x: colX.end, y: tableTopY }, end: { x: colX.end, y: tableBottomY - 80 }, strokeWidth: 1 }); 
+            // ... [Your existing vertical table lines are drawn right above this] ...
+            targetPage.drawLine({ start: { x: colX.amt, y: tableTopY }, end: { x: colX.amt, y: tableBottomY - 80 }, strokeWidth: 1 }); 
+            targetPage.drawLine({ start: { x: colX.end, y: tableTopY }, end: { x: colX.end, y: tableBottomY - 80 }, strokeWidth: 1 }); 
 
-
+            // Text labels for table columns
             targetPage.drawText("No.", { x: colX.no + 10, y: tableTopY - 17, size: 11, font: boldFont });
-            targetPage.drawText("Particular", { x: colX.part + 10, y: tableTopY - 17, size: 11, font: boldFont });
+
+            // =========================================================================
+            // 🌟 REPLACE YOUR OLD "targetPage.drawText("Particular", ...);" LINE WITH THIS:
+            // =========================================================================
+            const activeProfileKey = document.getElementById('industryProfileSelect').value;
+            const currentTableHeadingText = (activeProfileKey && INDUSTRY_PROFILES[activeProfileKey]) 
+                ? INDUSTRY_PROFILES[activeProfileKey].particularsLabel 
+                : "Particular";
+
+            targetPage.drawText(currentTableHeadingText, { x: colX.part + 10, y: tableTopY - 17, size: 11, font: boldFont });
+            // =========================================================================
+
+            // Your existing column header text continues right below it:
             targetPage.drawText("Qty", { x: colX.qty + 12, y: tableTopY - 17, size: 11, font: boldFont });
             targetPage.drawText("Rate", { x: colX.rate + 12, y: tableTopY - 17, size: 11, font: boldFont });
             targetPage.drawText("Amount", { x: colX.amt + 22, y: tableTopY - 17, size: 11, font: boldFont });
 
+                        // --- 1. Product Item Calculation Loop Routine ---
             let itemY = tableTopY - 42;
             let subTotalCost = 0;
 
             productsList.forEach((product, idx) => {
-                if (itemY < tableBottomY + 15) return;
+                if (itemY < tableBottomY + 15) return; // Grid overflow safety check
 
                 const rowCost = product.price * product.qty;
                 subTotalCost += rowCost;
 
-                targetPage.drawText((idx + 1).toString(), { x: colX.no + 12, y: itemY, size: 11, font: regularFont });
-                targetPage.drawText(product.name, { x: colX.part + 10, y: itemY, size: 11, font: regularFont });
-                targetPage.drawText(product.qty.toString(), { x: colX.qty + 20, y: itemY, size: 11, font: regularFont });
-                targetPage.drawText(product.price.toFixed(2), { x: colX.rate + 10, y: itemY, size: 11, font: regularFont });
-                targetPage.drawText(rowCost.toFixed(2), { x: colX.amt + 15, y: itemY, size: 11, font: regularFont });
+                targetPage.drawText((idx + 1).toString(), { x: colX.no + 12, y: itemY, size: 10, font: regularFont });
+                targetPage.drawText(product.name, { x: colX.part + 10, y: itemY, size: 10, font: regularFont });
+                targetPage.drawText(product.qty.toString(), { x: colX.qty + 20, y: itemY, size: 10, font: regularFont });
+                targetPage.drawText(product.price.toFixed(2), { x: colX.rate + 10, y: itemY, size: 10, font: regularFont });
+                targetPage.drawText(rowCost.toFixed(2), { x: colX.amt + 15, y: itemY, size: 10, font: regularFont });
 
                 itemY -= 22;
             });
 
+            // --- 2. Accounting Calculation Matrices ---
             const cgstValue = subTotalCost * 0.09;
-const sgstValue = subTotalCost * 0.09;
-// Round up or down to the nearest clean whole number
-const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
+            const sgstValue = subTotalCost * 0.09;
+            const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
 
-
-            targetPage.drawLine({ start: { x: colX.rate, y: tableBottomY - 20 }, end: { x: colX.end, y: tableBottomY - 20 }, strokeWidth: 1 });
-            targetPage.drawLine({ start: { x: colX.rate, y: tableBottomY - 40 }, end: { x: colX.end, y: tableBottomY - 40 }, strokeWidth: 1 });
-            targetPage.drawLine({ start: { x: colX.rate, y: tableBottomY - 60 }, end: { x: colX.end, y: tableBottomY - 60 }, strokeWidth: 1 });
-            
+            // --- 3. Draw Summary Breakdown Partitions ---
+            targetPage.drawLine({ start: { x: colX.rate, y: tableBottomY - 20 }, end: { x: colX.end, y: tableBottomY - 20 }, strokeWidth: 0.75 });
+            targetPage.drawLine({ start: { x: colX.rate, y: tableBottomY - 40 }, end: { x: colX.end, y: tableBottomY - 40 }, strokeWidth: 0.75 });
+            targetPage.drawLine({ start: { x: colX.rate, y: tableBottomY - 60 }, end: { x: colX.end, y: tableBottomY - 60 }, strokeWidth: 0.75 });
             targetPage.drawLine({ start: { x: tableLeftX, y: tableBottomY - 80 }, end: { x: colX.end, y: tableBottomY - 80 }, strokeWidth: 1 });
 
+            // --- 4. Render Financial Text & Summary Calculations ---
             targetPage.drawText("SubTotal", { x: colX.rate + 6, y: tableBottomY - 14, size: 10, font: boldFont });
             targetPage.drawText(subTotalCost.toFixed(2), { x: colX.amt + 15, y: tableBottomY - 14, size: 11, font: boldFont });
 
@@ -977,15 +1366,20 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
             targetPage.drawText("Total", { x: colX.rate + 6, y: tableBottomY - 74, size: 12, font: boldFont });
             targetPage.drawText(absoluteGrandTotal.toFixed(0), { x: colX.amt + 15, y: tableBottomY - 74, size: 12, font: boldFont });
 
+            // --- 5. Amount To Words Calculation String Call ---
             const wordsTranslationString = convertAmountToWords(absoluteGrandTotal);
-            targetPage.drawText(`In words:  ${wordsTranslationString}`, { x: tableLeftX + 5, y: tableBottomY - 74, size: 10, font: boldFont });
+            targetPage.drawText(`In words:  ${wordsTranslationString}`, { x: tableLeftX + 5, y: tableBottomY - 74, size: 9, font: boldFont });
             
-            targetPage.drawText("Signature or Stamp", { x: width - 110, y: tableBottomY - 120, size: 11, font: boldFont });
+            targetPage.drawText("Signature or Stamp", { x: width - 140, y: tableBottomY - 120, size: 10, font: boldFont });
 
+            // Sync values back to primary billing layout
             const amountInput = document.getElementById('amount');
-            amountInput.value = absoluteGrandTotal.toFixed(2);
-            amountInput.dispatchEvent(new Event('input'));
+            if (amountInput) {
+                amountInput.value = absoluteGrandTotal.toFixed(2);
+                amountInput.dispatchEvent(new Event('input'));
+            }
 
+            // Save PDF byte sequences directly to active display frameworks
             originalBytes = await docInstance.save();
 
             const initialPromptNode = document.getElementById('upload-placeholder-prompt');
@@ -998,40 +1392,33 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
             document.getElementById('previewBtn').style.display = 'block';
             document.getElementById('downloadBtn').style.display = 'block';
             
-        } catch (err) { alert("Generation Core Failure: " + err.message); }
+        } catch (err) { 
+            alert("Generation Core Failure: " + err.message); 
+        }
     };
 
-        gearIcon.onclick = () => {
+    // --- 6. Configuration Dropdown Navigation Menu Triggers ---
+    gearIcon.onclick = (e) => {
+        e.stopPropagation();
         settingsPanel.style.display = settingsPanel.style.display === 'block' ? 'none' : 'block';
     };
 
-    stampOptionMenu.onclick = () => {
+    document.onclick = () => { if(settingsPanel) settingsPanel.style.display = 'none'; };
+    if(settingsPanel) settingsPanel.onclick = (e) => e.stopPropagation();
+
+    stampOptionMenu.onclick = (e) => {
+        e.stopPropagation();
         stampFormArea.style.display = stampFormArea.style.display === 'block' ? 'none' : 'block';
+        if(businessFormArea) businessFormArea.style.display = 'none';
     };
 
-    const businessOptionMenu = document.getElementById('businessDetailsOptionMenu');
-    const businessFormArea = document.getElementById('businessFormArea');
-
-    businessOptionMenu.onclick = () => {
-        businessFormArea.style.display = businessFormArea.style.display === 'block' ? 'none' : 'block';
-    };
-    // ------------------------------------
-
-    lockStampBtn.onclick = () => {
-        if (!originalBytes) return alert("Select or Generate PDF First");
-        
-        const comp = document.getElementById('stampCompany').value.trim();
-        const appr = document.getElementById('stampApprover').value.trim();
-        const dateV = document.getElementById('stampDate').value;
-        const selectedInkColor = document.getElementById('stampColor').value;
-        const selectedShape = document.getElementById('stampShape').value;
-        
-        if (!comp || !appr || !dateV) return alert("Please fill all stamp info fields (Company Name, Approved By, Date)");
-
-        const canvas = document.createElement('canvas');
-        canvas.width = 480; 
-        canvas.height = 480;
-        const ctx = canvas.getContext('2d');
+    if (businessOptionMenu && businessFormArea) {
+        businessOptionMenu.onclick = (e) => {
+            e.stopPropagation();
+            businessFormArea.style.display = businessFormArea.style.display === 'block' ? 'none' : 'block';
+            stampFormArea.style.display = 'none';
+        };
+    }
 
         ctx.clearRect(0, 0, 480, 480);
         
