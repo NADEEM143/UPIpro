@@ -900,20 +900,31 @@
                 rightSideTextY -= 14;
             }
 
+                        // --- FIXED: Combines both mobile numbers horizontally onto one clean line ---
             if (bMob1 !== "") {
-                targetPage.drawText(`Mo. ${bMob1}`, { x: width - 180, y: rightSideTextY, size: 10, font: boldFont });
-                rightSideTextY -= 12;
+                let combinedMobileText = `Mo. ${bMob1}`;
+                if (bMob2 !== "") {
+                    combinedMobileText += `, ${bMob2}`;
+                }
+                targetPage.drawText(combinedMobileText, { 
+                    x: width - 180, 
+                    y: rightSideTextY, 
+                    size: 10, 
+                    font: boldFont 
+                });
+                rightSideTextY -= 12; // Shift coordinate down precisely by one line height
             }
 
-                       if (bMob2 !== "") {
-                targetPage.drawText(`    ${bMob2}`, { x: width - 180, y: rightSideTextY, size: 10, font: boldFont });
-                rightSideTextY -= 12; // Shift dynamic coordinate down safely
-            }
-
-            // --- FIXED: Email now matches mobile number bold styling and size perfectly ---
+            // --- Email configuration block sits cleanly right underneath ---
             if (bEmail !== "") {
-                targetPage.drawText(bEmail, { x: width - 180, y: rightSideTextY, size: 10, font: boldFont });
+                targetPage.drawText(bEmail, { 
+                    x: width - 180, 
+                    y: rightSideTextY, 
+                    size: 10, 
+                    font: boldFont 
+                });
             }
+
 
             // --- Unified Company Business Name Header ---
             if (bName !== "") {
