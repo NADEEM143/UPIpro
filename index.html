@@ -464,74 +464,29 @@
         setTimeout(() => { note.style.display = 'none'; }, 4000);
     };
 
-    document.getElementById('click-overlay').onclick = (e) => {
-        const rect = document.getElementById('workspace-scaler').getBoundingClientRect();
-        posX = (e.clientX - rect.left) / currentZoomScale; 
-        posY = (e.clientY - rect.top) / currentZoomScale;
-        
-        marker.style.left = (posX - 40) + 'px'; marker.style.top = (posY - 40) + 'px';
-        marker.style.display = 'flex';
-        
-        // --- THIS PART INJECTS THE REAL LIVE QR ---
-               const name = document.getElementById('payeeName').value;
-        const vpa = document.getElementById('vpa').value;
-        const amt = document.getElementById('amount').value;
-        
-        // Generates an automated unique daily transaction reference ID to pass NPCI retail guidelines
-        const uniqueTxnRefId = "INV" + Date.now(); 
-        const upi = `upi://pay?pa=${vpa}&pn=${encodeURIComponent(name)}&cu=INR&am=${parseFloat(amt || 0).toFixed(2)}&tr=${uniqueTxnRefId}&mc=0000&mode=02&purpose=00`;
-        
-        const liveTarget = document.getElementById('qr-graphic-target');
-        liveTarget.innerHTML = ""; 
-        liveTarget.style.display = "block"; 
-        
-        new QRCode(liveTarget, { text: upi, width: 120, height: 120 });
-
-        // ------------------------------------------
-
-        document.getElementById('click-overlay').style.display = 'none';
-        
-        document.getElementById('previewBtn').style.display = 'block';
-        document.getElementById('downloadBtn').style.display = 'block';
-        note.style.display = 'none';
-    };
-
-        let isDragging = false;
-    let offsetX = 0, offsetY = 0;
-    let stampOffsetX = 0, stampOffsetY = 0;
-    let isQrLocked = false; 
-    let isStampLocked = false; 
-
-
-    marker.onmousedown = (e) => { 
-        if (isQrLocked) return; 
-        if (e.offsetX < marker.clientWidth - 15 && e.offsetY < marker.clientHeight - 15) {
-            isDragging = true; 
-            offsetX = e.clientX - marker.getBoundingClientRect().left;
-            offsetY = e.clientY - marker.getBoundingClientRect().top;
-        }
-    };
-
-    stampMarker.onmousedown = (e) => { 
-        if (isStampLocked) return; 
-        if (e.offsetX < stampMarker.clientWidth - 15 && e.offsetY < stampMarker.clientHeight - 15) {
-            isStampDragging = true; 
-            stampOffsetX = e.clientX - stampMarker.getBoundingClientRect().left;
-            stampOffsetY = e.clientY - stampMarker.getBoundingClientRect().top;
-        }
-    };
-
+        // --- Hardened Mouse Position Drag Tracking (Zoom Variable Removed) ---
     window.onmousemove = (e) => {
         const rect = document.getElementById('workspace-scaler').getBoundingClientRect();
+        
         if (isDragging && !isQrLocked) {
-            posX = ((e.clientX - rect.left) - offsetX) / currentZoomScale;
-            posY = ((e.clientY - rect.top) - offsetY) / currentZoomScale;
+            // Calculated cleanly at a direct 1:1 baseline tracking scale
+            posX = (e.clientX - rect.left) - offsetX;
+            posY = (e.clientY - rect.top) - offsetY;
+            
+            // Boundary safety constraints to keep items from sliding out of the invoice canvas
+            posX = Math.max(0, Math.min(rect.width - marker.clientWidth, posX));
+            posY = Math.max(0, Math.min(rect.height - marker.clientHeight, posY));
+            
             marker.style.left = posX + 'px';
             marker.style.top = posY + 'px';
         }
         if (isStampDragging && !isStampLocked) { 
-            stampPosX = ((e.clientX - rect.left) - stampOffsetX) / currentZoomScale;
-            stampPosY = ((e.clientY - rect.top) - stampOffsetY) / currentZoomScale;
+            stampPosX = (e.clientX - rect.left) - stampOffsetX;
+            stampPosY = (e.clientY - rect.top) - stampOffsetY;
+            
+            stampPosX = Math.max(0, Math.min(rect.width - stampMarker.clientWidth, stampPosX));
+            stampPosY = Math.max(0, Math.min(rect.height - stampMarker.clientHeight, stampPosY));
+            
             stampMarker.style.left = stampPosX + 'px';
             stampMarker.style.top = stampPosY + 'px';
         }
@@ -542,26 +497,7 @@
         isStampDragging = false;
     };
 
-    marker.ontouchstart = (e) => {
-        if (isQrLocked) return;
-        isDragging = true;
-        const touch = e.touches[0] || e.changedTouches[0];
-        if (!touch) return;
-        const rect = marker.getBoundingClientRect();
-        offsetX = touch.clientX - rect.left;
-        offsetY = touch.clientY - rect.top;
-    };
-
-    stampMarker.ontouchstart = (e) => {
-        if (isStampLocked) return;
-        isStampDragging = true; 
-        const touch = e.touches[0] || e.changedTouches[0];
-        if (!touch) return;
-        const rect = stampMarker.getBoundingClientRect();
-        stampOffsetX = touch.clientX - rect.left;
-        stampOffsetY = touch.clientY - rect.top;
-    };
-
+    // --- Hardened Mobile Touch Drag Tracking (Zoom Variable Removed) ---
     window.addEventListener('touchmove', (e) => {
         if (!isDragging && !isStampDragging) return;
         const touch = e.touches[0] || e.changedTouches[0];
@@ -569,15 +505,23 @@
         const rect = document.getElementById('workspace-scaler').getBoundingClientRect();
         
         if (marker.style.display === 'flex' && !isQrLocked && isDragging) {
-            posX = ((touch.clientX - rect.left) - offsetX) / currentZoomScale;
-            posY = ((touch.clientY - rect.top) - offsetY) / currentZoomScale;
+            posX = (touch.clientX - rect.left) - offsetX;
+            posY = (touch.clientY - rect.top) - offsetY;
+            
+            posX = Math.max(0, Math.min(rect.width - marker.clientWidth, posX));
+            posY = Math.max(0, Math.min(rect.height - marker.clientHeight, posY));
+            
             marker.style.left = posX + 'px';
             marker.style.top = posY + 'px';
         }
         
         if (stampMarker.style.display === 'flex' && !isStampLocked && isStampDragging) {
-            stampPosX = ((touch.clientX - rect.left) - stampOffsetX) / currentZoomScale;
-            stampPosY = ((touch.clientY - rect.top) - stampOffsetY) / currentZoomScale;
+            stampPosX = (touch.clientX - rect.left) - stampOffsetX;
+            stampPosY = (touch.clientY - rect.top) - stampOffsetY;
+            
+            stampPosX = Math.max(0, Math.min(rect.width - stampMarker.clientWidth, stampPosX));
+            stampPosY = Math.max(0, Math.min(rect.height - stampMarker.clientHeight, stampPosY));
+            
             stampMarker.style.left = stampPosX + 'px';
             stampMarker.style.top = stampPosY + 'px';
         }
