@@ -439,82 +439,55 @@
     };
 
                 // ... Your existing document.getElementById('lockBtn').onclick code lives right above this ...
-    document.getElementById('lockBtn').onclick = () => {
+         document.getElementById('lockBtn').onclick = () => {
         if(!originalBytes) return alert("Select or Generate PDF First");
+        
         note.innerText = "📍 Click on the document to place your QR";
         note.style.display = 'block';
         document.getElementById('click-overlay').style.display = 'block';
+        
         setTimeout(() => { note.style.display = 'none'; }, 4000);
     };
 
-// =========================================================================
-// 📥 REMOVE YOUR OLD "click-overlay" BLOCK AND PASTE THIS ENTIRE NEW ONE HERE:
-// =========================================================================
     document.getElementById('click-overlay').onclick = (e) => {
         const rect = document.getElementById('workspace-scaler').getBoundingClientRect();
+        posX = (e.clientX - rect.left) / currentZoomScale; 
+        posY = (e.clientY - rect.top) / currentZoomScale;
         
-        // Compute 1:1 pixel projection positions
-        posX = (e.clientX - rect.left); 
-        posY = (e.clientY - rect.top);
-        
-        const halfMarkerWidth = marker.clientWidth / 2 || 40;
-        const halfMarkerHeight = marker.clientHeight / 2 || 40;
-        
-        marker.style.left = (posX - halfMarkerWidth) + 'px'; 
-        marker.style.top = (posY - halfMarkerHeight) + 'px';
+        marker.style.left = (posX - 40) + 'px'; marker.style.top = (posY - 40) + 'px';
         marker.style.display = 'flex';
         
-        // Extract sidebar values safely
-        const name = document.getElementById('payeeName').value || "Merchant";
-        const vpa = document.getElementById('vpa').value || "merchant@upi";
-        const amt = document.getElementById('amount').value || "0";
+        // --- THIS PART INJECTS THE REAL LIVE QR ---
+               const name = document.getElementById('payeeName').value;
+        const vpa = document.getElementById('vpa').value;
+        const amt = document.getElementById('amount').value;
         
-        // Build the compliant retail transaction deep-link string
+        // Generates an automated unique daily transaction reference ID to pass NPCI retail guidelines
         const uniqueTxnRefId = "INV" + Date.now(); 
-        let upiString = `upi://pay?pa=${vpa}&pn=${encodeURIComponent(name)}&cu=INR&tr=${uniqueTxnRefId}&mc=0000&mode=02&purpose=00`;
-        
-        if (parseFloat(amt) > 0) {
-            upiString += `&am=${parseFloat(amt).toFixed(2)}`;
-        }
+        const upi = `upi://pay?pa=${vpa}&pn=${encodeURIComponent(name)}&cu=INR&am=${parseFloat(amt || 0).toFixed(2)}&tr=${uniqueTxnRefId}&mc=0000&mode=02&purpose=00`;
         
         const liveTarget = document.getElementById('qr-graphic-target');
-        if (liveTarget) {
-            liveTarget.innerHTML = ""; 
-            liveTarget.style.display = "block"; 
-            
-            // --- 🌟 FIXED: Fire direct EasyQRCode engine matrix parameters ---
-            try {
-                if (typeof EasyQRCode !== 'undefined') {
-                    new EasyQRCode(liveTarget, {
-                        text: upiString,
-                        width: 120,
-                        height: 120,
-                        colorDark: "#000000",
-                        colorLight: "#ffffff",
-                        correctLevel: EasyQRCode.CorrectLevel.H
-                    });
-                } else if (typeof QRCode !== 'undefined') {
-                    new QRCode(liveTarget, { text: upiString, width: 120, height: 120 });
-                } else {
-                    liveTarget.innerText = "QR Engine Error";
-                }
-            } catch (err) {
-                console.error("QR drawing processing exception:", err);
-            }
-        }
+        liveTarget.innerHTML = ""; 
+        liveTarget.style.display = "block"; 
+        
+        new QRCode(liveTarget, { text: upi, width: 120, height: 120 });
+
+        // ------------------------------------------
 
         document.getElementById('click-overlay').style.display = 'none';
         
-        const previewBtn = document.getElementById('previewBtn');
-        const downloadBtn = document.getElementById('downloadBtn');
-        if (previewBtn) previewBtn.style.display = 'block';
-        if (downloadBtn) downloadBtn.style.display = 'block';
-        
-        if (note) note.style.display = 'none';
+        document.getElementById('previewBtn').style.display = 'block';
+        document.getElementById('downloadBtn').style.display = 'block';
+        note.style.display = 'none';
     };
-// =========================================================================
 
-    // ... Your restored marker.onmousedown and drag tracking functions live right below this ...
+        let isDragging = false;
+    let offsetX = 0, offsetY = 0;
+    let stampOffsetX = 0, stampOffsetY = 0;
+    let isQrLocked = false; 
+    let isStampLocked = false; 
+
+
     marker.onmousedown = (e) => { 
         if (isQrLocked) return; 
         // ...
