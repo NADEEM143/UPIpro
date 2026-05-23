@@ -566,31 +566,11 @@
         document.getElementById('click-overlay').style.display = 'block';
         setTimeout(() => { note.style.display = 'none'; }, 4000);
     };
-// =========================================================================
-// 📥 REMOVE YOUR OLD "click-overlay" BLOCK AND PASTE THIS ENTIRE NEW ONE HERE:
-// =========================================================================
-        // --- 📍 FIXED: Unified EasyQRCode Pipeline with Dynamic Scaling ---
-        document.getElementById('click-overlay').onclick = (e) => {
+    document.getElementById('click-overlay').onclick = (e) => {
         const rect = document.getElementById('workspace-scaler').getBoundingClientRect();
         
-        // Compute direct 1:1 projection positions (Old drifting currentZoomScale removed)
         posX = (e.clientX - rect.left); 
         posY = (e.clientY - rect.top);
-        
-        // ⚠️ 🌟 CRITICAL MULTI-PAGE FIX: Dynamic Geometric Page Resolver Math 🌟 ⚠️
-        // Automatically calculates the exact target page row based on your vertical click coordinates!
-        if (typeof pdfDoc !== 'undefined' && pdfDoc.getPages) {
-            const documentTotalPagesList = pdfDoc.getPages();
-            if (documentTotalPagesList.length > 1) {
-                // Divide the full screen container height by total pages to get a single page height segment
-                const calculatedSinglePageHeightIndex = rect.height / documentTotalPagesList.length;
-                currentActivePageIndex = Math.floor(posY / calculatedSinglePageHeightIndex);
-                
-                // Clamp index safely inside total document boundaries to prevent array limits errors
-                currentActivePageIndex = Math.max(0, Math.min(documentTotalPagesList.length - 1, currentActivePageIndex));
-                console.log("🎯 Geometric Context Sync: Auto-Calculated Target Page Index:", currentActivePageIndex);
-            }
-        }
         
         const halfMarkerWidth = marker.clientWidth / 2 || 40;
         const halfMarkerHeight = marker.clientHeight / 2 || 40;
@@ -599,78 +579,59 @@
         marker.style.top = (posY - halfMarkerHeight) + 'px';
         marker.style.display = 'flex';
         
-        // Extract merchant profile data elements safely
         const name = document.getElementById('payeeName').value || "Merchant";
         const vpa = document.getElementById('vpa').value || "merchant@upi";
         const amt = document.getElementById('amount').value || "0";
         
-        // Build the compliant retail transaction deep-link string
         const uniqueTxnRefId = "INV" + Date.now(); 
         let upiString = `upi://pay?pa=${vpa}&pn=${encodeURIComponent(name)}&cu=INR&tr=${uniqueTxnRefId}&mc=0000&mode=02&purpose=00`;
-        
-        if (parseFloat(amt) > 0) {
-            upiString += `&am=${parseFloat(amt).toFixed(2)}`;
-        }
+        if (parseFloat(amt) > 0) { upiString += `&am=${parseFloat(amt).toFixed(2)}`; }
         
         const liveTarget = document.getElementById('qr-graphic-target');
         if (liveTarget) {
-            // Force strict absolute sub-pixel layout constraints onto the graphic container
             liveTarget.innerHTML = ""; 
-            liveTarget.style.display = "block"; 
-            liveTarget.style.position = "absolute";
-            liveTarget.style.top = "0";
-            liveTarget.style.left = "0";
-            liveTarget.style.width = "100%";
-            liveTarget.style.height = "100%";
+            liveTarget.style.display = "block"; liveTarget.style.position = "absolute";
+            liveTarget.style.top = "0"; liveTarget.style.left = "0";
+            liveTarget.style.width = "100%"; liveTarget.style.height = "100%";
             liveTarget.style.boxSizing = "border-box";
-            
             try {
-                // Safely checks your script libraries to prevent crash initialization faults
                 if (typeof EasyQRCode !== 'undefined') {
-                    new EasyQRCode(liveTarget, {
-                        text: upiString,
-                        width: 240, // Generates sharp higher resolution base details matrix
-                        height: 240,
-                        colorDark: "#000000",
-                        colorLight: "#ffffff",
-                        correctLevel: EasyQRCode.CorrectLevel.H
-                    });
-
-                    // Forces the internal library assets to auto-scale tracking the box resizing limits
+                    new EasyQRCode(liveTarget, { text: upiString, width: 240, height: 240, colorDark: "#000000", colorLight: "#ffffff", correctLevel: EasyQRCode.CorrectLevel.H });
                     setTimeout(() => {
                         const internalSvgImg = liveTarget.querySelector('img, canvas, svg');
-                        if (internalSvgImg) {
-                            internalSvgImg.style.width = "100%";
-                            internalSvgImg.style.height = "100%";
-                            internalSvgImg.style.objectFit = "contain";
-                            internalSvgImg.style.display = "block";
-                        }
+                        if (internalSvgImg) { internalSvgImg.style.width = "100%"; internalSvgImg.style.height = "100%"; internalSvgImg.style.objectFit = "contain"; internalSvgImg.style.display = "block"; }
                     }, 20);
-
                 } else if (typeof QRCode !== 'undefined') {
                     new QRCode(liveTarget, { text: upiString, width: 120, height: 120 });
-                    setTimeout(() => {
-                        const internalImg = liveTarget.querySelector('img, canvas');
-                        if (internalImg) {
-                            internalImg.style.width = "100%";
-                            internalImg.style.height = "100%";
-                        }
-                    }, 20);
-                } else {
-                    liveTarget.innerText = "QR Engine Error";
-                }
-            } catch (err) {
-                console.error("QR drawing processing exception:", err);
-            }
+                    setTimeout(() => { const internalImg = liveTarget.querySelector('img, canvas'); if (internalImg) { internalImg.style.width = "100%"; internalImg.style.height = "100%"; } }, 20);
+                } else { liveTarget.innerText = "QR Engine Error"; }
+            } catch (err) { console.error("QR drawing processing exception:", err); }
         }
-
         document.getElementById('click-overlay').style.display = 'none';
+        const previewBtn = document.getElementById('previewBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        if (previewBtn) previewBtn.style.display = 'block';
+        if (downloadBtn) downloadBtn.style.display = 'block';
+        if (note) note.style.display = 'none';
+    };
+
+    document.getElementById('click-overlay-stamp').onclick = (e) => {
+        const rect = document.getElementById('workspace-scaler').getBoundingClientRect();
+        
+        stampPosX = (e.clientX - rect.left); 
+        stampPosY = (e.clientY - rect.top);
+        
+        stampMarker.style.left = (stampPosX - 60) + 'px';
+        stampMarker.style.top = (stampPosY - 60) + 'px';
+        stampMarker.style.display = 'flex';
+        
+        isStampPlaced = true;
+        document.getElementById('click-overlay-stamp').style.display = 'none';
         
         const previewBtn = document.getElementById('previewBtn');
         const downloadBtn = document.getElementById('downloadBtn');
         if (previewBtn) previewBtn.style.display = 'block';
         if (downloadBtn) downloadBtn.style.display = 'block';
-        
         if (note) note.style.display = 'none';
     };
 
