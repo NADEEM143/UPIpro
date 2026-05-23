@@ -1195,8 +1195,8 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
         };
     }
 
-    // Action Channels: Place Signature on Workspace
-        const lockSignBtn = document.getElementById('lockSignBtn');
+        // Action Channels: Place Signature on Workspace
+    const lockSignBtn = document.getElementById('lockSignBtn');
     if (lockSignBtn) {
         lockSignBtn.onclick = () => {
             if (!originalBytes) return alert("Select or Generate PDF First");
@@ -1239,11 +1239,11 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
     /* ==========================================================================
        🌟 RETINA PERSISTENT CACHE REHYDRATION ENGINE 🌟
        ========================================================================== */
-    const savedSignatureCache = localStorage.getItem('cachedESignatureDataUrl');
+        const savedSignatureCache = localStorage.getItem('cachedESignatureDataUrl');
     if (savedSignatureCache && stampMarker) {
         stampImgDataUrl = savedSignatureCache;
         
-        // 1. Force-render signature nodes immediately into position element memory layouts
+        // Force-render signature nodes immediately into memory elements layout
         stampMarker.innerHTML = `<img src="${savedSignatureCache}" style="width:100%; height:100%; object-fit:contain; pointer-events:none;" alt="High Resolution E-Sign" />`;
         stampMarker.style.width = '140px';
         stampMarker.style.height = '70px';
@@ -1252,16 +1252,11 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
         stampMarker.style.left = localStorage.getItem('signatureLeftPos') || '80px';
         stampMarker.style.top = localStorage.getItem('signatureTopPos') || '200px';
         
-        // Keep it hidden from the main view canvas if no document is loaded yet
-        if (!originalBytes) {
-            stampMarker.style.display = 'none'; 
-        } else {
-            stampMarker.style.display = 'flex';
-            isStampPlaced = true;
-            isStampLocked = false;
-        }
+        // 🌟 FIXED: Keep it completely hidden initially so it never pops up on document load
+        stampMarker.style.display = 'none'; 
+        isStampPlaced = false;
 
-        // 2. 🌟 FIXED: Instantly redraw the saved signature back into the settings pad box canvas upon page refresh!
+        // Instantly redraw the saved signature back into the settings pad box canvas upon page refresh
         if (signCanvas && signCtx) {
             const signatureTemplateImage = new Image();
             signatureTemplateImage.src = savedSignatureCache;
@@ -1275,34 +1270,25 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
         }
     }
 
-    // 🌟 INTERCEPT CHANNEL A: Automatically pops signature back up when a file is chosen/dropped
+    // 🌟 CLEANED: Restored your file selector to its original behavior without forcing signatures automatically
     const originalFileInputChangeHandler = document.getElementById('fileInput').onchange;
     document.getElementById('fileInput').onchange = async (e) => {
         if (typeof originalFileInputChangeHandler === 'function') {
             await originalFileInputChangeHandler(e);
         }
-        if (localStorage.getItem('cachedESignatureDataUrl') && stampMarker) {
-            stampMarker.style.display = 'flex';
-            isStampPlaced = true;
-            isStampLocked = false;
-        }
+        // Force pop-up lines removed entirely to preserve manual placement workflow
     };
 
-    // 🌟 INTERCEPT CHANNEL B: Automatically pops signature back up when a new blank template compiles
+    // 🌟 CLEANED: Restored your template generator to its original behavior without forcing signatures automatically
     const originalMakePdfClickHandler = document.getElementById('makePdfBtn').onclick;
     if (document.getElementById('makePdfBtn')) {
         document.getElementById('makePdfBtn').onclick = async () => {
             if (typeof originalMakePdfClickHandler === 'function') {
                 await originalMakePdfClickHandler();
             }
-            if (localStorage.getItem('cachedESignatureDataUrl') && stampMarker) {
-                stampMarker.style.display = 'flex';
-                isStampPlaced = true;
-                isStampLocked = false;
-            }
+            // Force pop-up lines removed entirely to preserve manual placement workflow
         };
     }
-
     // Append position change cache operations inside your existing global pointer movement routers
     const originalMouseUpHandler = window.onmouseup;
     window.onmouseup = () => {
@@ -1334,6 +1320,9 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
         ctx.clearRect(0, 0, 480, 480);
         
         const stampGraphicBufferCanvas = document.createElement('canvas');
+        stampGraphicBufferCanvas.width = 480;
+        stampGraphicBufferCanvas.height = 480;
+        const bufferCtx = stampGraphicBufferCanvas.getContext('2d');
 
         bufferCtx.strokeStyle = selectedInkColor;
         bufferCtx.fillStyle = selectedInkColor;
