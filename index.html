@@ -1352,11 +1352,17 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
     }
 
     // Isolated render function used on initial loads and button clicks alike
+       // Isolated render function used on initial loads and button clicks alike
     function renderSignatureToWorkspace(imgDataStr) {
-        // 🌟 FIXED: Target the unique signature HTML element container instead of stampMarker
+        // Target the unique signature HTML element container instead of stampMarker
         if (!signatureMarker) return;
 
-        signatureMarker.innerHTML = `<img src="${imgDataStr}" style="width:100%; height:100%; object-fit:contain; pointer-events:none;" alt="High Resolution E-Sign" />`;
+        // 🌟 FIXED: Embedded button inside your innerHTML string so it stays on screen
+        signatureMarker.innerHTML = `
+            <img src="${imgDataStr}" style="width:100%; height:100%; object-fit:contain; pointer-events:none;" alt="High Resolution E-Sign" />
+            <button id="closeSigBtn" style="position: absolute; top: 4px; right: 4px; width: 18px; height: 18px; background: #ef4444; color: white; border: 2px solid white; border-radius: 50%; font-size: 11px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 99999; line-height: 1; pointer-events: auto; padding: 0; margin: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.35);">×</button>
+        `;
+        
         signatureMarker.style.width = '140px';
         signatureMarker.style.height = '70px';
         signatureMarker.style.borderRadius = '0px';
@@ -1369,6 +1375,17 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
         
         isSigPlaced = true;
         isSigLocked = false;
+
+        // 🌟 FIXED: Closes and hides signature when the red × button is clicked
+        const closeSigBtn = document.getElementById('closeSigBtn');
+        if (closeSigBtn) {
+            closeSigBtn.onclick = (e) => {
+                e.stopPropagation(); // Stops drag engine stutters
+                signatureMarker.style.display = 'none';
+                isSigPlaced = false;
+                isSigLocked = false;
+            };
+        }
         
         note.innerText = "✍️ Position signature on document window context.";
         note.style.display = 'block';
@@ -1569,7 +1586,7 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
                 bufferCtx.clearRect(randomCoordX, randomCoordY, Math.random() * 2 + 1, Math.random() * 2 + 1);
             }
         }
-        for (let idx = 0; idx < 450; idx++) {
+                for (let idx = 0; idx < 450; idx++) {
             const randomSpreadX = Math.random() * 480;
             const randomSpreadY = Math.random() * 480;
             if (bufferCtx.getImageData(randomSpreadX, randomSpreadY, 1, 1).data[3] === 0) {
@@ -1581,13 +1598,28 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
 
         stampImgDataUrl = stampGraphicBufferCanvas.toDataURL('image/png');
 
-        stampMarker.innerHTML = `<img src="${stampImgDataUrl}" style="width:100%; height:100%; pointer-events:none;" />`;
+        // 🌟 FIXED: Embedded button inside your innerHTML template string so it remains visible over the raw image frame
+        stampMarker.innerHTML = `
+            <img src="${stampImgDataUrl}" style="width:100%; height:100%; pointer-events:none;" />
+            <button id="closeStampBtn" style="position: absolute; top: 4px; right: 4px; width: 18px; height: 18px; background: #ef4444; color: white; border: 2px solid white; border-radius: 50%; font-size: 11px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 99999; line-height: 1; pointer-events: auto; padding: 0; margin: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.35);">×</button>
+        `;
         stampMarker.style.borderColor = selectedInkColor;
 
         settingsPanel.style.display = 'none';
         note.innerText = "🏵️ Click on the document to place your Digital Stamp";
         note.style.display = 'block';
         document.getElementById('click-overlay-stamp').style.display = 'block';
+        
+        // 🌟 FIXED: Attached dynamic button dismiss handler immediately following node creation
+        const closeStampBtn = document.getElementById('closeStampBtn');
+        if (closeStampBtn) {
+            closeStampBtn.onclick = (e) => {
+                e.stopPropagation(); // Web Dev Safeguard: Stop gesture from firing background drag triggers
+                stampMarker.style.display = 'none';
+                isStampPlaced = false;
+                isStampLocked = false;
+            };
+        }
     };
 
     document.getElementById('click-overlay-stamp').onclick = (e) => {
@@ -1595,7 +1627,7 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
         stampPosX = (e.clientX - rect.left) / currentZoomScale; 
         stampPosY = (e.clientY - rect.top) / currentZoomScale;
         
-                stampMarker.style.left = (stampPosX - 60) + 'px';
+        stampMarker.style.left = (stampPosX - 60) + 'px';
         stampMarker.style.top = (stampPosY - 60) + 'px';
         stampMarker.style.display = 'flex';
         
@@ -1609,6 +1641,9 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
 
     stampMarker.onmousedown = (e) => { 
         if (isStampLocked) return; 
+        // 🌟 FIXED: Drop drag computations immediately if cursor selects the deletion node
+        if (e.target.id === 'closeStampBtn') return;
+        
         if (e.offsetX < stampMarker.clientWidth - 15 && e.offsetY < stampMarker.clientHeight - 15) {
             isStampDragging = true; 
             stampOffsetX = e.clientX - stampMarker.getBoundingClientRect().left;
@@ -1630,7 +1665,6 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
             }
         }
     });
-
         async function handleIncomingDocumentBufferChannels(fileObj) {
         originalBytes = await fileObj.arrayBuffer();
         const generatedObjectUrl = URL.createObjectURL(new Blob([originalBytes], {type: fileObj.type}));
