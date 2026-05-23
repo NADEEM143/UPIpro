@@ -1041,6 +1041,46 @@
         productsList = [];
         renderProductsPreviewWorkspace();
     };
+    /* ==========================================================================
+       📑 FIXED: MULTI-PAGE VIEWPORT NAVIGATION STATE ENGINE
+       ========================================================================== */
+    
+    // 1. Locate your "Next Page" button click handler and update it to this:
+    const nextPageBtn = document.getElementById('nextPageBtn') || document.getElementById('nextPage');
+    if (nextPageBtn) {
+        const originalNextPageClick = nextPageBtn.onclick;
+        nextPageBtn.onclick = (e) => {
+            if (typeof originalNextPageClick === 'function') {
+                originalNextPageClick(e);
+            }
+            // ⚠️ CRITICAL FIX: Track the active index value when page moves forward
+            if (typeof currentActivePageIndex !== 'undefined') {
+                // Ensure page calculation index stays within total document page boundaries
+                if (pagesCollection && currentActivePageIndex < pagesCollection.length - 1) {
+                    currentActivePageIndex++;
+                } else if (typeof pdfDoc !== 'undefined' && pdfDoc.getPages) {
+                    if (currentActivePageIndex < pdfDoc.getPages().length - 1) {
+                        currentActivePageIndex++;
+                    }
+                }
+            }
+        };
+    }
+
+    // 2. Locate your "Previous Page" button click handler and update it to this:
+    const prevPageBtn = document.getElementById('prevPageBtn') || document.getElementById('prevPage');
+    if (prevPageBtn) {
+        const originalPrevPageClick = prevPageBtn.onclick;
+        prevPageBtn.onclick = (e) => {
+            if (typeof originalPrevPageClick === 'function') {
+                originalPrevPageClick(e);
+            }
+            // ⚠️ CRITICAL FIX: Track the active index value when page moves backward
+            if (typeof currentActivePageIndex !== 'undefined' && currentActivePageIndex > 0) {
+                currentActivePageIndex--;
+            }
+        };
+    }
 
     document.getElementById('addProductBtn').onclick = () => {
         const nameField = document.getElementById('prodName').value.trim();
@@ -1967,6 +2007,38 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
         }
     };
 
+        /* ==========================================================================
+       📑 GLOBAL MULTI-PAGE MONITOR INTERCEPTOR LAYER
+       ========================================================================== */
+    // Safety Fallback: Automatically catches page layout flips no matter how they occur
+    const pageNumDisplayTracker = document.getElementById('page_num') || document.getElementById('pageNum') || document.getElementById('pageNumberDisplay');
+    if (pageNumDisplayTracker) {
+        // Create an observer that triggers whenever the on-screen page text number changes
+        const pageTextObserver = new MutationObserver(() => {
+            const parsedPageNumValue = parseInt(pageNumDisplayTracker.innerText || pageNumDisplayTracker.value, 10);
+            if (!isNaN(parsedPageNumValue) && parsedPageNumValue > 0) {
+                currentActivePageIndex = parsedPageNumValue - 1;
+                console.log("String Token Synced: Mapped multi-page compiler target safely to row calculation page", currentActivePageIndex);
+            }
+        });
+        pageTextObserver.observe(pageNumDisplayTracker, { childList: true, characterData: true, subtree: true });
+    }
+
+    // Additional Fallback: Keeps index perfectly aligned if your system uses an index dropdown selector element instead
+    const dynamicPageSelectorDropdown = document.getElementById('pageSelect') || document.getElementById('pageDropdown');
+    if (dynamicPageSelectorDropdown) {
+        dynamicPageSelectorDropdown.addEventListener('change', (e) => {
+            const chosenMenuIndex = parseInt(e.target.value, 10);
+            if (!isNaN(chosenMenuIndex)) {
+                currentActivePageIndex = chosenMenuIndex;
+            }
+        });
+    }
+    // ------------------------------------
+
+    /* ==========================================================================
+       🔢 UNTOUCHED NUMERIC STRING TO INDIAN RUPEE FORMAT TRANSLATION LOGIC
+       ========================================================================== */
     function convertAmountToWords(amount) {
         const sglDigit = ["Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"],
             dblDigit = ["Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"],
