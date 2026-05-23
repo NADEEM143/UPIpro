@@ -251,6 +251,21 @@
         <button id="lockStampBtn" class="btn btn-red">📍 Place Stamp Position</button>
     </div>
 
+    <!-- 🌟 UPDATED: Added E-Sign Configuration Canvas Right Inside Your Settings Panel -->
+    <div class="settings-option-item" id="eSignOptionMenu" style="margin-top: 10px;" role="button">✍️ Draw Electronic Signature</div>
+
+    <div class="stamp-form" id="eSignFormArea">
+        <div class="input-group">
+            <label>Draw Signature Below</label>
+            <canvas id="signatureCanvas" width="240" height="120" style="background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 8px; cursor: crosshair; touch-action: none; width: 100%; height: 120px;"></canvas>
+        </div>
+        
+        <div class="action-buttons-row">
+            <button id="clearSignBtn" class="btn-gray" style="flex: 1; padding: 10px; font-size: 12px; margin: 0;">🔄 Clear Canvas</button>
+            <button id="lockSignBtn" class="btn btn-blue" style="flex: 1; margin: 0 0 0 10px; padding: 10px; font-size: 12px;">📍 Place Signature</button>
+        </div>
+    </div>
+
     <div class="settings-option-item" id="businessDetailsOptionMenu" style="margin-top: 10px;">🏢 Business Details</div>
 
 <div class="stamp-form" id="businessFormArea">
