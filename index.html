@@ -1195,8 +1195,7 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
         };
     }
 
-    // Action Channels: Place Signature on Workspace
-    const lockSignBtn = document.getElementById('lockSignBtn');
+    // Action Channels: Place Signature on Workspace    const lockSignBtn = document.getElementById('lockSignBtn');
     if (lockSignBtn) {
         lockSignBtn.onclick = () => {
             if (!originalBytes) return alert("Select or Generate PDF First");
@@ -1236,16 +1235,56 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
         setTimeout(() => { note.style.display = 'none'; }, 4000);
     }
 
-    // 🌟 REHYDRATION HOOK: Load signature instantly upon page refresh 🌟
+    // 🌟 ADVANCED REHYDRATION HOOK: Keeps signature persistent across refreshes 🌟
     const savedSignatureCache = localStorage.getItem('cachedESignatureDataUrl');
     if (savedSignatureCache && stampMarker) {
         stampImgDataUrl = savedSignatureCache;
-        // Postpone render check to ensure workspace containers are fully mapped to DOM tree
-        setTimeout(() => {
-            if(originalBytes) {
-                renderSignatureToWorkspace(savedSignatureCache);
+        
+        // Force-render signature nodes immediately into memory layout
+        stampMarker.innerHTML = `<img src="${savedSignatureCache}" style="width:100%; height:100%; object-fit:contain; pointer-events:none;" alt="High Resolution E-Sign" />`;
+        stampMarker.style.width = '140px';
+        stampMarker.style.height = '70px';
+        stampMarker.style.borderRadius = '0px';
+        stampMarker.style.border = "2px dashed #1d4ed8";
+        stampMarker.style.left = localStorage.getItem('signatureLeftPos') || '80px';
+        stampMarker.style.top = localStorage.getItem('signatureTopPos') || '200px';
+        
+        // Web Dev Strategy: Keep it stored in canvas state buffer if no document container layer is open yet
+        if (!originalBytes) {
+            stampMarker.style.display = 'none'; 
+        } else {
+            stampMarker.style.display = 'flex';
+            isStampPlaced = true;
+            isStampLocked = false;
+        }
+    }
+
+    // 🌟 INTERCEPT CHANNEL A: Automatically pops signature back up when a file is chosen/dropped
+    const originalFileInputChangeHandler = document.getElementById('fileInput').onchange;
+    document.getElementById('fileInput').onchange = async (e) => {
+        if (typeof originalFileInputChangeHandler === 'function') {
+            await originalFileInputChangeHandler(e);
+        }
+        if (localStorage.getItem('cachedESignatureDataUrl') && stampMarker) {
+            stampMarker.style.display = 'flex';
+            isStampPlaced = true;
+            isStampLocked = false;
+        }
+    };
+
+    // 🌟 INTERCEPT CHANNEL B: Automatically pops signature back up when a new blank template compiles
+    const originalMakePdfClickHandler = document.getElementById('makePdfBtn').onclick;
+    if (document.getElementById('makePdfBtn')) {
+        document.getElementById('makePdfBtn').onclick = async () => {
+            if (typeof originalMakePdfClickHandler === 'function') {
+                await originalMakePdfClickHandler();
             }
-        }, 300);
+            if (localStorage.getItem('cachedESignatureDataUrl') && stampMarker) {
+                stampMarker.style.display = 'flex';
+                isStampPlaced = true;
+                isStampLocked = false;
+            }
+        };
     }
 
     // Append position change cache operations inside your existing global pointer movement routers
