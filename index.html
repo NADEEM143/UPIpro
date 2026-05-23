@@ -857,7 +857,7 @@
         /* ==========================================================================
        ⚡ DOWNLOAD CORE: RESTORED ORIGINAL PROPORTIONAL SQUARE MATH FOR ALL
        ========================================================================== */
-    document.getElementById('downloadBtn').onclick = async () => {
+        document.getElementById('downloadBtn').onclick = async () => {
         try {
             const name = document.getElementById('payeeName').value;
             const vpa = document.getElementById('vpa').value;
@@ -878,16 +878,18 @@
             const pdfDoc = await PDFLib.PDFDocument.load(originalBytes);
             
             const pagesCollection = pdfDoc.getPages();
-            const targetExportPage = pagesCollection[currentActivePageIndex] || pagesCollection;
+            // ⚠️ 🌟 CRITICAL FIX: Safe integer evaluation captures multi-page tracking cleanly!
+            const safePageIndex = (typeof currentActivePageIndex === 'number') ? currentActivePageIndex : 0;
+            const targetExportPage = pagesCollection[safePageIndex] || pagesCollection[0];
 
             const qrImage = await pdfDoc.embedPng(qrImgDataUrl);
-            
+
             const { width, height } = targetExportPage.getSize();
             const preview = document.getElementById('workspace-scaler');
             
             const pdfFrameNode = document.getElementById('pdf-frame');
             const imgFrameNode = document.getElementById('image-frame');
-            
+
             let actualWorkspaceWidth = 1;
             let actualWorkspaceHeight = 1;
             
@@ -978,7 +980,6 @@
             alert("Download Processing Failure: " + e.message); 
         }
     };
-
 
     document.getElementById('prodName').oninput = (e) => {
         document.getElementById('charCounter').innerText = `${e.target.value.length}/35`;
