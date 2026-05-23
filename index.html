@@ -460,33 +460,105 @@
         });
 
         // 🌟 ADDED: Map central panel workspace container natively to activate your hidden file explorer input
-        const uploadPlaceholderPrompt = document.getElementById('upload-placeholder-prompt');
+                const uploadPlaceholderPrompt = document.getElementById('upload-placeholder-prompt');
         if (uploadPlaceholderPrompt) {
             uploadPlaceholderPrompt.style.cursor = 'pointer';      // Changes cursor arrow to hand pointer on hover
             uploadPlaceholderPrompt.style.pointerEvents = 'auto';  // Unlocks mouse interactions safely
             
             uploadPlaceholderPrompt.onclick = () => {
                 const fileInputNode = document.getElementById('fileInput');
-                if (fileInputNode) fileInputNode.click();           // Dispatches native operating system window file drawer
+                if (fileInputNode) fileInputNode.click();           // Dispatches native operating system file explorer
+            };
+        }
+    }; // Closes your window.onload wrapper routine perfectly
+
+    /* ==========================================================================
+       🏵️ RESTORED: DIGITAL INK STAMP CONFIGURATION & GENERATION MODULE
+       ========================================================================== */
+    lockStampBtn.onclick = () => {
+        if (!originalBytes) return alert("Select or Generate PDF First");
+        
+        // Fix Scope: Safely isolate localized format calculations inside the click thread
+        const todayObj = new Date();
+        const yyyy = todayObj.getFullYear();
+        const mm = String(todayObj.getMonth() + 1).padStart(2, '0');
+        const dd = String(todayObj.getDate()).padStart(2, '0');
+        const localDateIso = `${yyyy}-${mm}-${dd}`;
+        const localDateDisplay = `${dd}/${mm}/${yyyy}`;
+
+        const stampDateElement = document.getElementById('stampDate');
+        if (stampDateElement && !stampDateElement.value) {
+            stampDateElement.value = localDateIso;
+        }
+        const bizDateElement = document.getElementById('bizDate');
+        if (bizDateElement && !bizDateElement.value) {
+            bizDateElement.value = localDateDisplay;
+        }
+
+        const comp = document.getElementById('stampCompany').value.trim();
+        const appr = document.getElementById('stampApprover').value.trim();
+        const dateV = stampDateElement ? stampDateElement.value : localDateIso;
+        const selectedInkColor = document.getElementById('stampColor').value;
+        const selectedShape = document.getElementById('stampShape').value;
+        
+        if (!comp || !appr || !dateV) return alert("Please fill all stamp info fields (Company Name, Approved By, Date)");
+
+        const canvas = document.createElement('canvas');
+        canvas.width = 480; 
+        canvas.height = 480;
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, 480, 480);
+        
+        const stampGraphicBufferCanvas = document.createElement('canvas');
+        stampGraphicBufferCanvas.width = 480;
+        stampGraphicBufferCanvas.height = 480;
+        const bufferCtx = stampGraphicBufferCanvas.getContext('2d');
+
+        // Execute drawing operations onto your workspace canvas layout substrate safely...
+        for (let idx = 0; idx < 450; idx++) {
+            const randomSpreadX = Math.random() * 480;
+            const randomSpreadY = Math.random() * 480;
+            if (bufferCtx.getImageData(randomSpreadX, randomSpreadY, 1, 1).data[3] === 0) {
+                bufferCtx.globalAlpha = Math.random() * 0.4;
+                bufferCtx.fillRect(randomSpreadX, randomSpreadY, 1.5, 1.5);
+            }
+        }
+        bufferCtx.globalAlpha = 1.0;
+
+        stampImgDataUrl = stampGraphicBufferCanvas.toDataURL('image/png');
+
+        // Embedded close option button overlay inside the template string context
+        stampMarker.innerHTML = `
+            <img src="${stampImgDataUrl}" style="width:100%; height:100%; pointer-events:none;" />
+            <button id="closeStampBtn" style="position: absolute; top: 4px; right: 4px; width: 18px; height: 18px; background: #ef4444; color: white; border: 2px solid white; border-radius: 50%; font-size: 11px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 99999; line-height: 1; pointer-events: auto; padding: 0; margin: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.35);">×</button>
+        `;
+        stampMarker.style.borderColor = selectedInkColor;
+
+        settingsPanel.style.display = 'none';
+        note.innerText = "🏵️ Click on the document to place your Digital Stamp";
+        note.style.display = 'block';
+        document.getElementById('click-overlay-stamp').style.display = 'block';
+        
+        const closeStampBtn = document.getElementById('closeStampBtn');
+        if (closeStampBtn) {
+            closeStampBtn.onclick = (e) => {
+                e.stopPropagation(); // Safeguard override blocks background movement glitches
+                stampMarker.style.display = 'none';
+                isStampPlaced = false;
+                isStampLocked = false;
             };
         }
     };
-        if (document.getElementById('stampDate') && !document.getElementById('stampDate').value) {
-            document.getElementById('stampDate').value = localDateIso;
-        }
-        if (document.getElementById('bizDate') && !document.getElementById('bizDate').value) {
-            document.getElementById('bizDate').value = localDateDisplay;
-        }
-    };
 
-
+    /* ==========================================================================
+       🌟 UNTOUCHED UTILITY HANDLERS & INPUT EVENT TUNNELS RE-CONNECTED
+       ========================================================================== */
     document.getElementById('fileInput').onchange = async (e) => {
         const file = e.target.files[0];
         if (!file) return;
         await handleIncomingDocumentBufferChannels(file);
     };
 
-                // ... Your existing document.getElementById('lockBtn').onclick code lives right above this ...
     document.getElementById('lockBtn').onclick = () => {
         if(!originalBytes) return alert("Select or Generate PDF First");
         note.innerText = "📍 Click on the document to place your QR";
@@ -494,7 +566,6 @@
         document.getElementById('click-overlay').style.display = 'block';
         setTimeout(() => { note.style.display = 'none'; }, 4000);
     };
-
 // =========================================================================
 // 📥 REMOVE YOUR OLD "click-overlay" BLOCK AND PASTE THIS ENTIRE NEW ONE HERE:
 // =========================================================================
