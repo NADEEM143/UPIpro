@@ -1380,31 +1380,57 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
     }
 
     // 🌟 CLEANED: Restored your file selector to its original behavior without forcing signatures automatically
+       // 🌟 CLEANED: Restored your file selector to its original behavior and isolated signature states
     const originalFileInputChangeHandler = document.getElementById('fileInput').onchange;
     document.getElementById('fileInput').onchange = async (e) => {
         if (typeof originalFileInputChangeHandler === 'function') {
             await originalFileInputChangeHandler(e);
         }
-        // Force pop-up lines removed entirely to preserve manual placement workflow
+        
+        // Reset signature display bounds exactly like the QR code and stamp markers
+        if (signatureMarker) {
+            signatureMarker.style.display = 'none'; 
+            signatureMarker.style.borderColor = "#1d4ed8";
+            signatureMarker.style.borderStyle = "dashed";
+            signatureMarker.style.cursor = "move";
+            isSigLocked = false;
+        }
     };
 
-    // 🌟 CLEANED: Restored your template generator to its original behavior without forcing signatures automatically
+    // 🌟 CLEANED: Restored your template generator to its original behavior and isolated signature states
     const originalMakePdfClickHandler = document.getElementById('makePdfBtn').onclick;
     if (document.getElementById('makePdfBtn')) {
         document.getElementById('makePdfBtn').onclick = async () => {
             if (typeof originalMakePdfClickHandler === 'function') {
                 await originalMakePdfClickHandler();
             }
-            // Force pop-up lines removed entirely to preserve manual placement workflow
+            
+            // Reset signature display bounds exactly like the QR code and stamp markers
+            if (signatureMarker) {
+                signatureMarker.style.display = 'none'; 
+                signatureMarker.style.borderColor = "#1d4ed8";
+                signatureMarker.style.borderStyle = "dashed";
+                signatureMarker.style.cursor = "move";
+                isSigLocked = false;
+            }
         };
     }
-    // Append position change cache operations inside your existing global pointer movement routers
+
+    // 🌟 SEPARATED: Global mouse release positional coordinate tracker caches
     const originalMouseUpHandler = window.onmouseup;
     window.onmouseup = () => {
         if (typeof originalMouseUpHandler === 'function') originalMouseUpHandler();
-        if (isStampPlaced && stampMarker.style.display === 'flex') {
-            localStorage.setItem('signatureLeftPos', stampMarker.style.left);
-            localStorage.setItem('signatureTopPos', stampMarker.style.top);
+        
+        // Store stamp positioning layout offsets
+        if (isStampPlaced && stampMarker && stampMarker.style.display === 'flex') {
+            localStorage.setItem('stampLeftPos', stampMarker.style.left);
+            localStorage.setItem('stampTopPos', stampMarker.style.top);
+        }
+        
+        // Store signature positioning layout offsets completely separately
+        if (isSigPlaced && signatureMarker && signatureMarker.style.display === 'flex') {
+            localStorage.setItem('signatureLeftPos', signatureMarker.style.left);
+            localStorage.setItem('signatureTopPos', signatureMarker.style.top);
         }
     };
     // ------------------------------------
@@ -1427,7 +1453,7 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
         const ctx = canvas.getContext('2d');
 
         ctx.clearRect(0, 0, 480, 480);
-        
+       
         const stampGraphicBufferCanvas = document.createElement('canvas');
         stampGraphicBufferCanvas.width = 480;
         stampGraphicBufferCanvas.height = 480;
