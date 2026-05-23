@@ -1864,12 +1864,13 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
                 stampMarker.style.display = 'none';
                 signatureMarker.style.display = 'none';
 
-            } else {
+                       } else {
                 const pdfDoc = await PDFLib.PDFDocument.load(originalBytes);
                 
                 const pagesCollection = pdfDoc.getPages();
-                const safePageIndex = (typeof currentActivePageIndex !== 'undefined') ? currentActivePageIndex : 0;
-                const targetExportPage = pagesCollection[safePageIndex] || pagesCollection[0];
+                // ⚠️ 🌟 CRITICAL FIX: Safe integer evaluation captures multi-page tracking cleanly inside your real-time preview matrix!
+                const safePageIndex = (typeof currentActivePageIndex === 'number') ? currentActivePageIndex : 0;
+                const targetExportPage = pagesCollection[safePageIndex] || pagesCollection;
                 
                 const { width, height } = targetExportPage.getSize();
 
@@ -1922,14 +1923,12 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
                     });
                 }
 
-                                /* ─── BLOCK 3: INJECT THE ELECTRONIC SIGNATURE (PRESERVE NATURAL SHAPE RECTANGLE) ─── */
                 if (isSigPlaced && sigImgDataUrl && signatureMarker) {
                     const sigImageObject = await pdfDoc.embedPng(sigImgDataUrl);
 
                     const sigLeftStyle = isSigLocked ? (sigPosX - 70) : (parseFloat(signatureMarker.style.left) || (sigPosX - 70));
                     const sigTopStyle = isSigLocked ? (sigPosY - 70) : (parseFloat(signatureMarker.style.top) || (sigPosY - 70));
 
-                    // ⚠️ LOGIC UPDATED: Kept width and height completely natural to protect aspect ratio
                     let docSigW = (signatureMarker.clientWidth / actualWorkspaceWidth) * width;
                     let docSigH = (signatureMarker.clientHeight / actualWorkspaceHeight) * height;
 
@@ -1943,6 +1942,7 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
                         height: docSigH
                     });
                 }
+
                 const previewPdfBytes = await pdfDoc.save();
                 const previewBlobUrl = URL.createObjectURL(new Blob([previewPdfBytes], { type: 'application/pdf' }));
 
