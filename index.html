@@ -1195,7 +1195,8 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
         };
     }
 
-    // Action Channels: Place Signature on Workspace    const lockSignBtn = document.getElementById('lockSignBtn');
+        // Action Channels: Place Signature on Workspace
+    const lockSignBtn = document.getElementById('lockSignBtn');
     if (lockSignBtn) {
         lockSignBtn.onclick = () => {
             if (!originalBytes) return alert("Select or Generate PDF First");
@@ -1235,12 +1236,14 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
         setTimeout(() => { note.style.display = 'none'; }, 4000);
     }
 
-    // 🌟 ADVANCED REHYDRATION HOOK: Keeps signature persistent across refreshes 🌟
+    /* ==========================================================================
+       🌟 RETINA PERSISTENT CACHE REHYDRATION ENGINE 🌟
+       ========================================================================== */
     const savedSignatureCache = localStorage.getItem('cachedESignatureDataUrl');
     if (savedSignatureCache && stampMarker) {
         stampImgDataUrl = savedSignatureCache;
         
-        // Force-render signature nodes immediately into memory layout
+        // 1. Force-render signature nodes immediately into position element memory layouts
         stampMarker.innerHTML = `<img src="${savedSignatureCache}" style="width:100%; height:100%; object-fit:contain; pointer-events:none;" alt="High Resolution E-Sign" />`;
         stampMarker.style.width = '140px';
         stampMarker.style.height = '70px';
@@ -1249,13 +1252,26 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
         stampMarker.style.left = localStorage.getItem('signatureLeftPos') || '80px';
         stampMarker.style.top = localStorage.getItem('signatureTopPos') || '200px';
         
-        // Web Dev Strategy: Keep it stored in canvas state buffer if no document container layer is open yet
+        // Keep it hidden from the main view canvas if no document is loaded yet
         if (!originalBytes) {
             stampMarker.style.display = 'none'; 
         } else {
             stampMarker.style.display = 'flex';
             isStampPlaced = true;
             isStampLocked = false;
+        }
+
+        // 2. 🌟 FIXED: Instantly draw the saved signature back into the settings pad canvas upon page refresh!
+        if (signCanvas && signCtx) {
+            const signatureTemplateImage = new Image();
+            signatureTemplateImage.src = savedSignatureCache;
+            signatureTemplateImage.onload = () => {
+                // Temporarily normalize canvas matrix coordinates to scale the cache layout correctly
+                signCtx.save();
+                signCtx.setTransform(1, 0, 0, 1, 0, 0);
+                signCtx.drawImage(signatureTemplateImage, 0, 0, signCanvas.width, signCanvas.height);
+                signCtx.restore();
+            };
         }
     }
 
@@ -1286,7 +1302,6 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
             }
         };
     }
-
     // Append position change cache operations inside your existing global pointer movement routers
     const originalMouseUpHandler = window.onmouseup;
     window.onmouseup = () => {
