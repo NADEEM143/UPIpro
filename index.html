@@ -367,19 +367,22 @@
                 <div id="click-overlay-stamp" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1005; display: none; background: rgba(0,0,0,0.01);"></div>
                 
                 <!-- Interactive Asset Placement Holders Matrix -->
-                                <div id="qr-marker">
+                                                <div id="qr-marker">
                     <div style="font-size:18px;">🎯</div>
                     <span>DRAG & RESIZE</span>
                     <div id="qr-graphic-target" style="width: 100%; height: 100%; position: absolute; top:0; left:0; background:white; display:none;"></div>
                 </div>
                 
-                <div id="stamp-marker">
+                <!-- 🌟 STAMP CONTAINER WITH EMBEDDED ABSOLUTE CLOSE OPTION BUTTON -->
+                <div id="stamp-marker" style="position: absolute;">
                     <span>STAMP PLACEHOLDER</span>
+                    <button id="closeStampBtn" style="position: absolute; top: 4px; right: 4px; width: 18px; height: 18px; background: #ef4444; color: white; border: none; border-radius: 50%; font-size: 11px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 9999; line-height: 1; pointer-events: auto;">×</button>
                 </div>
-                
-                <!-- 🌟 INDEPENDENT SIGNATURE TRACKER MARKER INSTANTIATED CLEANLY -->
+
+                <!-- 🌟 SIGNATURE CONTAINER WITH EMBEDDED ABSOLUTE CLOSE OPTION BUTTON (DUPLICATION REMOVED) -->
                 <div id="signature-marker" style="position: absolute; width: 140px; height: 70px; border: 2px dashed #1d4ed8; display: none; align-items: center; justify-content: center; z-index: 2006; cursor: move; background: rgba(29, 78, 216, 0.02); mix-blend-mode: multiply; filter: drop-shadow(0.5px 0.5px 0.5px rgba(0,0,0,0.15)); resize: both; overflow: hidden;">
                     <span>SIGNATURE PLACEHOLDER</span>
+                    <button id="closeSigBtn" style="position: absolute; top: 4px; right: 4px; width: 18px; height: 18px; background: #ef4444; color: white; border: none; border-radius: 50%; font-size: 11px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 9999; line-height: 1; pointer-events: auto;">×</button>
                 </div>
             </div> <!-- Closes #workspace-scaler cleanly -->
             
@@ -591,8 +594,12 @@
             /* ==========================================================================
        🌟 DETACHED INFRASTRUCTURE: INDEPENDENT MOUSE DOWN CLICK HOOKS
        ========================================================================== */
-    stampMarker.onmousedown = (e) => { 
+        stampMarker.onmousedown = (e) => { 
         if (isStampLocked) return; 
+        
+        // 🌟 SAFETY TRAP: If user clicks the close '×' button circle, exit drag code immediately!
+        if (e.target.tagName === 'BUTTON') return;
+
         if (e.offsetX < stampMarker.clientWidth - 15 && e.offsetY < stampMarker.clientHeight - 15) {
             isStampDragging = true; 
             stampOffsetX = e.clientX - stampMarker.getBoundingClientRect().left;
@@ -600,9 +607,12 @@
         }
     };
 
-    // 🌟 FIXED: Signature now captures its own unique structural offsets correctly!
     signatureMarker.onmousedown = (e) => { 
         if (isSigLocked) return; 
+        
+        // 🌟 SAFETY TRAP: If user clicks the close '×' button circle, exit drag code immediately!
+        if (e.target.tagName === 'BUTTON') return;
+
         if (e.offsetX < signatureMarker.clientWidth - 15 && e.offsetY < signatureMarker.clientHeight - 15) {
             isSigDragging = true; 
             sigOffsetX = e.clientX - signatureMarker.getBoundingClientRect().left;
@@ -1207,7 +1217,7 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
         settingsPanel.style.display = settingsPanel.style.display === 'block' ? 'none' : 'block';
     };
 
-    stampOptionMenu.onclick = () => {
+        stampOptionMenu.onclick = () => {
         stampFormArea.style.display = stampFormArea.style.display === 'block' ? 'none' : 'block';
     };
 
@@ -1217,6 +1227,32 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
     businessOptionMenu.onclick = () => {
         businessFormArea.style.display = businessFormArea.style.display === 'block' ? 'none' : 'block';
     };
+    // ------------------------------------
+
+    // 🌟 ADDED: Draggable Overlays Manual Close Button Functionality Channels
+    const closeStampBtn = document.getElementById('closeStampBtn');
+    if (closeStampBtn) {
+        closeStampBtn.onclick = (e) => {
+            e.stopPropagation(); // Stops event bubbling to prevent dragging glitches
+            if (stampMarker) {
+                stampMarker.style.display = 'none';
+                isStampPlaced = false; 
+                isStampLocked = false;
+            }
+        };
+    }
+
+    const closeSigBtn = document.getElementById('closeSigBtn');
+    if (closeSigBtn) {
+        closeSigBtn.onclick = (e) => {
+            e.stopPropagation(); // Stops event bubbling to prevent dragging glitches
+            if (signatureMarker) {
+                signatureMarker.style.display = 'none';
+                isSigPlaced = false; 
+                isSigLocked = false;
+            }
+        };
+    }
     // ------------------------------------
 
     const eSignOptionMenu = document.getElementById('eSignOptionMenu');
@@ -1266,7 +1302,6 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
             signCtx.beginPath();
             signCtx.moveTo(pos.x, pos.y);
         };
-
         const drawStroke = (e) => {
             if (!isDrawingSignature) return;
             const pos = getCanvasPointerPos(signCanvas, e);
