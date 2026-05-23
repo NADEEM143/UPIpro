@@ -1088,7 +1088,7 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
     };
 
             // 1. Locate your existing menu click listeners near the bottom of the file
-        gearIcon.onclick = () => {
+            gearIcon.onclick = () => {
         settingsPanel.style.display = settingsPanel.style.display === 'block' ? 'none' : 'block';
     };
 
@@ -1129,11 +1129,11 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
         // Get local relative pointer placement coordinates
         const getCanvasPointerPos = (canvasElement, eventTrigger) => {
             const rect = canvasElement.getBoundingClientRect();
-            const clientX = eventTrigger.touches ? eventTrigger.touches[0].clientX : eventTrigger.clientX;
-            const clientY = eventTrigger.touches ? eventTrigger.touches[0].clientY : eventTrigger.clientY;
+            // 🌟 FIXED: Safe fallback extraction targeting touch arrays correctly on mobile engines
+            const activeTouch = eventTrigger.touches && eventTrigger.touches.length > 0 ? eventTrigger.touches[0] : eventTrigger;
             return {
-                x: (clientX - rect.left) * (canvasElement.width / rect.width),
-                y: (clientY - rect.top) * (canvasElement.height / rect.height)
+                x: (activeTouch.clientX - rect.left) * (canvasElement.width / rect.width),
+                y: (activeTouch.clientY - rect.top) * (canvasElement.height / rect.height)
             };
         };
 
