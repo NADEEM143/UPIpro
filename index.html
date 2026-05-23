@@ -367,11 +367,14 @@
                 <div id="click-overlay-stamp" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1005; display: none; background: rgba(0,0,0,0.01);"></div>
                 
                 <!-- Interactive Asset Placement Holders Matrix -->
-                                                <div id="qr-marker">
+                                                                <div id="qr-marker" style="position: absolute;">
                     <div style="font-size:18px;">🎯</div>
                     <span>DRAG & RESIZE</span>
                     <div id="qr-graphic-target" style="width: 100%; height: 100%; position: absolute; top:0; left:0; background:white; display:none;"></div>
+                    <!-- 🌟 ADDED: Embedded absolute close option button for QR Code -->
+                    <button id="closeQrBtn" style="position: absolute; top: 4px; right: 4px; width: 18px; height: 18px; background: #ef4444; color: white; border: 2px solid white; border-radius: 50%; font-size: 11px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 99999; line-height: 1; pointer-events: auto; padding: 0; margin: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.35);">×</button>
                 </div>
+
                 
                 <!-- 🌟 STAMP CONTAINER WITH EMBEDDED ABSOLUTE CLOSE OPTION BUTTON -->
                 <div id="stamp-marker" style="position: absolute;">
@@ -1230,7 +1233,7 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
     // ------------------------------------
 
     // 🌟 ADDED: Draggable Overlays Manual Close Button Functionality Channels
-    const closeStampBtn = document.getElementById('closeStampBtn');
+        const closeStampBtn = document.getElementById('closeStampBtn');
     if (closeStampBtn) {
         closeStampBtn.onclick = (e) => {
             e.stopPropagation(); // Stops event bubbling to prevent dragging glitches
@@ -1250,6 +1253,22 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
                 signatureMarker.style.display = 'none';
                 isSigPlaced = false; 
                 isSigLocked = false;
+            }
+        };
+    }
+
+    // 🌟 ADDED: Direct event portal channel to hide the QR Code container layout safely
+    const closeQrBtn = document.getElementById('closeQrBtn');
+    if (closeQrBtn) {
+        closeQrBtn.onclick = (e) => {
+            e.stopPropagation(); // Prevents click gesture event from leaking into the drag engine
+            if (marker) {
+                marker.style.display = 'none';
+                isQrPlaced = false; // Prevents downline compilers from rendering the graphic row
+                isQrLocked = false;
+                
+                const qrTarget = document.getElementById('qr-graphic-target');
+                if (qrTarget) qrTarget.style.display = 'none';
             }
         };
     }
