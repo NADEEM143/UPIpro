@@ -1087,6 +1087,7 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
         } catch (err) { alert("Generation Core Failure: " + err.message); }
     };
 
+            // 1. Locate your existing menu click listeners near the bottom of the file
         gearIcon.onclick = () => {
         settingsPanel.style.display = settingsPanel.style.display === 'block' ? 'none' : 'block';
     };
@@ -1103,7 +1104,109 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
     };
     // ------------------------------------
 
+    // 🌟 UPDATED: Added E-Sign Action Channels & Native Touch Gesture Capturing Logic Here
+    const eSignOptionMenu = document.getElementById('eSignOptionMenu');
+    const eSignFormArea = document.getElementById('eSignFormArea');
+    
+    if (eSignOptionMenu) {
+        eSignOptionMenu.onclick = () => {
+            eSignFormArea.style.display = eSignFormArea.style.display === 'block' ? 'none' : 'block';
+        };
+    }
+
+    // Canvas Signature Capture Setup
+    const signCanvas = document.getElementById('signatureCanvas');
+    let signCtx = null;
+    let isDrawingSignature = false;
+
+    if (signCanvas) {
+        signCtx = signCanvas.getContext('2d');
+        signCtx.strokeStyle = "#1e3a8a"; // Deep Navy Indigo ink profile
+        signCtx.lineWidth = 3;
+        signCtx.lineCap = "round";
+        signCtx.lineJoin = "round";
+
+        // Get local relative pointer placement coordinates
+        const getCanvasPointerPos = (canvasElement, eventTrigger) => {
+            const rect = canvasElement.getBoundingClientRect();
+            const clientX = eventTrigger.touches ? eventTrigger.touches[0].clientX : eventTrigger.clientX;
+            const clientY = eventTrigger.touches ? eventTrigger.touches[0].clientY : eventTrigger.clientY;
+            return {
+                x: (clientX - rect.left) * (canvasElement.width / rect.width),
+                y: (clientY - rect.top) * (canvasElement.height / rect.height)
+            };
+        };
+
+        // Stroke event mappings (Mouse and Mobile Touch pointers)
+        const startStroke = (e) => {
+            isDrawingSignature = true;
+            const pos = getCanvasPointerPos(signCanvas, e);
+            signCtx.beginPath();
+            signCtx.moveTo(pos.x, pos.y);
+        };
+
+        const drawStroke = (e) => {
+            if (!isDrawingSignature) return;
+            const pos = getCanvasPointerPos(signCanvas, e);
+            signCtx.lineTo(pos.x, pos.y);
+            signCtx.stroke();
+        };
+
+        const stopStroke = () => { isDrawingSignature = false; };
+
+        signCanvas.onmousedown = startStroke;
+        signCanvas.onmousemove = drawStroke;
+        window.addEventListener('mouseup', stopStroke);
+
+        signCanvas.ontouchstart = startStroke;
+        signCanvas.ontouchmove = drawStroke;
+        window.addEventListener('touchend', stopStroke);
+    }
+
+    // Action Channels: Clear Pad logic
+    const clearSignBtn = document.getElementById('clearSignBtn');
+    if (clearSignBtn) {
+        clearSignBtn.onclick = () => {
+            if (signCtx && signCanvas) {
+                signCtx.clearRect(0, 0, signCanvas.width, signCanvas.height);
+            }
+        };
+    }
+
+    // Action Channels: Place Signature on Workspace
+    const lockSignBtn = document.getElementById('lockSignBtn');
+    if (lockSignBtn) {
+        lockSignBtn.onclick = () => {
+            if (!originalBytes) return alert("Select or Generate PDF First");
+            if (!signCanvas) return;
+            
+            // Convert signature drawing to raw string data URL mapping
+            stampImgDataUrl = signCanvas.toDataURL('image/png');
+            
+            // Reuse your existing dynamic signature placement template marker settings
+            stampMarker.innerHTML = `<img src="${stampImgDataUrl}" style="width:100%; height:100%; pointer-events:none;" alt="E-Sign" />`;
+            stampMarker.style.width = '140px';
+            stampMarker.style.height = '70px';
+            stampMarker.style.borderRadius = '0px';
+            stampMarker.style.border = "2px dashed #1e3a8a";
+            stampMarker.style.left = '80px';
+            stampMarker.style.top = '200px';
+            stampMarker.style.display = 'flex';
+            
+            isStampPlaced = true;
+            isStampLocked = false;
+            if (eSignFormArea) eSignFormArea.style.display = 'none';
+            if (settingsPanel) settingsPanel.style.display = 'none';
+            
+            note.innerText = "✍️ Position signature on document window context.";
+            note.style.display = 'block';
+            setTimeout(() => { note.style.display = 'none'; }, 4000);
+        };
+    }
+    // ------------------------------------
+
     lockStampBtn.onclick = () => {
+
         if (!originalBytes) return alert("Select or Generate PDF First");
         
         const comp = document.getElementById('stampCompany').value.trim();
