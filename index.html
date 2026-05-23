@@ -2007,24 +2007,57 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
         }
     };
 
+       
         /* ==========================================================================
-       📑 GLOBAL MULTI-PAGE MONITOR INTERCEPTOR LAYER
+       📑 GLOBAL MULTI-PAGE MONITOR INTERCEPTOR LAYER (PARITY REALIGNED)
        ========================================================================== */
-    // Safety Fallback: Automatically catches page layout flips no matter how they occur
+    // ⚠️ CRITICAL OVERRIDE: Unified memory syncing matrix for absolute multi-page targeting
+    function syncActivePageTrackIndex(pageNum) {
+        const parsed = parseInt(pageNum, 10);
+        if (!isNaN(parsed) && parsed > 0) {
+            currentActivePageIndex = parsed - 1;
+            console.log("🎯 Page Pointer Synced: Context switched safely to page index", currentActivePageIndex);
+        }
+    }
+
+    // Intercept broad-spectrum button gestures across your user interface elements
+    document.addEventListener('click', (e) => {
+        const targetElement = e.target;
+        if (!targetElement) return;
+
+        // Automatically captures actions from common pagination button IDs or class frameworks
+        if (targetElement.id === 'nextPageBtn' || targetElement.id === 'nextPage' || targetElement.classList.contains('next-page-btn')) {
+            setTimeout(() => {
+                const el = document.getElementById('page_num') || document.getElementById('pageNum') || document.getElementById('pageNumberDisplay');
+                if (el) syncActivePageTrackIndex(el.innerText || el.value);
+            }, 50);
+        }
+        if (targetElement.id === 'prevPageBtn' || targetElement.id === 'prevPage' || targetElement.classList.contains('prev-page-btn')) {
+            setTimeout(() => {
+                const el = document.getElementById('page_num') || document.getElementById('pageNum') || document.getElementById('pageNumberDisplay');
+                if (el) syncActivePageTrackIndex(el.innerText || el.value);
+            }, 50);
+        }
+    });
+
+    // Intercept active scroll toggles or page selection drop-down events
+    document.addEventListener('change', (e) => {
+        const target = e.target;
+        if (target && (target.id === 'pageSelect' || target.id === 'pageDropdown' || target.id === 'page_num' || target.classList.contains('page-selector'))) {
+            syncActivePageTrackIndex(target.value);
+        }
+    });
+
+    // Fallback Mutation Observer targeting raw text changes inside the viewer layouts
     const pageNumDisplayTracker = document.getElementById('page_num') || document.getElementById('pageNum') || document.getElementById('pageNumberDisplay');
     if (pageNumDisplayTracker) {
-        // Create an observer that triggers whenever the on-screen page text number changes
         const pageTextObserver = new MutationObserver(() => {
-            const parsedPageNumValue = parseInt(pageNumDisplayTracker.innerText || pageNumDisplayTracker.value, 10);
-            if (!isNaN(parsedPageNumValue) && parsedPageNumValue > 0) {
-                currentActivePageIndex = parsedPageNumValue - 1;
-                console.log("String Token Synced: Mapped multi-page compiler target safely to row calculation page", currentActivePageIndex);
-            }
+            syncActivePageTrackIndex(pageNumDisplayTracker.innerText || pageNumDisplayTracker.value);
         });
         pageTextObserver.observe(pageNumDisplayTracker, { childList: true, characterData: true, subtree: true });
     }
 
-    // Additional Fallback: Keeps index perfectly aligned if your system uses an index dropdown selector element instead
+    // Additional Fallback Dropdown Listener
     const dynamicPageSelectorDropdown = document.getElementById('pageSelect') || document.getElementById('pageDropdown');
     if (dynamicPageSelectorDropdown) {
         dynamicPageSelectorDropdown.addEventListener('change', (e) => {
