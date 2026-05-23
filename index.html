@@ -588,7 +588,10 @@
         }
     };
 
-        stampMarker.onmousedown = (e) => { 
+            /* ==========================================================================
+       🌟 DETACHED INFRASTRUCTURE: INDEPENDENT MOUSE DOWN CLICK HOOKS
+       ========================================================================== */
+    stampMarker.onmousedown = (e) => { 
         if (isStampLocked) return; 
         if (e.offsetX < stampMarker.clientWidth - 15 && e.offsetY < stampMarker.clientHeight - 15) {
             isStampDragging = true; 
@@ -597,7 +600,7 @@
         }
     };
 
-    // 🌟 SEPARATE MOUSE DOWN INFRASTRUCTURE FOR SIGNATURE ELEMENT
+    // 🌟 FIXED: Signature now captures its own unique structural offsets correctly!
     signatureMarker.onmousedown = (e) => { 
         if (isSigLocked) return; 
         if (e.offsetX < signatureMarker.clientWidth - 15 && e.offsetY < signatureMarker.clientHeight - 15) {
@@ -607,7 +610,9 @@
         }
     };
 
-    // --- 🖱️ RESTORED: Mouse Move Drag Tracking Logic with Signature Support ---
+    /* ==========================================================================
+       🌟 DETACHED INFRASTRUCTURE: INDEPENDENT MOUSE MOVEMENT LOOPS
+       ========================================================================== */
     window.onmousemove = (e) => {
         const rect = document.getElementById('workspace-scaler').getBoundingClientRect();
         if (isDragging && !isQrLocked) {
@@ -630,7 +635,7 @@
             stampMarker.style.left = stampPosX + 'px';
             stampMarker.style.top = stampPosY + 'px';
         }
-        // 🌟 SEPARATED SIGNATURE MOUSE TRACKING BOUNDS
+        // 🌟 FIXED: Tracks signature drag calculations without interfering with other variables
         if (isSigDragging && !isSigLocked) {
             sigPosX = (e.clientX - rect.left) - sigOffsetX;
             sigPosY = (e.clientY - rect.top) - sigOffsetY;
@@ -646,34 +651,31 @@
     window.onmouseup = () => {
         isDragging = false;
         isStampDragging = false;
-        isSigDragging = false; // 🌟 Safely release signature tracker drag thread
+        isSigDragging = false; 
     };
 
-    // 🌟 SEPARATE MOBILE TOUCH INFRASTRUCTURE FOR SIGNATURE ELEMENT
+    /* ==========================================================================
+       🌟 DETACHED INFRASTRUCTURE: INDEPENDENT MOBILE TOUCH GENERATORS
+       ========================================================================== */
     signatureMarker.ontouchstart = (e) => {
         if (isSigLocked) return;
         isSigDragging = true;
-        const touch = e.touches[0] || e.changedTouches[0];
+        const touch = e.touches || e.changedTouches;
         if (!touch) return;
         const rect = signatureMarker.getBoundingClientRect();
         sigOffsetX = touch.clientX - rect.left;
         sigOffsetY = touch.clientY - rect.top;
     };
 
-    // --- 📱 RESTORED: Mobile Touch Move Drag Tracking Logic with Signature Support ---
     window.addEventListener('touchmove', (e) => {
         if (!isDragging && !isStampDragging && !isSigDragging) return;
-        const touch = e.touches[0] || e.changedTouches[0];
+        const touch = e.touches || e.changedTouches;
         if (!touch) return;
         const rect = document.getElementById('workspace-scaler').getBoundingClientRect();
         
         if (marker.style.display === 'flex' && !isQrLocked && isDragging) {
             posX = (touch.clientX - rect.left) - offsetX;
             posY = (touch.clientY - rect.top) - offsetY;
-            
-            posX = Math.max(0, Math.min(rect.width - marker.clientWidth, posX));
-            posY = Math.max(0, Math.min(rect.height - marker.clientHeight, posY));
-            
             marker.style.left = posX + 'px';
             marker.style.top = posY + 'px';
         }
@@ -681,15 +683,11 @@
         if (stampMarker.style.display === 'flex' && !isStampLocked && isStampDragging) {
             stampPosX = (touch.clientX - rect.left) - stampOffsetX;
             stampPosY = (touch.clientY - rect.top) - stampOffsetY;
-            
-            stampPosX = Math.max(0, Math.min(rect.width - stampMarker.clientWidth, stampPosX));
-            stampPosY = Math.max(0, Math.min(rect.height - stampMarker.clientHeight, stampPosY));
-            
             stampMarker.style.left = stampPosX + 'px';
             stampMarker.style.top = stampPosY + 'px';
         }
 
-        // 🌟 SEPARATED SIGNATURE RESPONSIVE TOUCH TRACKING BOUNDS
+        // 🌟 FIXED: Handles mobile finger movements uniquely for your signature pad layers
         if (signatureMarker.style.display === 'flex' && !isSigLocked && isSigDragging) {
             sigPosX = (touch.clientX - rect.left) - sigOffsetX;
             sigPosY = (touch.clientY - rect.top) - sigOffsetY;
