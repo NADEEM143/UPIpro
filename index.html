@@ -763,13 +763,17 @@
         }
     });
    
-               document.getElementById('downloadBtn').onclick = async () => {
+                   /* ==========================================================================
+       ⚡ DOWNLOAD CORE: FIXED ASPECT RATIO SYSTEM STAMP AND SIGNATURE BOTH
+       ========================================================================== */
+    document.getElementById('downloadBtn').onclick = async () => {
         try {
             const name = document.getElementById('payeeName').value;
             const vpa = document.getElementById('vpa').value;
             const amt = document.getElementById('amount').value;
             
-            // Generates an automated unique daily transaction reference ID to pass NCPI retail guidelines
+            if (!vpa) return alert("UPI ID configuration payload field is empty!");
+
             const uniqueTxnRefId = "INV" + Date.now(); 
             const upi = `upi://pay?pa=${vpa}&pn=${encodeURIComponent(name)}&cu=INR&am=${parseFloat(amt || 0).toFixed(2)}&tr=${uniqueTxnRefId}&mc=0000&mode=02&purpose=00`;
             
@@ -788,12 +792,11 @@
             const qrImage = await pdfDoc.embedPng(qrImgDataUrl);
             
             const { width, height } = targetExportPage.getSize();
-            const preview = document.getElementById('workspace-scaler');
+            const preview = document.getElementById('dropzone');
             
             const pdfFrameNode = document.getElementById('pdf-frame');
             const imgFrameNode = document.getElementById('image-frame');
             
-            // Web Dev Optimization: Read the precise responsive dimensions of the active screen workspace
             let actualWorkspaceWidth = preview.offsetWidth;
             let actualWorkspaceHeight = preview.offsetHeight;
             
@@ -805,34 +808,45 @@
                 actualWorkspaceHeight = imgFrameNode.offsetHeight;
             }
 
-            /* ─── BLOCK 1: INJECT THE REAL-TIME UPI QR CODE ─── */
+            // High Precision Web Dev Resolution Scale Calculators
             const finalLeftPos = isQrLocked ? (posX - 40) : (parseFloat(marker.style.left) || (posX - 40));
             const finalTopPos = isQrLocked ? (posY - 40) : (parseFloat(marker.style.top) || (posY - 40));
 
-            // Direct Percent Mapping: Translates browser window coordinates safely to PDF coordinates
+            const finalQrWidth = (marker.clientWidth / actualWorkspaceWidth) * width;
+            const finalQrHeight = (marker.clientHeight / actualWorkspaceHeight) * height;
+            const finalSquareSize = Math.max(finalQrWidth, finalQrHeight);
+
+            // Translate HTML UI layout points directly to standard PDF vector matrix rows
             const pdfX = (finalLeftPos / actualWorkspaceWidth) * width;
-            const pdfY = height - ((finalTopPos / actualWorkspaceHeight) * height) - ((marker.clientHeight / actualWorkspaceHeight) * height);
-            const finalQrW = (marker.clientWidth / actualWorkspaceWidth) * width;
-            const finalQrH = (marker.clientHeight / actualWorkspaceHeight) * height;
+            const pdfY = height - ((finalTopPos / actualWorkspaceHeight) * height) - finalSquareSize;
 
             targetExportPage.drawImage(qrImage, {
                 x: pdfX,
                 y: pdfY,
-                width: finalQrW,
-                height: finalQrH
+                width: finalSquareSize,
+                height: finalSquareSize
             });
-            
-            /* ─── BLOCK 2: INJECT THE DIGITAL INK STAMP (IF PLACED) ─── */
+
+            /* ─── BLOCK 2: INJECT THE DIGITAL INK STAMP (RESTORED ASPECT RATIO MATH) ─── */
             if (isStampPlaced && stampImgDataUrl) {
                 const stampImageObject = await pdfDoc.embedPng(stampImgDataUrl);
 
                 const finalStampLeft = isStampLocked ? (stampPosX - 60) : (parseFloat(stampMarker.style.left) || (stampPosX - 60));
                 const finalStampTop = isStampLocked ? (stampPosY - 60) : (parseFloat(stampMarker.style.top) || (stampPosY - 60));
 
+                let docStampW = (stampMarker.clientWidth / actualWorkspaceWidth) * width;
+                let docStampH = (stampMarker.clientHeight / actualWorkspaceHeight) * height;
+                
+                // ⚠️ CRITICAL ASPECT-RATIO FIX RULES RESTORED UNTOUCHED ⚠️
+                const currentSelectedShapeType = document.getElementById('stampShape').value;
+                if (currentSelectedShapeType === 'circle' || currentSelectedShapeType === 'square') {
+                    const unifiedSquareDimensionValue = Math.max(docStampW, docStampH);
+                    docStampW = unifiedSquareDimensionValue;
+                    docStampH = unifiedSquareDimensionValue;
+                }
+
                 const docStampX = (finalStampLeft / actualWorkspaceWidth) * width;
-                const docStampY = height - ((finalStampTop / actualWorkspaceHeight) * height) - ((stampMarker.clientHeight / actualWorkspaceHeight) * height);
-                const docStampW = (stampMarker.clientWidth / actualWorkspaceWidth) * width;
-                const docStampH = (stampMarker.clientHeight / actualWorkspaceHeight) * height;
+                const docStampY = height - ((finalStampTop / actualWorkspaceHeight) * height) - docStampH;
                 
                 targetExportPage.drawImage(stampImageObject, {
                     x: docStampX,
@@ -842,17 +856,18 @@
                 });
             }
 
-            /* ─── BLOCK 3: INJECT THE ELECTRONIC SIGNATURE (IF PLACED) ─── */
+            /* ─── BLOCK 3: INJECT THE ELECTRONIC SIGNATURE (SEPARATE CONTAINER LAYER) ─── */
             if (isSigPlaced && sigImgDataUrl && signatureMarker) {
                 const sigImageObject = await pdfDoc.embedPng(sigImgDataUrl);
 
                 const finalSigLeft = isSigLocked ? (sigPosX - 70) : (parseFloat(signatureMarker.style.left) || (sigPosX - 70));
                 const finalSigTop = isSigLocked ? (sigPosY - 70) : (parseFloat(signatureMarker.style.top) || (sigPosY - 70));
 
+                let docSigW = (signatureMarker.clientWidth / actualWorkspaceWidth) * width;
+                let docSigH = (signatureMarker.clientHeight / actualWorkspaceHeight) * height;
+
                 const docSigX = (finalSigLeft / actualWorkspaceWidth) * width;
-                const docSigY = height - ((finalSigTop / actualWorkspaceHeight) * height) - ((signatureMarker.clientHeight / actualWorkspaceHeight) * height);
-                const docSigW = (signatureMarker.clientWidth / actualWorkspaceWidth) * width;
-                const docSigH = (signatureMarker.clientHeight / actualWorkspaceHeight) * height;
+                const docSigY = height - ((finalSigTop / actualWorkspaceHeight) * height) - docSigH;
                 
                 targetExportPage.drawImage(sigImageObject, {
                     x: docSigX,
@@ -862,7 +877,6 @@
                 });
             }
 
-            // Save modified document bytes array and compile local download trigger
             const pdfData = await pdfDoc.save();
             const link = document.createElement('a');
             link.href = URL.createObjectURL(new Blob([pdfData], { type: 'application/pdf' }));
@@ -872,6 +886,7 @@
             alert("Download Processing Failure: " + e.message); 
         }
     };
+
 
     document.getElementById('prodName').oninput = (e) => {
         document.getElementById('charCounter').innerText = `${e.target.value.length}/35`;
