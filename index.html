@@ -566,17 +566,45 @@
         document.getElementById('click-overlay').style.display = 'block';
         setTimeout(() => { note.style.display = 'none'; }, 4000);
     };
-    document.getElementById('click-overlay').onclick = (e) => {
+        document.getElementById('click-overlay').onclick = (e) => {
         const rect = document.getElementById('workspace-scaler').getBoundingClientRect();
         
-        posX = (e.clientX - rect.left); 
-        posY = (e.clientY - rect.top);
+        // Get raw coordinates relative to the full scrolling viewport frame
+        let rawPosX = (e.clientX - rect.left); 
+        let rawPosY = (e.clientY - rect.top);
+        
+        // ⚠️ 🌟 HIGH-PRECISION FIX: Reset vertical coordinate layout relative to clicked page 🌟 ⚠️
+        if (typeof pdfDoc !== 'undefined' && pdfDoc.getPages) {
+            const documentTotalPagesList = pdfDoc.getPages();
+            if (documentTotalPagesList.length > 1) {
+                // Determine the physical pixel height of a single page container
+                const singlePageHeight = rect.height / documentTotalPagesList.length;
+                
+                // Track exactly which page index was selected under the mouse click pointer
+                currentActivePageIndex = Math.floor(rawPosY / singlePageHeight);
+                currentActivePageIndex = Math.max(0, Math.min(documentTotalPagesList.length - 1, currentActivePageIndex));
+                
+                // Subtract the heights of all previous pages to make positioning relative to current page top edge
+                posX = rawPosX;
+                posY = rawPosY - (currentActivePageIndex * singlePageHeight);
+                console.log("🎯 QR Anchor Locked - Target Page:", currentActivePageIndex + 1, "Page-Relative posY:", posY);
+            } else {
+                currentActivePageIndex = 0;
+                posX = rawPosX;
+                posY = rawPosY;
+            }
+        } else {
+            currentActivePageIndex = 0;
+            posX = rawPosX;
+            posY = rawPosY;
+        }
         
         const halfMarkerWidth = marker.clientWidth / 2 || 40;
         const halfMarkerHeight = marker.clientHeight / 2 || 40;
         
-        marker.style.left = (posX - halfMarkerWidth) + 'px'; 
-        marker.style.top = (posY - halfMarkerHeight) + 'px';
+        // Retain original onscreen visual positioning rules matching user view tracking precisely
+        marker.style.left = (rawPosX - halfMarkerWidth) + 'px'; 
+        marker.style.top = (rawPosY - halfMarkerHeight) + 'px';
         marker.style.display = 'flex';
         
         const name = document.getElementById('payeeName').value || "Merchant";
@@ -618,11 +646,39 @@
     document.getElementById('click-overlay-stamp').onclick = (e) => {
         const rect = document.getElementById('workspace-scaler').getBoundingClientRect();
         
-        stampPosX = (e.clientX - rect.left); 
-        stampPosY = (e.clientY - rect.top);
+        // Get raw coordinates relative to the full scrolling viewport frame
+        let rawStampPosX = (e.clientX - rect.left); 
+        let rawStampPosY = (e.clientY - rect.top);
+
+        // ⚠️ 🌟 HIGH-PRECISION FIX: Reset vertical coordinate layout relative to clicked page 🌟 ⚠️
+        if (typeof pdfDoc !== 'undefined' && pdfDoc.getPages) {
+            const documentTotalPagesList = pdfDoc.getPages();
+            if (documentTotalPagesList.length > 1) {
+                // Determine the physical pixel height of a single page container
+                const singlePageHeight = rect.height / documentTotalPagesList.length;
+                
+                // Track exactly which page index was selected under the mouse click pointer
+                currentActivePageIndex = Math.floor(rawStampPosY / singlePageHeight);
+                currentActivePageIndex = Math.max(0, Math.min(documentTotalPagesList.length - 1, currentActivePageIndex));
+                
+                // Subtract the heights of all previous pages to make positioning relative to current page top edge
+                stampPosX = rawStampPosX;
+                stampPosY = rawStampPosY - (currentActivePageIndex * singlePageHeight);
+                console.log("🎯 Stamp Anchor Locked - Target Page:", currentActivePageIndex + 1, "Page-Relative stampPosY:", stampPosY);
+            } else {
+                currentActivePageIndex = 0;
+                stampPosX = rawStampPosX;
+                stampPosY = rawStampPosY;
+            }
+        } else {
+            currentActivePageIndex = 0;
+            stampPosX = rawStampPosX;
+            stampPosY = rawStampPosY;
+        }
         
-        stampMarker.style.left = (stampPosX - 60) + 'px';
-        stampMarker.style.top = (stampPosY - 60) + 'px';
+        // Retain original onscreen visual positioning rules matching user view tracking precisely
+        stampMarker.style.left = (rawStampPosX - 60) + 'px';
+        stampMarker.style.top = (rawStampPosY - 60) + 'px';
         stampMarker.style.display = 'flex';
         
         isStampPlaced = true;
