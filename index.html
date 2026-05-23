@@ -367,7 +367,7 @@
                 <div id="click-overlay-stamp" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1005; display: none; background: rgba(0,0,0,0.01);"></div>
                 
                 <!-- Interactive Asset Placement Holders Matrix -->
-                <div id="qr-marker">
+                                <div id="qr-marker">
                     <div style="font-size:18px;">🎯</div>
                     <span>DRAG & RESIZE</span>
                     <div id="qr-graphic-target" style="width: 100%; height: 100%; position: absolute; top:0; left:0; background:white; display:none;"></div>
@@ -377,26 +377,45 @@
                     <span>STAMP PLACEHOLDER</span>
                 </div>
                 
-            </div> <!-- 1. Closes #workspace-scaler cleanly -->
-        </section> <!-- 2. Closes your main preview panel container safely -->
-    </main> <!-- 3. Closes .main-layout grid structural parent safely -->
-</div> <!-- 4. Closes the main parent .container layout safely -->
-
+                <!-- 🌟 INDEPENDENT SIGNATURE TRACKER MARKER INSTANTIATED CLEANLY -->
+                <div id="signature-marker" style="position: absolute; width: 140px; height: 70px; border: 2px dashed #1d4ed8; display: none; align-items: center; justify-content: center; z-index: 2006; cursor: move; background: rgba(29, 78, 216, 0.02); mix-blend-mode: multiply; filter: drop-shadow(0.5px 0.5px 0.5px rgba(0,0,0,0.15)); resize: both; overflow: hidden;">
+                    <span>SIGNATURE PLACEHOLDER</span>
+                </div>
+            </div> <!-- Closes #workspace-scaler cleanly -->
+            
+            <!-- Your floating zoom panel controls go here natively -->
+            <div class="zoom-controls-bar">
+                <button class="zoom-btn" id="zoomOutBtn">−</button>
+                <div class="zoom-display" id="zoomValueLabel">100%</div>
+                <button class="zoom-btn" id="zoomInBtn">+</button>
+            </div>
+        </div> <!-- 🌟 FIXED: Closes #dropzone / .preview-area div box wrapper safely -->
+    </div> <!-- 🌟 FIXED: Closes .main-layout grid structural parent safely -->
+</div> <!-- 🌟 FIXED: Closes the main parent .container layout safely -->
 
 <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/easyqrcodejs@4.6.2/dist/easy.qrcode.min.js"></script>
 <script>
     // --- 🌟 RESTORED: Unified Global Architecture State Variables ---
-    const currentZoomScale = 1.0; // Hardened locked baseline ratio mapping multiplier
+       const currentZoomScale = 1.0; // Hardened locked baseline ratio mapping multiplier
     let originalBytes = null;
     let productsList = [];
     
-    // Core placement interaction coordinate states
+    // Core placement interaction coordinate states (QR Code Engine)
     let posX = 100, posY = 100, isQrPlaced = false, isDragging = false;
-    let stampPosX = 250, stampPosY = 100, isStampPlaced = false, isStampDragging = false;
-    let stampImgDataUrl = null, isQrLocked = false, isStampLocked = false;
-    let offsetX = 0, offsetY = 0, stampOffsetX = 0, stampOffsetY = 0;
+    let isQrLocked = false;
+    let offsetX = 0, offsetY = 0;
     let currentActivePageIndex = 0;
+
+    // Core placement interaction coordinate states (Digital Stamp Engine)
+    let stampPosX = 250, stampPosY = 100, isStampPlaced = false, isStampDragging = false;
+    let stampImgDataUrl = null, isStampLocked = false;
+    let stampOffsetX = 0, stampOffsetY = 0;
+
+    // 🌟 SEPARATED INDEPENDENT TRACKING VARIABLES FOR SIGNATURE ENGINE 🌟
+    let sigPosX = 80, sigPosY = 200, isSigPlaced = false, isSigDragging = false;
+    let sigImgDataUrl = null, isSigLocked = false;
+    let sigOffsetX = 0, sigOffsetY = 0;
 
     // Element Target Caches
     const gearIcon = document.getElementById('gearIcon');
@@ -406,6 +425,7 @@
     const lockStampBtn = document.getElementById('lockStampBtn');
     const marker = document.getElementById('qr-marker');
     const stampMarker = document.getElementById('stamp-marker');
+    const signatureMarker = document.getElementById('signature-marker'); // 🌟 Added cache node
     const note = document.getElementById('on-screen-note');
 
     // --- System-Wide Local Initialization Lifecycle Sync ---
@@ -568,7 +588,7 @@
         }
     };
 
-    stampMarker.onmousedown = (e) => { 
+        stampMarker.onmousedown = (e) => { 
         if (isStampLocked) return; 
         if (e.offsetX < stampMarker.clientWidth - 15 && e.offsetY < stampMarker.clientHeight - 15) {
             isStampDragging = true; 
@@ -577,7 +597,17 @@
         }
     };
 
-    // --- 🖱️ RESTORED: Mouse Move Drag Tracking Logic ---
+    // 🌟 SEPARATE MOUSE DOWN INFRASTRUCTURE FOR SIGNATURE ELEMENT
+    signatureMarker.onmousedown = (e) => { 
+        if (isSigLocked) return; 
+        if (e.offsetX < signatureMarker.clientWidth - 15 && e.offsetY < signatureMarker.clientHeight - 15) {
+            isSigDragging = true; 
+            sigOffsetX = e.clientX - signatureMarker.getBoundingClientRect().left;
+            sigOffsetY = e.clientY - signatureMarker.getBoundingClientRect().top;
+        }
+    };
+
+    // --- 🖱️ RESTORED: Mouse Move Drag Tracking Logic with Signature Support ---
     window.onmousemove = (e) => {
         const rect = document.getElementById('workspace-scaler').getBoundingClientRect();
         if (isDragging && !isQrLocked) {
@@ -600,17 +630,40 @@
             stampMarker.style.left = stampPosX + 'px';
             stampMarker.style.top = stampPosY + 'px';
         }
+        // 🌟 SEPARATED SIGNATURE MOUSE TRACKING BOUNDS
+        if (isSigDragging && !isSigLocked) {
+            sigPosX = (e.clientX - rect.left) - sigOffsetX;
+            sigPosY = (e.clientY - rect.top) - sigOffsetY;
+            
+            sigPosX = Math.max(0, Math.min(rect.width - signatureMarker.clientWidth, sigPosX));
+            sigPosY = Math.max(0, Math.min(rect.height - signatureMarker.clientHeight, sigPosY));
+            
+            signatureMarker.style.left = sigPosX + 'px';
+            signatureMarker.style.top = sigPosY + 'px';
+        }
     };
 
     window.onmouseup = () => {
         isDragging = false;
         isStampDragging = false;
+        isSigDragging = false; // 🌟 Safely release signature tracker drag thread
     };
 
-    // --- 📱 RESTORED: Mobile Touch Move Drag Tracking Logic ---
+    // 🌟 SEPARATE MOBILE TOUCH INFRASTRUCTURE FOR SIGNATURE ELEMENT
+    signatureMarker.ontouchstart = (e) => {
+        if (isSigLocked) return;
+        isSigDragging = true;
+        const touch = e.touches[0] || e.changedTouches[0];
+        if (!touch) return;
+        const rect = signatureMarker.getBoundingClientRect();
+        sigOffsetX = touch.clientX - rect.left;
+        sigOffsetY = touch.clientY - rect.top;
+    };
+
+    // --- 📱 RESTORED: Mobile Touch Move Drag Tracking Logic with Signature Support ---
     window.addEventListener('touchmove', (e) => {
-        if (!isDragging && !isStampDragging) return;
-        const touch = e.touches || e.changedTouches;
+        if (!isDragging && !isStampDragging && !isSigDragging) return;
+        const touch = e.touches[0] || e.changedTouches[0];
         if (!touch) return;
         const rect = document.getElementById('workspace-scaler').getBoundingClientRect();
         
@@ -635,19 +688,32 @@
             stampMarker.style.left = stampPosX + 'px';
             stampMarker.style.top = stampPosY + 'px';
         }
+
+        // 🌟 SEPARATED SIGNATURE RESPONSIVE TOUCH TRACKING BOUNDS
+        if (signatureMarker.style.display === 'flex' && !isSigLocked && isSigDragging) {
+            sigPosX = (touch.clientX - rect.left) - sigOffsetX;
+            sigPosY = (touch.clientY - rect.top) - sigOffsetY;
+            
+            sigPosX = Math.max(0, Math.min(rect.width - signatureMarker.clientWidth, sigPosX));
+            sigPosY = Math.max(0, Math.min(rect.height - signatureMarker.clientHeight, sigPosY));
+            
+            signatureMarker.style.left = sigPosX + 'px';
+            signatureMarker.style.top = sigPosY + 'px';
+        }
     }, { passive: false }); 
 
     window.addEventListener('touchend', () => {
         isDragging = false;
         isStampDragging = false;
+        isSigDragging = false;
     });
 // =========================================================================
 
-    // ... Your keydown handlers and text-counter listeners continue safely below ...
+    /* ==========================================================================
+       KEYBOARD CONTROLS (ENTER KEY LOCKS ALL TRACKED ELEMENT POSITIONS)
+       ========================================================================== */
     window.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
-        // ...
-
             if (!originalBytes) return;
             
             let toastMessage = "";
@@ -668,10 +734,21 @@
                 stampMarker.style.borderStyle = "solid"; 
                 stampMarker.style.borderColor = "#059669"; 
                 stampMarker.style.cursor = "default";
-                toastMessage += "🏵️ Stamp Position Locked!";
+                toastMessage += "🏵️ Stamp Position Locked! ";
+            }
+
+            // 🌟 SEPARATED SIGNATURE LOCK MATRIX SYSTEM
+            if (signatureMarker.style.display === 'flex' && !isSigLocked) {
+                isSigLocked = true;
+                sigPosX = (parseFloat(signatureMarker.style.left) || sigPosX) + 70;
+                sigPosY = (parseFloat(signatureMarker.style.top) || sigPosY) + 70;
+                signatureMarker.style.borderStyle = "solid";
+                signatureMarker.style.borderColor = "#059669";
+                signatureMarker.style.cursor = "default";
+                toastMessage += "✍️ Signature Position Locked!";
             }
             
-                        if (toastMessage !== "") {
+            if (toastMessage !== "") {
                 document.getElementById('previewBtn').style.display = 'block';
                 document.getElementById('downloadBtn').style.display = 'block';
 
