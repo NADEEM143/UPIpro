@@ -2042,10 +2042,6 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
     };
 
        
-        /* ==========================================================================
-       📑 GLOBAL MULTI-PAGE MONITOR INTERCEPTOR LAYER (PARITY REALIGNED)
-       ========================================================================== */
-    // ⚠️ CRITICAL OVERRIDE: Unified memory syncing matrix for absolute multi-page targeting
     function syncActivePageTrackIndex(pageNum) {
         const parsed = parseInt(pageNum, 10);
         if (!isNaN(parsed) && parsed > 0) {
@@ -2101,6 +2097,72 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
             }
         });
     }
+    // ------------------------------------
+
+    /* ==========================================================================
+       🚀 ENTERPRISE MULTI-PAGE DESCRIPTOR INTERSECTION ENGINE (WORLD-CLASS FIX)
+       ========================================================================== */
+    // Automatically watches visible page nodes on your screen and syncs background memory
+    const initializeWorldClassPageObserver = () => {
+        // Target individual page container classes inside your PDF scrolling viewer container
+        // Matches standard wrappers like .page, [data-page-number], .pdf-page, or canvas frames
+        const scrollPageNodes = document.querySelectorAll('.page, [data-page-number], .pdf-page, #workspace-scaler canvas');
+        
+        if (scrollPageNodes.length === 0) {
+            // Fallback: If no sub-pages are rendered yet, look for a standard container viewport scroll
+            const fallbackScaler = document.getElementById('workspace-scaler');
+            if (fallbackScaler) {
+                fallbackScaler.addEventListener('scroll', () => {
+                    if (typeof pdfDoc !== 'undefined' && pdfDoc.getPages) {
+                        const totalCount = pdfDoc.getPages().length;
+                        const scrollPct = fallbackScaler.scrollTop / (fallbackScaler.scrollHeight - fallbackScaler.clientHeight);
+                        currentActivePageIndex = Math.max(0, Math.min(totalCount - 1, Math.floor(scrollPct * totalCount)));
+                    }
+                });
+            }
+            return;
+        }
+
+        const pageViewSettings = {
+            root: document.getElementById('workspace-scaler') || null, // Watches view viewport scrolling frame bounding box
+            rootMargin: '0px',
+            threshold: 0.55 // Triggers instantly when 55% of a page sheet area occupies the viewport screen center
+        };
+
+        const activePageObserver = new IntersectionObserver((entriesCollection) => {
+            entriesCollection.forEach((entryElement) => {
+                if (entryElement.isIntersecting) {
+                    // Extract page numerical values dynamically from standard native attributes or loop indexes
+                    let detectedPageNumber = parseInt(entryElement.target.getAttribute('data-page-number') || entryElement.target.getAttribute('id'), 10);
+                    
+                    if (isNaN(detectedPageNumber)) {
+                        // Backup fallback mapping: Match order position arrays index inside parent container nodes
+                        const pagesArrayElementsList = Array.from(scrollPageNodes);
+                        detectedPageNumber = pagesArrayElementsList.indexOf(entryElement.target) + 1;
+                    }
+
+                    if (detectedPageNumber > 0) {
+                        currentActivePageIndex = detectedPageNumber - 1;
+                        console.log("Aura Tracking Portal Locked Context Page Index:", currentActivePageIndex);
+                    }
+                }
+            });
+        }, pageViewSettings);
+
+        // Bind intersection listener directly across every single sheet page container element node
+        scrollPageNodes.forEach(pageNode => activePageObserver.observe(pageNode));
+    };
+
+    // Re-trigger the page observer whenever a new document file buffer changes or initializes onto screen
+    const fileInputElementTarget = document.getElementById('fileInput');
+    if (fileInputElementTarget) {
+        fileInputElementTarget.addEventListener('change', () => {
+            setTimeout(initializeWorldClassPageObserver, 800); // Gives document graphics time to render onto screen arrays
+        });
+    }
+
+    // Auto-boot observer hook once document initializes window viewports
+    setTimeout(initializeWorldClassPageObserver, 1500);
     // ------------------------------------
 
     /* ==========================================================================
