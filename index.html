@@ -840,7 +840,7 @@
                 const finalStampLeft = (isStampLocked ? (stampPosX - 60) : (parseFloat(stampMarker.style.left) || (stampPosX - 60))) / currentResponsiveLayoutScaleFactorX;
                 const finalStampTop = (isStampLocked ? (stampPosY - 60) : (parseFloat(stampMarker.style.top) || (stampPosY - 60))) / currentResponsiveLayoutScaleFactorY;
 
-                // ⚠️ CLONED LOGIC: Uses your exact Math.max logic to make it a perfect circle
+                // ⚠️ UNTOUCHED LOGIC: Uses your exact Math.max logic to make it a perfect circle
                 let stampWidthCalc = (stampMarker.clientWidth / actualWorkspaceWidth) * width;
                 let stampHeightCalc = (stampMarker.clientHeight / actualWorkspaceHeight) * height;
                 let uniformStampSize = Math.max(stampWidthCalc, stampHeightCalc);
@@ -856,26 +856,25 @@
                 });
             }
 
-            /* ─── BLOCK 3: INJECT THE ELECTRONIC SIGNATURE (CLONED UNIFORM SQUARE MATH) ─── */
+            /* ─── BLOCK 3: INJECT THE ELECTRONIC SIGNATURE (PRESERVE NATURAL SHAPE RECTANGLE) ─── */
             if (isSigPlaced && sigImgDataUrl && signatureMarker) {
                 const sigImageObject = await pdfDoc.embedPng(sigImgDataUrl);
 
                 const finalSigLeft = (isSigLocked ? (sigPosX - 70) : (parseFloat(signatureMarker.style.left) || (sigPosX - 70))) / currentResponsiveLayoutScaleFactorX;
                 const finalSigTop = (isSigLocked ? (sigPosY - 70) : (parseFloat(signatureMarker.style.top) || (sigPosY - 70))) / currentResponsiveLayoutScaleFactorY;
 
-                // ⚠️ CLONED LOGIC: Uses your exact Math.max logic to keep perfect signature aspect ratios
-                let sigWidthCalc = (signatureMarker.clientWidth / actualWorkspaceWidth) * width;
-                let sigHeightCalc = (signatureMarker.clientHeight / actualWorkspaceHeight) * height;
-                let uniformSigSize = Math.max(sigWidthCalc, sigHeightCalc);
+                // ⚠️ FIXED LOGIC: Kept width and height completely natural to protect the widescreen signature look
+                let docSigW = (signatureMarker.clientWidth / actualWorkspaceWidth) * width;
+                let docSigH = (signatureMarker.clientHeight / actualWorkspaceHeight) * height;
 
                 const docSigX = (finalSigLeft / actualWorkspaceWidth) * width;
-                const docSigY = height - (finalSigTop / actualWorkspaceHeight) * height - uniformSigSize;
+                const docSigY = height - (finalSigTop / actualWorkspaceHeight) * height - docSigH;
                 
                 targetExportPage.drawImage(sigImageObject, {
                     x: docSigX,
                     y: docSigY,
-                    width: uniformSigSize,
-                    height: uniformSigSize
+                    width: docSigW,
+                    height: docSigH
                 });
             }
 
@@ -1756,27 +1755,27 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
                     });
                 }
 
+                                /* ─── BLOCK 3: INJECT THE ELECTRONIC SIGNATURE (PRESERVE NATURAL SHAPE RECTANGLE) ─── */
                 if (isSigPlaced && sigImgDataUrl && signatureMarker) {
                     const sigImageObject = await pdfDoc.embedPng(sigImgDataUrl);
 
                     const sigLeftStyle = isSigLocked ? (sigPosX - 70) : (parseFloat(signatureMarker.style.left) || (sigPosX - 70));
                     const sigTopStyle = isSigLocked ? (sigPosY - 70) : (parseFloat(signatureMarker.style.top) || (sigPosY - 70));
 
+                    // ⚠️ LOGIC UPDATED: Kept width and height completely natural to protect aspect ratio
                     let docSigW = (signatureMarker.clientWidth / actualWorkspaceWidth) * width;
                     let docSigH = (signatureMarker.clientHeight / actualWorkspaceHeight) * height;
-                    const uniformSigSize = Math.max(docSigW, docSigH);
 
                     const docSigX = (sigLeftStyle / actualWorkspaceWidth) * width;
-                    const docSigY = height - (sigTopStyle / actualWorkspaceHeight) * height - uniformSigSize;
+                    const docSigY = height - (sigTopStyle / actualWorkspaceHeight) * height - docSigH;
 
                     targetExportPage.drawImage(sigImageObject, {
                         x: docSigX,
                         y: docSigY,
-                        width: uniformSigSize,
-                        height: uniformSigSize
+                        width: docSigW,
+                        height: docSigH
                     });
                 }
-
                 const previewPdfBytes = await pdfDoc.save();
                 const previewBlobUrl = URL.createObjectURL(new Blob([previewPdfBytes], { type: 'application/pdf' }));
 
