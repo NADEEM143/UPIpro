@@ -765,13 +765,13 @@
         }
     });
    
-       document.getElementById('downloadBtn').onclick = async () => {
+           document.getElementById('downloadBtn').onclick = async () => {
         try {
             const name = document.getElementById('payeeName').value;
             const vpa = document.getElementById('vpa').value;
             const amt = document.getElementById('amount').value;
             
-            // Generates an automated unique daily transaction reference ID to pass NPCI retail guidelines
+            // Generates an automated unique daily transaction reference ID to pass NCPI retail guidelines
             const uniqueTxnRefId = "INV" + Date.now(); 
             const upi = `upi://pay?pa=${vpa}&pn=${encodeURIComponent(name)}&cu=INR&am=${parseFloat(amt || 0).toFixed(2)}&tr=${uniqueTxnRefId}&mc=0000&mode=02&purpose=00`;
             
@@ -809,9 +809,10 @@
                 actualWorkspaceHeight = preview.offsetHeight;
             }
 
-            const currentResponsiveLayoutScaleFactorX = imgFrameNode.offsetWidth / actualWorkspaceWidth;
-            const currentResponsiveLayoutScaleFactorY = imgFrameNode.offsetHeight / actualWorkspaceHeight;
+            const currentResponsiveLayoutScaleFactorX = imgFrameNode.offsetWidth / actualWorkspaceWidth || 1;
+            const currentResponsiveLayoutScaleFactorY = imgFrameNode.offsetHeight / actualWorkspaceHeight || 1;
 
+            /* ─── BLOCK 1: INJECT THE REAL-TIME UPI QR CODE ─── */
             const finalLeftPos = (isQrLocked ? (posX - 40) : (parseFloat(marker.style.left) || (posX - 40))) / currentResponsiveLayoutScaleFactorX;
             const finalTopPos = (isQrLocked ? (posY - 40) : (parseFloat(marker.style.top) || (posY - 40))) / currentResponsiveLayoutScaleFactorY;
 
@@ -819,7 +820,7 @@
             const finalQrHeight = (marker.clientHeight / actualWorkspaceHeight) * height;
             const finalSquareSize = Math.max(finalQrWidth, finalQrHeight);
 
-                        const pdfX = (finalLeftPos / actualWorkspaceWidth) * width;
+            const pdfX = (finalLeftPos / actualWorkspaceWidth) * width;
             const pdfY = height - (finalTopPos / actualWorkspaceHeight) * height - finalSquareSize;
 
             targetExportPage.drawImage(qrImage, {
@@ -829,6 +830,7 @@
                 height: finalSquareSize
             });
             
+            /* ─── BLOCK 2: INJECT THE DIGITAL INK STAMP (IF PLACED) ─── */
             if (isStampPlaced && stampImgDataUrl) {
                 const stampImageObject = await pdfDoc.embedPng(stampImgDataUrl);
 
@@ -856,6 +858,29 @@
                 });
             }
 
+            /* ─── BLOCK 3: INJECT THE ELECTRONIC SIGNATURE (IF PLACED) ─── */
+            // 🌟 FIXED: Completely separate track handles signature injection independently at the same time
+            if (isSigPlaced && sigImgDataUrl && signatureMarker) {
+                const sigImageObject = await pdfDoc.embedPng(sigImgDataUrl);
+
+                const finalSigLeft = (isSigLocked ? (sigPosX - 70) : (parseFloat(signatureMarker.style.left) || (sigPosX - 70))) / currentResponsiveLayoutScaleFactorX;
+                const finalSigTop = (isSigLocked ? (sigPosY - 70) : (parseFloat(signatureMarker.style.top) || (sigPosY - 70))) / currentResponsiveLayoutScaleFactorY;
+
+                let docSigW = (signatureMarker.clientWidth / actualWorkspaceWidth) * width;
+                let docSigH = (signatureMarker.clientHeight / actualWorkspaceHeight) * height;
+
+                const docSigX = (finalSigLeft / actualWorkspaceWidth) * width;
+                const docSigY = height - ((finalSigTop / actualWorkspaceHeight) * height) - docSigH;
+                
+                targetExportPage.drawImage(sigImageObject, {
+                    x: docSigX,
+                    y: docSigY,
+                    width: docSigW,
+                    height: docSigH
+                });
+            }
+
+            // Save modified document bytes array and compile local download trigger
             const pdfData = await pdfDoc.save();
             const link = document.createElement('a');
             link.href = URL.createObjectURL(new Blob([pdfData], { type: 'application/pdf' }));
