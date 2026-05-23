@@ -705,11 +705,9 @@
         isStampDragging = false;
         isSigDragging = false;
     });
-// =========================================================================
-
-    /* ==========================================================================
-       KEYBOARD CONTROLS (ENTER KEY LOCKS ALL TRACKED ELEMENT POSITIONS)
-       ========================================================================== */
+    // =========================================================================
+    // 🌟 RESTORED: Untouched Keyboard Event Listeners for Object Locking
+    // =========================================================================
     window.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
             if (!originalBytes) return;
@@ -735,8 +733,7 @@
                 toastMessage += "🏵️ Stamp Position Locked! ";
             }
 
-            // 🌟 SEPARATED SIGNATURE LOCK MATRIX SYSTEM
-            if (signatureMarker.style.display === 'flex' && !isSigLocked) {
+            if (signatureMarker && signatureMarker.style.display === 'flex' && !isSigLocked) {
                 isSigLocked = true;
                 sigPosX = (parseFloat(signatureMarker.style.left) || sigPosX) + 70;
                 sigPosY = (parseFloat(signatureMarker.style.top) || sigPosY) + 70;
@@ -762,9 +759,12 @@
             }
         }
     });
-   
-                   /* ==========================================================================
-       ⚡ DOWNLOAD CORE: FIXED ASPECT RATIO SYSTEM STAMP AND SIGNATURE BOTH
+
+    /* ==========================================================================
+       ⚡ DOWNLOAD CORE: RESTORED ORIGINAL PROPORTIONAL SQUARE MATH FOR ALL
+       ========================================================================== */
+        /* ==========================================================================
+       ⚡ DOWNLOAD CORE: RESTORED ORIGINAL PROPORTIONAL SQUARE MATH FOR ALL
        ========================================================================== */
     document.getElementById('downloadBtn').onclick = async () => {
         try {
@@ -787,38 +787,44 @@
             const pdfDoc = await PDFLib.PDFDocument.load(originalBytes);
             
             const pagesCollection = pdfDoc.getPages();
-            const targetExportPage = pagesCollection[currentActivePageIndex] || pagesCollection[0];
+            const targetExportPage = pagesCollection[currentActivePageIndex] || pagesCollection;
 
             const qrImage = await pdfDoc.embedPng(qrImgDataUrl);
             
             const { width, height } = targetExportPage.getSize();
-            const preview = document.getElementById('dropzone');
+            const preview = document.getElementById('workspace-scaler');
             
             const pdfFrameNode = document.getElementById('pdf-frame');
             const imgFrameNode = document.getElementById('image-frame');
             
-            let actualWorkspaceWidth = preview.offsetWidth;
-            let actualWorkspaceHeight = preview.offsetHeight;
+            let actualWorkspaceWidth = 1;
+            let actualWorkspaceHeight = 1;
             
-            if (pdfFrameNode && window.getComputedStyle(pdfFrameNode).display === 'block') {
+            if (pdfFrameNode && pdfFrameNode.style.display === 'block') {
                 actualWorkspaceWidth = pdfFrameNode.offsetWidth;
                 actualWorkspaceHeight = pdfFrameNode.offsetHeight;
-            } else if (imgFrameNode && window.getComputedStyle(imgFrameNode).display === 'block') {
-                actualWorkspaceWidth = imgFrameNode.offsetWidth;
-                actualWorkspaceHeight = imgFrameNode.offsetHeight;
+            } else if (imgFrameNode && imgFrameNode.style.display === 'block') {
+                actualWorkspaceWidth = imgFrameNode.naturalWidth;
+                actualWorkspaceHeight = imgFrameNode.naturalHeight;
+            } else {
+                actualWorkspaceWidth = preview.offsetWidth;
+                actualWorkspaceHeight = preview.offsetHeight;
             }
 
-            // High Precision Web Dev Resolution Scale Calculators
-            const finalLeftPos = isQrLocked ? (posX - 40) : (parseFloat(marker.style.left) || (posX - 40));
-            const finalTopPos = isQrLocked ? (posY - 40) : (parseFloat(marker.style.top) || (posY - 40));
+            // original scaling factor calculations (untouched)
+            const currentResponsiveLayoutScaleFactorX = imgFrameNode.offsetWidth / actualWorkspaceWidth || 1;
+            const currentResponsiveLayoutScaleFactorY = imgFrameNode.offsetHeight / actualWorkspaceHeight || 1;
+
+            /* ─── BLOCK 1: INJECT THE REAL-TIME UPI QR CODE (UNTOUCHED ORIGINAL LOGIC) ─── */
+            const finalLeftPos = (isQrLocked ? (posX - 40) : (parseFloat(marker.style.left) || (posX - 40))) / currentResponsiveLayoutScaleFactorX;
+            const finalTopPos = (isQrLocked ? (posY - 40) : (parseFloat(marker.style.top) || (posY - 40))) / currentResponsiveLayoutScaleFactorY;
 
             const finalQrWidth = (marker.clientWidth / actualWorkspaceWidth) * width;
             const finalQrHeight = (marker.clientHeight / actualWorkspaceHeight) * height;
             const finalSquareSize = Math.max(finalQrWidth, finalQrHeight);
 
-            // Translate HTML UI layout points directly to standard PDF vector matrix rows
             const pdfX = (finalLeftPos / actualWorkspaceWidth) * width;
-            const pdfY = height - ((finalTopPos / actualWorkspaceHeight) * height) - finalSquareSize;
+            const pdfY = height - (finalTopPos / actualWorkspaceHeight) * height - finalSquareSize;
 
             targetExportPage.drawImage(qrImage, {
                 x: pdfX,
@@ -826,54 +832,50 @@
                 width: finalSquareSize,
                 height: finalSquareSize
             });
-
-            /* ─── BLOCK 2: INJECT THE DIGITAL INK STAMP (RESTORED ASPECT RATIO MATH) ─── */
+            
+            /* ─── BLOCK 2: INJECT THE DIGITAL INK STAMP (CLONED UNIFORM SQUARE MATH) ─── */
             if (isStampPlaced && stampImgDataUrl) {
                 const stampImageObject = await pdfDoc.embedPng(stampImgDataUrl);
 
-                const finalStampLeft = isStampLocked ? (stampPosX - 60) : (parseFloat(stampMarker.style.left) || (stampPosX - 60));
-                const finalStampTop = isStampLocked ? (stampPosY - 60) : (parseFloat(stampMarker.style.top) || (stampPosY - 60));
+                const finalStampLeft = (isStampLocked ? (stampPosX - 60) : (parseFloat(stampMarker.style.left) || (stampPosX - 60))) / currentResponsiveLayoutScaleFactorX;
+                const finalStampTop = (isStampLocked ? (stampPosY - 60) : (parseFloat(stampMarker.style.top) || (stampPosY - 60))) / currentResponsiveLayoutScaleFactorY;
 
-                let docStampW = (stampMarker.clientWidth / actualWorkspaceWidth) * width;
-                let docStampH = (stampMarker.clientHeight / actualWorkspaceHeight) * height;
-                
-                // ⚠️ CRITICAL ASPECT-RATIO FIX RULES RESTORED UNTOUCHED ⚠️
-                const currentSelectedShapeType = document.getElementById('stampShape').value;
-                if (currentSelectedShapeType === 'circle' || currentSelectedShapeType === 'square') {
-                    const unifiedSquareDimensionValue = Math.max(docStampW, docStampH);
-                    docStampW = unifiedSquareDimensionValue;
-                    docStampH = unifiedSquareDimensionValue;
-                }
+                // ⚠️ CLONED LOGIC: Uses your exact Math.max logic to make it a perfect circle
+                let stampWidthCalc = (stampMarker.clientWidth / actualWorkspaceWidth) * width;
+                let stampHeightCalc = (stampMarker.clientHeight / actualWorkspaceHeight) * height;
+                let uniformStampSize = Math.max(stampWidthCalc, stampHeightCalc);
 
                 const docStampX = (finalStampLeft / actualWorkspaceWidth) * width;
-                const docStampY = height - ((finalStampTop / actualWorkspaceHeight) * height) - docStampH;
+                const docStampY = height - (finalStampTop / actualWorkspaceHeight) * height - uniformStampSize;
                 
                 targetExportPage.drawImage(stampImageObject, {
                     x: docStampX,
                     y: docStampY,
-                    width: docStampW,
-                    height: docStampH
+                    width: uniformStampSize,
+                    height: uniformStampSize
                 });
             }
 
-            /* ─── BLOCK 3: INJECT THE ELECTRONIC SIGNATURE (SEPARATE CONTAINER LAYER) ─── */
+            /* ─── BLOCK 3: INJECT THE ELECTRONIC SIGNATURE (CLONED UNIFORM SQUARE MATH) ─── */
             if (isSigPlaced && sigImgDataUrl && signatureMarker) {
                 const sigImageObject = await pdfDoc.embedPng(sigImgDataUrl);
 
-                const finalSigLeft = isSigLocked ? (sigPosX - 70) : (parseFloat(signatureMarker.style.left) || (sigPosX - 70));
-                const finalSigTop = isSigLocked ? (sigPosY - 70) : (parseFloat(signatureMarker.style.top) || (sigPosY - 70));
+                const finalSigLeft = (isSigLocked ? (sigPosX - 70) : (parseFloat(signatureMarker.style.left) || (sigPosX - 70))) / currentResponsiveLayoutScaleFactorX;
+                const finalSigTop = (isSigLocked ? (sigPosY - 70) : (parseFloat(signatureMarker.style.top) || (sigPosY - 70))) / currentResponsiveLayoutScaleFactorY;
 
-                let docSigW = (signatureMarker.clientWidth / actualWorkspaceWidth) * width;
-                let docSigH = (signatureMarker.clientHeight / actualWorkspaceHeight) * height;
+                // ⚠️ CLONED LOGIC: Uses your exact Math.max logic to keep perfect signature aspect ratios
+                let sigWidthCalc = (signatureMarker.clientWidth / actualWorkspaceWidth) * width;
+                let sigHeightCalc = (signatureMarker.clientHeight / actualWorkspaceHeight) * height;
+                let uniformSigSize = Math.max(sigWidthCalc, sigHeightCalc);
 
                 const docSigX = (finalSigLeft / actualWorkspaceWidth) * width;
-                const docSigY = height - ((finalSigTop / actualWorkspaceHeight) * height) - docSigH;
+                const docSigY = height - (finalSigTop / actualWorkspaceHeight) * height - uniformSigSize;
                 
                 targetExportPage.drawImage(sigImageObject, {
                     x: docSigX,
                     y: docSigY,
-                    width: docSigW,
-                    height: docSigH
+                    width: uniformSigSize,
+                    height: uniformSigSize
                 });
             }
 
@@ -891,6 +893,7 @@
     document.getElementById('prodName').oninput = (e) => {
         document.getElementById('charCounter').innerText = `${e.target.value.length}/35`;
     };
+
 
     const renderProductsPreviewWorkspace = () => {
         const previewBlock = document.getElementById('productPreviewArea');
@@ -1615,32 +1618,19 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
         
         document.getElementById('previewBtn').style.display = 'block';
         document.getElementById('downloadBtn').style.display = 'block';
-    }
+    }    /* ==========================================================================
+       👁️ PREVIEW CORE: RESTORED ORIGINAL PROPORTIONAL SQUARE MATH FOR ALL
+       ========================================================================== */
     document.getElementById('previewBtn').onclick = async () => {
-                try {
+        try {
             if (!originalBytes) return alert("Select or Generate PDF First");
 
             const liveQrContainer = document.getElementById('qr-graphic-target');
-            const preview = document.getElementById('dropzone');
+            const preview = document.getElementById('workspace-scaler');
             const pdfFrameNode = document.getElementById('pdf-frame');
             const imgFrameNode = document.getElementById('image-frame');
 
-            // Web Dev Refinement: Read the exact active display box sizes of your screen workspace
-            let activeWidth = preview.offsetWidth;
-            let activeHeight = preview.offsetHeight;
-            
-            if (pdfFrameNode && window.getComputedStyle(pdfFrameNode).display === 'block') {
-                activeWidth = pdfFrameNode.offsetWidth;
-                activeHeight = pdfFrameNode.offsetHeight;
-            } else if (imgFrameNode && window.getComputedStyle(imgFrameNode).display === 'block') {
-                activeWidth = imgFrameNode.offsetWidth;
-                activeHeight = imgFrameNode.offsetHeight;
-            }
-
-            /* ==========================================================================
-               SUBSTRATE PATH A: COMPILING LIVE PREVIEW ON AN IMAGE BACKGROUND
-               ========================================================================== */
-            if (imgFrameNode && window.getComputedStyle(imgFrameNode).display === 'block') {
+            if (imgFrameNode && imgFrameNode.style.display === 'block') {
                 const canvas = document.createElement('canvas');
                 canvas.width = imgFrameNode.naturalWidth;
                 canvas.height = imgFrameNode.naturalHeight;
@@ -1648,15 +1638,24 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
 
                 ctx.drawImage(imgFrameNode, 0, 0);
 
-                const renderingScaleX = imgFrameNode.naturalWidth / activeWidth;
-                const renderingScaleY = imgFrameNode.naturalHeight / activeHeight;
+                const actualWorkspaceWidth = imgFrameNode.naturalWidth;
+                const actualWorkspaceHeight = imgFrameNode.naturalHeight;
+                const scaleFactorX = preview.offsetWidth / actualWorkspaceWidth;
+                const scaleFactorY = preview.offsetHeight / actualWorkspaceHeight;
 
-                if (liveQrContainer && window.getComputedStyle(liveQrContainer).display === "block") {
+                if (liveQrContainer && liveQrContainer.style.display === "block") {
                     const liveCanvasElement = liveQrContainer.querySelector('canvas');
                     if (liveCanvasElement) {
-                        const styleLeft = isQrLocked ? (posX - 40) : (parseFloat(marker.style.left) || (posX - 40));
-                        const styleTop = isQrLocked ? (posY - 40) : (parseFloat(marker.style.top) || (posY - 40));
-                        ctx.drawImage(liveCanvasElement, styleLeft * renderingScaleX, styleTop * renderingScaleY, marker.clientWidth * renderingScaleX, marker.clientHeight * renderingScaleY);
+                        const markerLeftStyleRaw = isQrLocked ? (posX - 40) : (parseFloat(marker.style.left) || (posX - 40));
+                        const markerTopStyleRaw = isQrLocked ? (posY - 40) : (parseFloat(marker.style.top) || (posY - 40));
+
+                        const imgX = markerLeftStyleRaw / scaleFactorX;
+                        const imgY = markerTopStyleRaw / scaleFactorY;
+                        const imgW = marker.clientWidth / scaleFactorX;
+                        const imgH = marker.clientHeight / scaleFactorY;
+                        const squareSize = Math.max(imgW, imgH);
+
+                        ctx.drawImage(liveCanvasElement, imgX, imgY, squareSize, squareSize);
                     }
                 }
 
@@ -1664,85 +1663,118 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
                     const tempStampImg = new Image();
                     tempStampImg.src = stampImgDataUrl;
                     await new Promise(resolve => tempStampImg.onload = resolve);
-                    const styleLeft = isStampLocked ? (stampPosX - 60) : (parseFloat(stampMarker.style.left) || (stampPosX - 60));
-                    const styleTop = isStampLocked ? (stampPosY - 60) : (parseFloat(stampMarker.style.top) || (stampPosY - 60));
-                    ctx.drawImage(tempStampImg, styleLeft * renderingScaleX, styleTop * renderingScaleY, stampMarker.clientWidth * renderingScaleX, stampMarker.clientHeight * renderingScaleY);
+
+                    const stampLeftStyleRaw = isStampLocked ? (stampPosX - 60) : (parseFloat(stampMarker.style.left) || (stampPosX - 60));
+                    const stampTopStyleRaw = isStampLocked ? (stampPosY - 60) : (parseFloat(stampMarker.style.top) || (stampPosY - 60));
+
+                    const stampX = stampLeftStyleRaw / scaleFactorX;
+                    const stampY = stampTopStyleRaw / scaleFactorY;
+                    let stampW = stampMarker.clientWidth / scaleFactorX;
+                    let stampH = stampMarker.clientHeight / scaleFactorY;
+                    const uniformStampSize = Math.max(stampW, stampH);
+
+                    ctx.drawImage(tempStampImg, stampX, stampY, uniformStampSize, uniformStampSize);
                 }
 
-                // 🌟 FIXED: Renders signature overlay data cleanly onto background image layers without drift
                 if (isSigPlaced && sigImgDataUrl && signatureMarker) {
                     const tempSigImg = new Image();
                     tempSigImg.src = sigImgDataUrl;
                     await new Promise(resolve => tempSigImg.onload = resolve);
-                    const styleLeft = isSigLocked ? (sigPosX - 70) : (parseFloat(signatureMarker.style.left) || (sigPosX - 70));
-                    const styleTop = isSigLocked ? (sigPosY - 70) : (parseFloat(signatureMarker.style.top) || (sigPosY - 70));
-                    ctx.drawImage(tempSigImg, styleLeft * renderingScaleX, styleTop * renderingScaleY, signatureMarker.clientWidth * renderingScaleX, signatureMarker.clientHeight * renderingScaleY);
+
+                    const sigLeftStyleRaw = isSigLocked ? (sigPosX - 70) : (parseFloat(signatureMarker.style.left) || (sigPosX - 70));
+                    const sigTopStyleRaw = isSigLocked ? (sigPosY - 70) : (parseFloat(signatureMarker.style.top) || (sigPosY - 70));
+
+                    const sigX = sigLeftStyleRaw / scaleFactorX;
+                    const sigY = sigTopStyleRaw / scaleFactorY;
+                    let sigW = signatureMarker.clientWidth / scaleFactorX;
+                    let sigH = signatureMarker.clientHeight / scaleFactorY;
+                    const uniformSigSize = Math.max(sigW, sigH);
+
+                    ctx.drawImage(tempSigImg, sigX, sigY, uniformSigSize, uniformSigSize);
                 }
 
                 imgFrameNode.src = canvas.toDataURL('image/png');
-                
                 marker.style.display = 'none';
                 stampMarker.style.display = 'none';
-                signatureMarker.style.display = 'none'; // Close signature layer view
+                signatureMarker.style.display = 'none';
 
             } else {
-                /* ==========================================================================
-                   SUBSTRATE PATH B: COMPILING LIVE PREVIEW ON A PDF BACKGROUND
-                   ========================================================================== */
                 const pdfDoc = await PDFLib.PDFDocument.load(originalBytes);
                 
                 const pagesCollection = pdfDoc.getPages();
                 const safePageIndex = (typeof currentActivePageIndex !== 'undefined') ? currentActivePageIndex : 0;
                 const targetExportPage = pagesCollection[safePageIndex] || pagesCollection[0];
                 
-                const { width: pdfWidth, height: pdfHeight } = targetExportPage.getSize();
+                const { width, height } = targetExportPage.getSize();
 
-                if (liveQrContainer && window.getComputedStyle(liveQrContainer).display === "block") {
+                let actualWorkspaceWidth = pdfFrameNode.offsetWidth || preview.offsetWidth;
+                let actualWorkspaceHeight = pdfFrameNode.offsetHeight || preview.offsetHeight;
+
+                if (liveQrContainer && liveQrContainer.style.display === "block") {
                     const liveCanvasElement = liveQrContainer.querySelector('canvas');
                     if (liveCanvasElement) {
                         const qrImgDataUrl = liveCanvasElement.toDataURL('image/png');
                         const qrImage = await pdfDoc.embedPng(qrImgDataUrl);
 
-                        const styleLeft = isQrLocked ? (posX - 40) : (parseFloat(marker.style.left) || (posX - 40));
-                        const styleTop = isQrLocked ? (posY - 40) : (parseFloat(marker.style.top) || (posY - 40));
+                        const markerLeftStyle = isQrLocked ? (posX - 40) : (parseFloat(marker.style.left) || (posX - 40));
+                        const markerTopStyle = isQrLocked ? (posY - 40) : (parseFloat(marker.style.top) || (posY - 40));
 
-                        // High-precision percentage calculation multipliers
-                        const pdfX = (styleLeft / activeWidth) * pdfWidth;
-                        const pdfY = pdfHeight - ((styleTop / activeHeight) * pdfHeight) - ((marker.clientHeight / activeHeight) * pdfHeight);
-                        const drawW = (marker.clientWidth / activeWidth) * pdfWidth;
-                        const drawH = (marker.clientHeight / activeHeight) * pdfHeight;
+                        const finalQrWidth = (marker.clientWidth / actualWorkspaceWidth) * width;
+                        const finalQrHeight = (marker.clientHeight / actualWorkspaceHeight) * height;
+                        const finalSquareSize = Math.max(finalQrWidth, finalQrHeight);
 
-                        targetExportPage.drawImage(qrImage, { x: pdfX, y: pdfY, width: drawW, height: drawH });
+                        const pdfX = (markerLeftStyle / actualWorkspaceWidth) * width;
+                        const pdfY = height - (markerTopStyle / actualWorkspaceHeight) * height - finalSquareSize;
+
+                        targetExportPage.drawImage(qrImage, {
+                            x: pdfX,
+                            y: pdfY,
+                            width: finalSquareSize,
+                            height: finalSquareSize
+                        });
                     }
                 }
 
                 if (isStampPlaced && stampImgDataUrl) {
                     const stampImageObject = await pdfDoc.embedPng(stampImgDataUrl);
 
-                    const styleLeft = isStampLocked ? (stampPosX - 60) : (parseFloat(stampMarker.style.left) || (stampPosX - 60));
-                    const styleTop = isStampLocked ? (stampPosY - 60) : (parseFloat(stampMarker.style.top) || (stampPosY - 60));
+                    const stampLeftStyle = isStampLocked ? (stampPosX - 60) : (parseFloat(stampMarker.style.left) || (stampPosX - 60));
+                    const stampTopStyle = isStampLocked ? (stampPosY - 60) : (parseFloat(stampMarker.style.top) || (stampPosY - 60));
 
-                    const pdfX = (styleLeft / activeWidth) * pdfWidth;
-                    const pdfY = pdfHeight - ((styleTop / activeHeight) * pdfHeight) - ((stampMarker.clientHeight / activeHeight) * pdfHeight);
-                    const drawW = (stampMarker.clientWidth / activeWidth) * pdfWidth;
-                    const drawH = (stampMarker.clientHeight / activeHeight) * pdfHeight;
+                    let docStampW = (stampMarker.clientWidth / actualWorkspaceWidth) * width;
+                    let docStampH = (stampMarker.clientHeight / actualWorkspaceHeight) * height;
+                    const uniformStampSize = Math.max(docStampW, docStampH);
 
-                    targetExportPage.drawImage(stampImageObject, { x: pdfX, y: pdfY, width: drawW, height: drawH });
+                    const docStampX = (stampLeftStyle / actualWorkspaceWidth) * width;
+                    const docStampY = height - (stampTopStyle / actualWorkspaceHeight) * height - uniformStampSize;
+
+                    targetExportPage.drawImage(stampImageObject, {
+                        x: docStampX,
+                        y: docStampY,
+                        width: uniformStampSize,
+                        height: uniformStampSize
+                    });
                 }
 
-                // 🌟 FIXED: Renders signature overlay data cleanly onto background PDF vectors safely at the same time
                 if (isSigPlaced && sigImgDataUrl && signatureMarker) {
                     const sigImageObject = await pdfDoc.embedPng(sigImgDataUrl);
 
-                    const styleLeft = isSigLocked ? (sigPosX - 70) : (parseFloat(signatureMarker.style.left) || (sigPosX - 70));
-                    const styleTop = isSigLocked ? (sigPosY - 70) : (parseFloat(signatureMarker.style.top) || (sigPosY - 70));
+                    const sigLeftStyle = isSigLocked ? (sigPosX - 70) : (parseFloat(signatureMarker.style.left) || (sigPosX - 70));
+                    const sigTopStyle = isSigLocked ? (sigPosY - 70) : (parseFloat(signatureMarker.style.top) || (sigPosY - 70));
 
-                    const pdfX = (styleLeft / activeWidth) * pdfWidth;
-                    const pdfY = pdfHeight - ((styleTop / activeHeight) * pdfHeight) - ((signatureMarker.clientHeight / activeHeight) * pdfHeight);
-                    const drawW = (signatureMarker.clientWidth / activeWidth) * pdfWidth;
-                    const drawH = (signatureMarker.clientHeight / activeHeight) * pdfHeight;
+                    let docSigW = (signatureMarker.clientWidth / actualWorkspaceWidth) * width;
+                    let docSigH = (signatureMarker.clientHeight / actualWorkspaceHeight) * height;
+                    const uniformSigSize = Math.max(docSigW, docSigH);
 
-                    targetExportPage.drawImage(sigImageObject, { x: pdfX, y: pdfY, width: drawW, height: drawH });
+                    const docSigX = (sigLeftStyle / actualWorkspaceWidth) * width;
+                    const docSigY = height - (sigTopStyle / actualWorkspaceHeight) * height - uniformSigSize;
+
+                    targetExportPage.drawImage(sigImageObject, {
+                        x: docSigX,
+                        y: docSigY,
+                        width: uniformSigSize,
+                        height: uniformSigSize
+                    });
                 }
 
                 const previewPdfBytes = await pdfDoc.save();
