@@ -1102,8 +1102,7 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
         } catch (err) { alert("Generation Core Failure: " + err.message); }
     };
 
-            // 1. Locate your existing menu click listeners near the bottom of the file
-               gearIcon.onclick = () => {
+                gearIcon.onclick = () => {
         settingsPanel.style.display = settingsPanel.style.display === 'block' ? 'none' : 'block';
     };
 
@@ -1136,17 +1135,14 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
     if (signCanvas) {
         signCtx = signCanvas.getContext('2d');
         
-        /* 🌟 ADVANCED HI-DPI RETINA SCALING FACTOR ENGINE 🌟 */
-        // We set the canvas internal matrix size to 4x high-resolution grid bounds
+        // Advanced Hi-DPI Retina Scaling Factor Engine (4x crisp resolution map)
         const scalingUpscaleFactor = 4;
         signCanvas.width = 240 * scalingUpscaleFactor;
         signCanvas.height = 120 * scalingUpscaleFactor;
         
-        // Scale the canvas execution context grid natively to match
         signCtx.scale(scalingUpscaleFactor, scalingUpscaleFactor);
         
-        // Clean anti-aliased smooth brush settings
-        signCtx.strokeStyle = "#1d4ed8"; // Rich royal blue fountain pen ink tint
+        signCtx.strokeStyle = "#1d4ed8"; // Rich royal blue fountain pen ink
         signCtx.lineWidth = 2.5;
         signCtx.lineCap = "round";
         signCtx.lineJoin = "round";
@@ -1154,13 +1150,11 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
         // Get highly precise relative pointer placement coordinates
         const getCanvasPointerPos = (canvasElement, eventTrigger) => {
             const rect = canvasElement.getBoundingClientRect();
-            const clientX = eventTrigger.touches ? eventTrigger.touches[0].clientX : eventTrigger.clientX;
-            const clientY = eventTrigger.touches ? eventTrigger.touches[0].clientY : eventTrigger.clientY;
-            
-            // Map the layout positions relative to bounding boxes accurately
+            // Unified touch fallback extraction targeting touch arrays correctly on mobile engines
+            const touchSource = eventTrigger.touches && eventTrigger.touches.length > 0 ? eventTrigger.touches[0] : eventTrigger;
             return {
-                x: (clientX - rect.left) * (240 / rect.width),
-                y: (clientY - rect.top) * (120 / rect.height)
+                x: (touchSource.clientX - rect.left) * (240 / rect.width),
+                y: (touchSource.clientY - rect.top) * (120 / rect.height)
             };
         };
 
@@ -1195,8 +1189,8 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
     if (clearSignBtn) {
         clearSignBtn.onclick = () => {
             if (signCtx && signCanvas) {
-                // Clear the true upscaled dimensional parameters safely
                 signCtx.clearRect(0, 0, signCanvas.width, signCanvas.height);
+                localStorage.removeItem('cachedESignatureDataUrl'); // Clear persistent storage states
             }
         };
     }
@@ -1211,26 +1205,58 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
             // Convert upscaled drawing to ultra-sharp PNG tracking data
             stampImgDataUrl = signCanvas.toDataURL('image/png', 1.0);
             
-            // Reuse existing placement wrapper configurations
-            stampMarker.innerHTML = `<img src="${stampImgDataUrl}" style="width:100%; height:100%; object-fit:contain; pointer-events:none;" alt="High Resolution E-Sign" />`;
-            stampMarker.style.width = '140px';
-            stampMarker.style.height = '70px';
-            stampMarker.style.borderRadius = '0px';
-            stampMarker.style.border = "2px dashed #1d4ed8";
-            stampMarker.style.left = '80px';
-            stampMarker.style.top = '200px';
-            stampMarker.style.display = 'flex';
+            // 🌟 SAVE SIGNATURE PERSISTENTLY TO LOCAL STORAGE STATE 🌟
+            localStorage.setItem('cachedESignatureDataUrl', stampImgDataUrl);
             
-            isStampPlaced = true;
-            isStampLocked = false;
+            renderSignatureToWorkspace(stampImgDataUrl);
+
             if (eSignFormArea) eSignFormArea.style.display = 'none';
             if (settingsPanel) settingsPanel.style.display = 'none';
-            
-            note.innerText = "✍️ Position signature on document window context.";
-            note.style.display = 'block';
-            setTimeout(() => { note.style.display = 'none'; }, 4000);
         };
     }
+
+    // Isolated render function used on initial loads and button clicks alike
+    function renderSignatureToWorkspace(imgDataStr) {
+        stampMarker.innerHTML = `<img src="${imgDataStr}" style="width:100%; height:100%; object-fit:contain; pointer-events:none;" alt="High Resolution E-Sign" />`;
+        stampMarker.style.width = '140px';
+        stampMarker.style.height = '70px';
+        stampMarker.style.borderRadius = '0px';
+        stampMarker.style.border = "2px dashed #1d4ed8";
+        
+        // Read saved structural layout tracking offsets if they exist
+        stampMarker.style.left = localStorage.getItem('signatureLeftPos') || '80px';
+        stampMarker.style.top = localStorage.getItem('signatureTopPos') || '200px';
+        stampMarker.style.display = 'flex';
+        
+        isStampPlaced = true;
+        isStampLocked = false;
+        
+        note.innerText = "✍️ Position signature on document window context.";
+        note.style.display = 'block';
+        setTimeout(() => { note.style.display = 'none'; }, 4000);
+    }
+
+    // 🌟 REHYDRATION HOOK: Load signature instantly upon page refresh 🌟
+    const savedSignatureCache = localStorage.getItem('cachedESignatureDataUrl');
+    if (savedSignatureCache && stampMarker) {
+        stampImgDataUrl = savedSignatureCache;
+        // Postpone render check to ensure workspace containers are fully mapped to DOM tree
+        setTimeout(() => {
+            if(originalBytes) {
+                renderSignatureToWorkspace(savedSignatureCache);
+            }
+        }, 300);
+    }
+
+    // Append position change cache operations inside your existing global pointer movement routers
+    const originalMouseUpHandler = window.onmouseup;
+    window.onmouseup = () => {
+        if (typeof originalMouseUpHandler === 'function') originalMouseUpHandler();
+        if (isStampPlaced && stampMarker.style.display === 'flex') {
+            localStorage.setItem('signatureLeftPos', stampMarker.style.left);
+            localStorage.setItem('signatureTopPos', stampMarker.style.top);
+        }
+    };
     // ------------------------------------
 
     lockStampBtn.onclick = () => {
