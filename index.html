@@ -1297,20 +1297,20 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
         };
     }
 
-        // Action Channels: Place Signature on Workspace
+            // Action Channels: Place Signature on Workspace
     const lockSignBtn = document.getElementById('lockSignBtn');
     if (lockSignBtn) {
         lockSignBtn.onclick = () => {
             if (!originalBytes) return alert("Select or Generate PDF First");
             if (!signCanvas) return;
             
-            // Convert upscaled drawing to ultra-sharp PNG tracking data
-            stampImgDataUrl = signCanvas.toDataURL('image/png', 1.0);
+            // 🌟 FIXED: Convert drawing to its own independent signature variable
+            sigImgDataUrl = signCanvas.toDataURL('image/png', 1.0);
             
-            // 🌟 SAVE SIGNATURE PERSISTENTLY TO LOCAL STORAGE STATE 🌟
-            localStorage.setItem('cachedESignatureDataUrl', stampImgDataUrl);
+            // Save signature persistently to local storage state
+            localStorage.setItem('cachedESignatureDataUrl', sigImgDataUrl);
             
-            renderSignatureToWorkspace(stampImgDataUrl);
+            renderSignatureToWorkspace(sigImgDataUrl);
 
             if (eSignFormArea) eSignFormArea.style.display = 'none';
             if (settingsPanel) settingsPanel.style.display = 'none';
@@ -1319,19 +1319,22 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
 
     // Isolated render function used on initial loads and button clicks alike
     function renderSignatureToWorkspace(imgDataStr) {
-        stampMarker.innerHTML = `<img src="${imgDataStr}" style="width:100%; height:100%; object-fit:contain; pointer-events:none;" alt="High Resolution E-Sign" />`;
-        stampMarker.style.width = '140px';
-        stampMarker.style.height = '70px';
-        stampMarker.style.borderRadius = '0px';
-        stampMarker.style.border = "2px dashed #1d4ed8";
+        // 🌟 FIXED: Target the unique signature HTML element container instead of stampMarker
+        if (!signatureMarker) return;
+
+        signatureMarker.innerHTML = `<img src="${imgDataStr}" style="width:100%; height:100%; object-fit:contain; pointer-events:none;" alt="High Resolution E-Sign" />`;
+        signatureMarker.style.width = '140px';
+        signatureMarker.style.height = '70px';
+        signatureMarker.style.borderRadius = '0px';
+        signatureMarker.style.border = "2px dashed #1d4ed8";
         
         // Read saved structural layout tracking offsets if they exist
-        stampMarker.style.left = localStorage.getItem('signatureLeftPos') || '80px';
-        stampMarker.style.top = localStorage.getItem('signatureTopPos') || '200px';
-        stampMarker.style.display = 'flex';
+        signatureMarker.style.left = localStorage.getItem('signatureLeftPos') || '80px';
+        signatureMarker.style.top = localStorage.getItem('signatureTopPos') || '200px';
+        signatureMarker.style.display = 'flex';
         
-        isStampPlaced = true;
-        isStampLocked = false;
+        isSigPlaced = true;
+        isSigLocked = false;
         
         note.innerText = "✍️ Position signature on document window context.";
         note.style.display = 'block';
@@ -1341,22 +1344,26 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
     /* ==========================================================================
        🌟 RETINA PERSISTENT CACHE REHYDRATION ENGINE 🌟
        ========================================================================== */
-        const savedSignatureCache = localStorage.getItem('cachedESignatureDataUrl');
-    if (savedSignatureCache && stampMarker) {
-        stampImgDataUrl = savedSignatureCache;
+            /* ==========================================================================
+       🌟 RETINA PERSISTENT CACHE REHYDRATION ENGINE 🌟
+       ========================================================================== */
+    const savedSignatureCache = localStorage.getItem('cachedESignatureDataUrl');
+    if (savedSignatureCache && signatureMarker) {
+        // 🌟 FIXED: Map the cached data string safely to your unique signature variable
+        sigImgDataUrl = savedSignatureCache;
         
-        // Force-render signature nodes immediately into memory elements layout
-        stampMarker.innerHTML = `<img src="${savedSignatureCache}" style="width:100%; height:100%; object-fit:contain; pointer-events:none;" alt="High Resolution E-Sign" />`;
-        stampMarker.style.width = '140px';
-        stampMarker.style.height = '70px';
-        stampMarker.style.borderRadius = '0px';
-        stampMarker.style.border = "2px dashed #1d4ed8";
-        stampMarker.style.left = localStorage.getItem('signatureLeftPos') || '80px';
-        stampMarker.style.top = localStorage.getItem('signatureTopPos') || '200px';
+        // Force-render signature nodes immediately into its own dedicated element frame layout
+        signatureMarker.innerHTML = `<img src="${savedSignatureCache}" style="width:100%; height:100%; object-fit:contain; pointer-events:none;" alt="High Resolution E-Sign" />`;
+        signatureMarker.style.width = '140px';
+        signatureMarker.style.height = '70px';
+        signatureMarker.style.borderRadius = '0px';
+        signatureMarker.style.border = "2px dashed #1d4ed8";
+        signatureMarker.style.left = localStorage.getItem('signatureLeftPos') || '80px';
+        signatureMarker.style.top = localStorage.getItem('signatureTopPos') || '200px';
         
-        // 🌟 FIXED: Keep it completely hidden initially so it never pops up on document load
-        stampMarker.style.display = 'none'; 
-        isStampPlaced = false;
+        // Keep it hidden initially so it never pops up automatically on document load
+        signatureMarker.style.display = 'none'; 
+        isSigPlaced = false;
 
         // Instantly redraw the saved signature back into the settings pad box canvas upon page refresh
         if (signCanvas && signCtx) {
