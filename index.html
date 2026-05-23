@@ -430,7 +430,7 @@
     const note = document.getElementById('on-screen-note');
 
     // --- System-Wide Local Initialization Lifecycle Sync ---
-    window.onload = () => {
+       window.onload = () => {
         const todayObj = new Date();
         const yyyy = todayObj.getFullYear();
         const mm = String(todayObj.getMonth() + 1).padStart(2, '0');
@@ -459,6 +459,18 @@
             }
         });
 
+        // 🌟 ADDED: Map central panel workspace container natively to activate your hidden file explorer input
+        const uploadPlaceholderPrompt = document.getElementById('upload-placeholder-prompt');
+        if (uploadPlaceholderPrompt) {
+            uploadPlaceholderPrompt.style.cursor = 'pointer';      // Changes cursor arrow to hand pointer on hover
+            uploadPlaceholderPrompt.style.pointerEvents = 'auto';  // Unlocks mouse interactions safely
+            
+            uploadPlaceholderPrompt.onclick = () => {
+                const fileInputNode = document.getElementById('fileInput');
+                if (fileInputNode) fileInputNode.click();           // Dispatches native operating system window file drawer
+            };
+        }
+    };
         if (document.getElementById('stampDate') && !document.getElementById('stampDate').value) {
             document.getElementById('stampDate').value = localDateIso;
         }
