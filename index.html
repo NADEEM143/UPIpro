@@ -570,12 +570,27 @@
 // 📥 REMOVE YOUR OLD "click-overlay" BLOCK AND PASTE THIS ENTIRE NEW ONE HERE:
 // =========================================================================
         // --- 📍 FIXED: Unified EasyQRCode Pipeline with Dynamic Scaling ---
-    document.getElementById('click-overlay').onclick = (e) => {
+        document.getElementById('click-overlay').onclick = (e) => {
         const rect = document.getElementById('workspace-scaler').getBoundingClientRect();
         
         // Compute direct 1:1 projection positions (Old drifting currentZoomScale removed)
         posX = (e.clientX - rect.left); 
         posY = (e.clientY - rect.top);
+        
+        // ⚠️ 🌟 CRITICAL MULTI-PAGE FIX: Dynamic Geometric Page Resolver Math 🌟 ⚠️
+        // Automatically calculates the exact target page row based on your vertical click coordinates!
+        if (typeof pdfDoc !== 'undefined' && pdfDoc.getPages) {
+            const documentTotalPagesList = pdfDoc.getPages();
+            if (documentTotalPagesList.length > 1) {
+                // Divide the full screen container height by total pages to get a single page height segment
+                const calculatedSinglePageHeightIndex = rect.height / documentTotalPagesList.length;
+                currentActivePageIndex = Math.floor(posY / calculatedSinglePageHeightIndex);
+                
+                // Clamp index safely inside total document boundaries to prevent array limits errors
+                currentActivePageIndex = Math.max(0, Math.min(documentTotalPagesList.length - 1, currentActivePageIndex));
+                console.log("🎯 Geometric Context Sync: Auto-Calculated Target Page Index:", currentActivePageIndex);
+            }
+        }
         
         const halfMarkerWidth = marker.clientWidth / 2 || 40;
         const halfMarkerHeight = marker.clientHeight / 2 || 40;
@@ -1760,10 +1775,26 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
         }
     };
 
-    document.getElementById('click-overlay-stamp').onclick = (e) => {
+        document.getElementById('click-overlay-stamp').onclick = (e) => {
         const rect = document.getElementById('workspace-scaler').getBoundingClientRect();
-        stampPosX = (e.clientX - rect.left) / currentZoomScale; 
-        stampPosY = (e.clientY - rect.top) / currentZoomScale;
+        
+        stampPosX = (e.clientX - rect.left); 
+        stampPosY = (e.clientY - rect.top);
+
+        // ⚠️ 🌟 CRITICAL MULTI-PAGE FIX: Dynamic Geometric Page Resolver Math 🌟 ⚠️
+        // Automatically calculates the exact target page row based on your vertical click coordinates!
+        if (typeof pdfDoc !== 'undefined' && pdfDoc.getPages) {
+            const documentTotalPagesList = pdfDoc.getPages();
+            if (documentTotalPagesList.length > 1) {
+                // Divide the full screen container height by total pages to get a single page height segment
+                const calculatedSinglePageHeightIndex = rect.height / documentTotalPagesList.length;
+                currentActivePageIndex = Math.floor(stampPosY / calculatedSinglePageHeightIndex);
+                
+                // Clamp index safely inside total document boundaries to prevent array limits errors
+                currentActivePageIndex = Math.max(0, Math.min(documentTotalPagesList.length - 1, currentActivePageIndex));
+                console.log("🎯 Geometric Context Sync: Auto-Calculated Target Stamp Page Index:", currentActivePageIndex);
+            }
+        }
         
         stampMarker.style.left = (stampPosX - 60) + 'px';
         stampMarker.style.top = (stampPosY - 60) + 'px';
@@ -1772,9 +1803,12 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
         isStampPlaced = true;
         document.getElementById('click-overlay-stamp').style.display = 'none';
         
-        document.getElementById('previewBtn').style.display = 'block';
-        document.getElementById('downloadBtn').style.display = 'block';
-        note.style.display = 'none';
+        const previewBtn = document.getElementById('previewBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        if (previewBtn) previewBtn.style.display = 'block';
+        if (downloadBtn) downloadBtn.style.display = 'block';
+        
+        if (note) note.style.display = 'none';
     };
 
     stampMarker.onmousedown = (e) => { 
