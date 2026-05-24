@@ -1955,7 +1955,7 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
                 stampMarker.style.display = 'none';
                 signatureMarker.style.display = 'none';
 
-                       } else {
+                                   } else {
                 const pdfDoc = await PDFLib.PDFDocument.load(originalBytes);
                 
                 const pagesCollection = pdfDoc.getPages();
@@ -1968,6 +1968,9 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
                 let actualWorkspaceWidth = pdfFrameNode.offsetWidth || preview.offsetWidth;
                 let actualWorkspaceHeight = pdfFrameNode.offsetHeight || preview.offsetHeight;
 
+                // ⚠️ DYNAMIC SCALE FIX: Compute single page height blocks accurately matching download logic exactly!
+                const singlePageContainerHeight = actualWorkspaceHeight / pagesCollection.length;
+
                 if (liveQrContainer && liveQrContainer.style.display === "block") {
                     const liveCanvasElement = liveQrContainer.querySelector('canvas');
                     if (liveCanvasElement) {
@@ -1977,14 +1980,24 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
                         const markerLeftStyle = isQrLocked ? (posX - 40) : (parseFloat(marker.style.left) || (posX - 40));
                         const markerTopStyle = isQrLocked ? (posY - 40) : (parseFloat(marker.style.top) || (posY - 40));
 
-                        const finalQrWidth = (marker.clientWidth / actualWorkspaceWidth) * width;
-                        const finalQrHeight = (marker.clientHeight / actualWorkspaceHeight) * height;
+                        // 🌟 ENTERPRISE AUTO-DETECT: Find target page from marker screen boundary coordinates
+                        let qrTargetIdx = Math.floor((markerTopStyle + (marker.clientHeight / 2)) / singlePageContainerHeight);
+                        qrTargetIdx = Math.max(0, Math.min(pagesCollection.length - 1, qrTargetIdx));
+                        const qrPage = pagesCollection[qrTargetIdx] || targetExportPage;
+                        const { width: pW, height: pH } = qrPage.getSize();
+
+                        // Force relative layout offset reset
+                        const relativeTop = markerTopStyle - (qrTargetIdx * singlePageContainerHeight);
+
+                        const finalQrWidth = (marker.clientWidth / actualWorkspaceWidth) * pW;
+                        const finalQrHeight = (marker.clientHeight / singlePageContainerHeight) * pH;
                         const finalSquareSize = Math.max(finalQrWidth, finalQrHeight);
 
-                        const pdfX = (markerLeftStyle / actualWorkspaceWidth) * width;
-                        const pdfY = height - (markerTopStyle / actualWorkspaceHeight) * height - finalSquareSize;
+                        const pdfX = (markerLeftStyle / actualWorkspaceWidth) * pW;
+                        // ⚠️ CALCULATION FIX: Multiplied by singlePageContainerHeight ratio for precision alignment mapping
+                        const pdfY = pH - ((relativeTop / singlePageContainerHeight) * pH) - finalSquareSize;
 
-                        targetExportPage.drawImage(qrImage, {
+                        qrPage.drawImage(qrImage, {
                             x: pdfX,
                             y: pdfY,
                             width: finalSquareSize,
@@ -1999,14 +2012,24 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
                     const stampLeftStyle = isStampLocked ? (stampPosX - 60) : (parseFloat(stampMarker.style.left) || (stampPosX - 60));
                     const stampTopStyle = isStampLocked ? (stampPosY - 60) : (parseFloat(stampMarker.style.top) || (stampPosY - 60));
 
-                    let docStampW = (stampMarker.clientWidth / actualWorkspaceWidth) * width;
-                    let docStampH = (stampMarker.clientHeight / actualWorkspaceHeight) * height;
+                    // 🌟 ENTERPRISE AUTO-DETECT: Find target page from stamp marker screen boundary coordinates
+                    let stampTargetIdx = Math.floor((stampTopStyle + (stampMarker.clientHeight / 2)) / singlePageContainerHeight);
+                    stampTargetIdx = Math.max(0, Math.min(pagesCollection.length - 1, stampTargetIdx));
+                    const stampPage = pagesCollection[stampTargetIdx] || targetExportPage;
+                    const { width: pW, height: pH } = stampPage.getSize();
+
+                    // Force relative layout offset reset
+                    const relativeTop = stampTopStyle - (stampTargetIdx * singlePageContainerHeight);
+
+                    let docStampW = (stampMarker.clientWidth / actualWorkspaceWidth) * pW;
+                    let docStampH = (stampMarker.clientHeight / actualWorkspaceHeight) * pH * pagesCollection.length;
                     const uniformStampSize = Math.max(docStampW, docStampH);
 
-                    const docStampX = (stampLeftStyle / actualWorkspaceWidth) * width;
-                    const docStampY = height - (stampTopStyle / actualWorkspaceHeight) * height - uniformStampSize;
+                    const docStampX = (stampLeftStyle / actualWorkspaceWidth) * pW;
+                    // ⚠️ CALCULATION FIX: Multiplied by singlePageContainerHeight ratio for precision alignment mapping
+                    const docStampY = pH - ((relativeTop / singlePageContainerHeight) * pH) - uniformStampSize;
 
-                    targetExportPage.drawImage(stampImageObject, {
+                    stampPage.drawImage(stampImageObject, {
                         x: docStampX,
                         y: docStampY,
                         width: uniformStampSize,
@@ -2020,13 +2043,23 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
                     const sigLeftStyle = isSigLocked ? (sigPosX - 70) : (parseFloat(signatureMarker.style.left) || (sigPosX - 70));
                     const sigTopStyle = isSigLocked ? (sigPosY - 70) : (parseFloat(signatureMarker.style.top) || (sigPosY - 70));
 
-                    let docSigW = (signatureMarker.clientWidth / actualWorkspaceWidth) * width;
-                    let docSigH = (signatureMarker.clientHeight / actualWorkspaceHeight) * height;
+                    // 🌟 ENTERPRISE AUTO-DETECT: Find target page from signature marker screen boundary coordinates
+                    let sigTargetIdx = Math.floor((sigTopStyle + (signatureMarker.clientHeight / 2)) / singlePageContainerHeight);
+                    sigTargetIdx = Math.max(0, Math.min(pagesCollection.length - 1, sigTargetIdx));
+                    const sigPage = pagesCollection[sigTargetIdx] || targetExportPage;
+                    const { width: pW, height: pH } = sigPage.getSize();
 
-                    const docSigX = (sigLeftStyle / actualWorkspaceWidth) * width;
-                    const docSigY = height - (sigTopStyle / actualWorkspaceHeight) * height - docSigH;
+                    // Force relative layout offset reset
+                    const relativeTop = sigTopStyle - (sigTargetIdx * singlePageContainerHeight);
 
-                    targetExportPage.drawImage(sigImageObject, {
+                    let docSigW = (signatureMarker.clientWidth / actualWorkspaceWidth) * pW;
+                    let docSigH = (signatureMarker.clientHeight / actualWorkspaceHeight) * pH * pagesCollection.length;
+
+                    const docSigX = (sigLeftStyle / actualWorkspaceWidth) * pW;
+                    // ⚠️ CALCULATION FIX: Multiplied by singlePageContainerHeight ratio for precision alignment mapping
+                    const docSigY = pH - ((relativeTop / singlePageContainerHeight) * pH) - docSigH;
+
+                    sigPage.drawImage(sigImageObject, {
                         x: docSigX,
                         y: docSigY,
                         width: docSigW,
@@ -2057,7 +2090,6 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
             alert("Preview Canvas Render Failure: " + previewError.message);
         }
     };
-
        
     function syncActivePageTrackIndex(pageNum) {
         const parsed = parseInt(pageNum, 10);
