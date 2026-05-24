@@ -1925,7 +1925,7 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
         }
     }
 
-        document.addEventListener('click', (e) => {
+    document.addEventListener('click', (e) => {
         const targetElement = e.target;
         if (!targetElement) return;
 
@@ -2020,73 +2020,6 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
     }
 
     setTimeout(initializeWorldClassPageObserver, 1500);
-
-    /* ==========================================================================
-       🖱️ RE-ALIGNED SYSTEM MOUSE RELEASE PORTAL (MULTI-PAGE TRACKING CAPTURE)
-       ========================================================================== */
-    document.addEventListener('mouseup', () => {
-        // Recalibrates QR Code element positioning context relative to the target page drop zone
-        if (typeof isDragging !== 'undefined' && isDragging) {
-            isDragging = false;
-            const targetQrMarker = document.getElementById('qr-marker');
-            if (targetQrMarker) {
-                const workspaceBox = document.getElementById('workspace-scaler');
-                if (workspaceBox && typeof pdfDoc !== 'undefined' && pdfDoc.getPages) {
-                    const totalPages = pdfDoc.getPages().length;
-                    if (totalPages > 1) {
-                        const currentVisualTop = parseFloat(targetQrMarker.style.top) || 0;
-                        const singlePageHeight = workspaceBox.scrollHeight / totalPages;
-                        currentActivePageIndex = Math.max(0, Math.min(totalPages - 1, Math.floor(currentVisualTop / singlePageHeight)));
-                        posX = parseFloat(targetQrMarker.style.left) || 0;
-                        posY = currentVisualTop - (currentActivePageIndex * singlePageHeight);
-                    }
-                }
-            }
-        }
-
-        // Recalibrates Stamp element positioning context relative to the target page drop zone
-        if (typeof isStampDragging !== 'undefined' && isStampDragging) {
-            isStampDragging = false;
-            const targetStampMarker = document.getElementById('stamp-marker') || document.getElementById('stampMarker');
-            if (targetStampMarker) {
-                const workspaceBox = document.getElementById('workspace-scaler');
-                if (workspaceBox && typeof pdfDoc !== 'undefined' && pdfDoc.getPages) {
-                    const totalPages = pdfDoc.getPages().length;
-                    if (totalPages > 1) {
-                        const currentVisualTop = parseFloat(targetStampMarker.style.top) || 0;
-                        const singlePageHeight = workspaceBox.scrollHeight / totalPages;
-                        currentActivePageIndex = Math.max(0, Math.min(totalPages - 1, Math.floor(currentVisualTop / singlePageHeight)));
-                        stampPosX = parseFloat(targetStampMarker.style.left) || 0;
-                        stampPosY = currentVisualTop - (currentActivePageIndex * singlePageHeight);
-                    }
-                }
-            }
-        }
-
-        // Recalibrates Signature element positioning context relative to the target page drop zone
-        if (typeof isSigDragging !== 'undefined' && isSigDragging) {
-            isSigDragging = false;
-            const targetSigMarker = document.getElementById('signature-marker') || document.getElementById('signatureMarker');
-            if (targetSigMarker) {
-                const workspaceBox = document.getElementById('workspace-scaler');
-                if (workspaceBox && typeof pdfDoc !== 'undefined' && pdfDoc.getPages) {
-                    const totalPages = pdfDoc.getPages().length;
-                    if (totalPages > 1) {
-                        const currentVisualTop = parseFloat(targetSigMarker.style.top) || 0;
-                        const singlePageHeight = workspaceBox.scrollHeight / totalPages;
-                        
-                        // Dynamically lock target page context corresponding to cursor layout coordinates
-                        currentActivePageIndex = Math.floor(currentVisualTop / singlePageHeight);
-                        currentActivePageIndex = Math.max(0, Math.min(totalPages - 1, currentActivePageIndex));
-                        
-                        sigPosX = parseFloat(targetSigMarker.style.left) || 0;
-                        sigPosY = currentVisualTop - (currentActivePageIndex * singlePageHeight);
-                        console.log("🎯 Signature Dropped Safely on Page Index:", currentActivePageIndex, "Page relative posY:", sigPosY);
-                    }
-                }
-            }
-        }
-    });
 
     function convertAmountToWords(amount) {
         const sglDigit = ["Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"],
