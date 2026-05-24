@@ -292,26 +292,10 @@
             <div class="input-group"><label>UPI ID</label><input type="text" id="vpa"></div>
             <div class="input-group"><label>Amount</label><input type="number" id="amount"></div>
             
-            <!-- ==========================================================================
-                 ✍️ STANDALONE EMBEDDED SIGNATURE WORKFLOW COMPONENT
-                 ========================================================================== -->
-            <div id="embedded-signing-card" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin: 16px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); font-family: sans-serif; display: block !important;">
-                <h3 style="margin-top: 0; margin-bottom: 8px; font-size: 14px; color: #334155; font-weight: 600;">✍️ Secure Embedded Client Signing Zone</h3>
-                <p style="margin-top: 0; margin-bottom: 12px; font-size: 12px; color: #64748b; line-height: 1.4;">Draw your signature directly inside the secure box below. It will be automatically sealed onto a fixed, locked location at the bottom of the last page upon download output execution.</p>
-                
-                <div style="position: relative; width: 100%; max-width: 320px; height: 120px; background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 6px; overflow: hidden; margin-bottom: 10px;">
-                    <canvas id="embeddedSignCanvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: crosshair; touch-action: none; z-index: 99999; pointer-events: auto;"></canvas>
-                </div>
-                
-                <div style="display: flex; gap: 8px;">
-                    <button id="clearEmbeddedSignBtn" type="button" style="background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; padding: 6px 12px; font-size: 12px; font-weight: 500; border-radius: 4px; cursor: pointer; transition: background 0.1s;">Clear Ink</button>
-                    <div id="embedded-sign-status-badge" style="display: flex; align-items: center; font-size: 12px; color: #059669; font-weight: 500; display: none;">✓ Signature Captured & Ready</div>
-                </div>
-            </div>
-            
             <button id="lockBtn" class="btn btn-blue">📍 Set QR Position</button>
             <button id="previewBtn" class="btn btn-orange" style="margin-top: 10px; display: none;">👁️ Preview Document</button>
             <button id="downloadBtn" class="btn btn-green">⚡ Download PDF</button>
+
             <div class="gen-pdf-box">
                 <h3>Generate PDF</h3>
 
@@ -342,32 +326,14 @@
                 <button id="addProductBtn" class="btn btn-purple">➕ Add Product</button>
                 <div id="productPreviewArea" class="product-preview-list" style="display: none;"></div>
 
-                                <div class="action-buttons-row">
+                <div class="action-buttons-row">
                     <button id="makePdfBtn" class="btn btn-orange">🛠️ Generate PDF</button>
                     <button id="clearProductsBtn" class="btn-gray" style="display: none;">🔄 Reset All</button>
                 </div>
-                
-                <!-- ==========================================================================
-                     ✍️ STANDALONE EMBEDDED SIGNATURE WORKFLOW COMPONENT
-                     ========================================================================== -->
-                <div id="embedded-signing-card" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin: 16px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); font-family: sans-serif;">
-                    <h3 style="margin-top: 0; margin-bottom: 8px; font-size: 14px; color: #334155; font-weight: 600;">✍️ Secure Embedded Client Signing Zone</h3>
-                    <p style="margin-top: 0; margin-bottom: 12px; font-size: 12px; color: #64748b; line-height: 1.4;">Draw your signature directly inside the secure box below. It will be automatically sealed onto a fixed, locked location at the bottom of the last page upon download output execution.</p>
-                    
-                    <div style="position: relative; width: 100%; max-width: 320px; height: 120px; background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 6px; overflow: hidden; margin-bottom: 10px;">
-                        <canvas id="embeddedSignCanvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: crosshair; touch-action: none;"></canvas>
-                    </div>
-                    
-                    <div style="display: flex; gap: 8px;">
-                        <button id="clearEmbeddedSignBtn" type="button" style="background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; padding: 6px 12px; font-size: 12px; font-weight: 500; border-radius: 4px; cursor: pointer; transition: background 0.1s;">Clear Ink</button>
-                        <div id="embedded-sign-status-badge" style="display: flex; align-items: center; font-size: 12px; color: #059669; font-weight: 500; display: none;">✓ Signature Captured & Ready</div>
-                    </div>
-                </div>
-
-            </div> <!-- This closes your settings-section block cleanly -->
-        </div> <!-- This closes your sidebar column grid layout container card safely -->
+            </div>
+        </div>
         
-        <div class="preview-area" id="dropzone">
+               <div class="preview-area" id="dropzone">
             <div id="workspace-scaler" style="position: relative;">
                 
                 <div id="upload-placeholder-prompt" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; padding: 40px; pointer-events: none; user-select: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 100%; max-width: 500px; z-index: 10; box-sizing: border-box;">
@@ -970,39 +936,11 @@
                 const docSigX = (finalSigLeft / actualWorkspaceWidth) * width;
                 const docSigY = height - (finalSigTop / actualWorkspaceHeight) * height - docSigH;
                 
-                                targetExportPage.drawImage(sigImageObject, {
+                targetExportPage.drawImage(sigImageObject, {
                     x: docSigX,
                     y: docSigY,
                     width: docSigW,
                     height: docSigH
-                });
-            }
-
-            /* ─── EXTRA WORKFLOW MODULE: SECURE EMBEDDED CLOSING SIGNATURE INJECTION ─── */
-            // ⚠️ AUTOMATED LAST-PAGE MATHEMATICAL LOCK OUTRIDES GESTURE MOVEMENT SHIFTS
-            if (typeof embeddedSignImgDataUrl !== 'undefined' && embeddedSignImgDataUrl) {
-                const embeddedSigImageObject = await pdfDoc.embedPng(embeddedSignImgDataUrl);
-                
-                // Read complete page collections and explicitly index the absolute final sheet page
-                const fullPagesArray = pdfDoc.getPages();
-                const lastPageIdx = fullPagesArray.length - 1;
-                const finalTargetPageSheet = fullPagesArray[lastPageIdx];
-                
-                const { width: pageW, height: pageH } = finalTargetPageSheet.getSize();
-
-                // Define fixed, production-standard hardcoded sizing and bounding box coordinates
-                const lockedSigWidth = 140;
-                const lockedSigHeight = 52;
-                
-                // Placed safely in the bottom-right signature corner of the last page with perfect spacing alignment
-                const fixedPdfX = pageW - lockedSigWidth - 50; 
-                const fixedPdfY = 45; 
-
-                finalTargetPageSheet.drawImage(embeddedSigImageObject, {
-                    x: fixedPdfX,
-                    y: fixedPdfY,
-                    width: lockedSigWidth,
-                    height: lockedSigHeight
                 });
             }
 
@@ -1987,7 +1925,7 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
         }
     }
 
-    document.addEventListener('click', (e) => {
+        document.addEventListener('click', (e) => {
         const targetElement = e.target;
         if (!targetElement) return;
 
@@ -2074,7 +2012,7 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
         scrollPageNodes.forEach(pageNode => activePageObserver.observe(pageNode));
     };
 
-   const fileInputElementTarget = document.getElementById('fileInput');
+    const fileInputElementTarget = document.getElementById('fileInput');
     if (fileInputElementTarget) {
         fileInputElementTarget.addEventListener('change', () => {
             setTimeout(initializeWorldClassPageObserver, 800); 
@@ -2084,81 +2022,71 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
     setTimeout(initializeWorldClassPageObserver, 1500);
 
     /* ==========================================================================
-       🖋️ STANDALONE EMBEDDED SIGNATURE PROCESSOR CORE (WORLD-CLASS FLOW)
+       🖱️ RE-ALIGNED SYSTEM MOUSE RELEASE PORTAL (MULTI-PAGE TRACKING CAPTURE)
        ========================================================================== */
-    let embeddedSignImgDataUrl = null;
-
-    const embedCanvas = document.getElementById('embeddedSignCanvas');
-    const embedStatusBadge = document.getElementById('embedded-sign-status-badge');
-    const clearEmbedBtn = document.getElementById('clearEmbeddedSignBtn');
-
-    if (embedCanvas) {
-        const embedCtx = embedCanvas.getContext('2d');
-        let isDrawingEmbedded = false;
-
-        // Force High-DPI Upscaling Matrix for crisp signatures
-        const upscaleRatio = 3;
-        embedCanvas.width = 320 * upscaleRatio;
-        embedCanvas.height = 120 * upscaleRatio;
-        embedCtx.scale(upscaleRatio, upscaleRatio);
-
-        embedCtx.strokeStyle = "#0f172a"; // Elegant fountain pen slate color
-        embedCtx.lineWidth = 2.2;
-        embedCtx.lineCap = "round";
-        embedCtx.lineJoin = "round";
-
-        const getEmbedPointerPos = (e) => {
-            const boundRect = embedCanvas.getBoundingClientRect();
-            const src = e.touches && e.touches.length > 0 ? e.touches[0] : e;
-            return {
-                x: (src.clientX - boundRect.left) * (320 / boundRect.width),
-                y: (src.clientY - boundRect.top) * (120 / boundRect.height)
-            };
-        };
-
-        const startEmbedStroke = (e) => {
-            isDrawingEmbedded = true;
-            const pt = getEmbedPointerPos(e);
-            embedCtx.beginPath();
-            embedCtx.moveTo(pt.x, pt.y);
-            if (embedStatusBadge) embedStatusBadge.style.display = 'none';
-        };
-
-        const traceEmbedStroke = (e) => {
-            if (!isDrawingEmbedded) return;
-            e.preventDefault();
-            const pt = getEmbedPointerPos(e);
-            embedCtx.lineTo(pt.x, pt.y);
-            embedCtx.stroke();
-        };
-
-        const terminateEmbedStroke = () => {
-            if (!isDrawingEmbedded) return;
-            isDrawingEmbedded = false;
-            // Export stroke matrix directly into data url cash channel string
-            embeddedSignImgDataUrl = embedCanvas.toDataURL('image/png');
-            if (embedStatusBadge) embedStatusBadge.style.display = 'flex';
-        };
-
-        // Desktop Pointer Event Registries
-        embedCanvas.addEventListener('mousedown', startEmbedStroke);
-        embedCanvas.addEventListener('mousemove', traceEmbedStroke);
-        window.addEventListener('mouseup', terminateEmbedStroke);
-
-        // Mobile Touch Event Registries
-        embedCanvas.addEventListener('touchstart', startEmbedStroke, { passive: false });
-        embedCanvas.addEventListener('touchmove', traceEmbedStroke, { passive: false });
-        embedCanvas.addEventListener('touchend', terminateEmbedStroke);
-
-        if (clearEmbedBtn) {
-            clearEmbedBtn.onclick = () => {
-                embedCtx.clearRect(0, 0, 320, 120);
-                embeddedSignImgDataUrl = null;
-                if (embedStatusBadge) embedStatusBadge.style.display = 'none';
-            };
+    document.addEventListener('mouseup', () => {
+        // Recalibrates QR Code element positioning context relative to the target page drop zone
+        if (typeof isDragging !== 'undefined' && isDragging) {
+            isDragging = false;
+            const targetQrMarker = document.getElementById('qr-marker');
+            if (targetQrMarker) {
+                const workspaceBox = document.getElementById('workspace-scaler');
+                if (workspaceBox && typeof pdfDoc !== 'undefined' && pdfDoc.getPages) {
+                    const totalPages = pdfDoc.getPages().length;
+                    if (totalPages > 1) {
+                        const currentVisualTop = parseFloat(targetQrMarker.style.top) || 0;
+                        const singlePageHeight = workspaceBox.scrollHeight / totalPages;
+                        currentActivePageIndex = Math.max(0, Math.min(totalPages - 1, Math.floor(currentVisualTop / singlePageHeight)));
+                        posX = parseFloat(targetQrMarker.style.left) || 0;
+                        posY = currentVisualTop - (currentActivePageIndex * singlePageHeight);
+                    }
+                }
+            }
         }
-    }
-    // --------------------------------------------------------------------------
+
+        // Recalibrates Stamp element positioning context relative to the target page drop zone
+        if (typeof isStampDragging !== 'undefined' && isStampDragging) {
+            isStampDragging = false;
+            const targetStampMarker = document.getElementById('stamp-marker') || document.getElementById('stampMarker');
+            if (targetStampMarker) {
+                const workspaceBox = document.getElementById('workspace-scaler');
+                if (workspaceBox && typeof pdfDoc !== 'undefined' && pdfDoc.getPages) {
+                    const totalPages = pdfDoc.getPages().length;
+                    if (totalPages > 1) {
+                        const currentVisualTop = parseFloat(targetStampMarker.style.top) || 0;
+                        const singlePageHeight = workspaceBox.scrollHeight / totalPages;
+                        currentActivePageIndex = Math.max(0, Math.min(totalPages - 1, Math.floor(currentVisualTop / singlePageHeight)));
+                        stampPosX = parseFloat(targetStampMarker.style.left) || 0;
+                        stampPosY = currentVisualTop - (currentActivePageIndex * singlePageHeight);
+                    }
+                }
+            }
+        }
+
+        // Recalibrates Signature element positioning context relative to the target page drop zone
+        if (typeof isSigDragging !== 'undefined' && isSigDragging) {
+            isSigDragging = false;
+            const targetSigMarker = document.getElementById('signature-marker') || document.getElementById('signatureMarker');
+            if (targetSigMarker) {
+                const workspaceBox = document.getElementById('workspace-scaler');
+                if (workspaceBox && typeof pdfDoc !== 'undefined' && pdfDoc.getPages) {
+                    const totalPages = pdfDoc.getPages().length;
+                    if (totalPages > 1) {
+                        const currentVisualTop = parseFloat(targetSigMarker.style.top) || 0;
+                        const singlePageHeight = workspaceBox.scrollHeight / totalPages;
+                        
+                        // Dynamically lock target page context corresponding to cursor layout coordinates
+                        currentActivePageIndex = Math.floor(currentVisualTop / singlePageHeight);
+                        currentActivePageIndex = Math.max(0, Math.min(totalPages - 1, currentActivePageIndex));
+                        
+                        sigPosX = parseFloat(targetSigMarker.style.left) || 0;
+                        sigPosY = currentVisualTop - (currentActivePageIndex * singlePageHeight);
+                        console.log("🎯 Signature Dropped Safely on Page Index:", currentActivePageIndex, "Page relative posY:", sigPosY);
+                    }
+                }
+            }
+        }
+    });
 
     function convertAmountToWords(amount) {
         const sglDigit = ["Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"],
