@@ -251,7 +251,6 @@
         <button id="lockStampBtn" class="btn btn-red">📍 Place Stamp Position</button>
     </div>
 
-    <!-- 🌟 UPDATED: Added E-Sign Configuration Canvas Right Inside Your Settings Panel -->
     <div class="settings-option-item" id="eSignOptionMenu" style="margin-top: 10px;" role="button">✍️ Draw Electronic Signature</div>
 
     <div class="stamp-form" id="eSignFormArea">
@@ -299,7 +298,7 @@
 
             <div class="gen-pdf-box">
                 <h3>Generate PDF</h3>
-                <!-- PASTE THIS IN THE SIDEBAR UNDER THE 'Generate PDF' HEADER -->
+
 <div class="input-group">
     <label>Customer Name</label>
     <input type="text" id="custName" placeholder="e.g., Nadim Ahmad">
@@ -366,59 +365,50 @@
                 <div id="click-overlay"></div>
                 <div id="click-overlay-stamp" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1005; display: none; background: rgba(0,0,0,0.01);"></div>
                 
-                <!-- Interactive Asset Placement Holders Matrix -->
                                                                 <div id="qr-marker" style="position: absolute;">
                     <div style="font-size:18px;">🎯</div>
                     <span>DRAG & RESIZE</span>
                     <div id="qr-graphic-target" style="width: 100%; height: 100%; position: absolute; top:0; left:0; background:white; display:none;"></div>
-                    <!-- 🌟 ADDED: Embedded absolute close option button for QR Code -->
                     <button id="closeQrBtn" style="position: absolute; top: 4px; right: 4px; width: 18px; height: 18px; background: #ef4444; color: white; border: 2px solid white; border-radius: 50%; font-size: 11px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 99999; line-height: 1; pointer-events: auto; padding: 0; margin: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.35);">×</button>
                 </div>
 
                 
-                <!-- 🌟 STAMP CONTAINER WITH EMBEDDED ABSOLUTE CLOSE OPTION BUTTON -->
                 <div id="stamp-marker" style="position: absolute;">
                     <span>STAMP PLACEHOLDER</span>
                     <button id="closeStampBtn" style="position: absolute; top: 4px; right: 4px; width: 18px; height: 18px; background: #ef4444; color: white; border: none; border-radius: 50%; font-size: 11px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 9999; line-height: 1; pointer-events: auto;">×</button>
                 </div>
 
-                <!-- 🌟 SIGNATURE CONTAINER WITH EMBEDDED ABSOLUTE CLOSE OPTION BUTTON (DUPLICATION REMOVED) -->
                 <div id="signature-marker" style="position: absolute; width: 140px; height: 70px; border: 2px dashed #1d4ed8; display: none; align-items: center; justify-content: center; z-index: 2006; cursor: move; background: rgba(29, 78, 216, 0.02); mix-blend-mode: multiply; filter: drop-shadow(0.5px 0.5px 0.5px rgba(0,0,0,0.15)); resize: both; overflow: hidden;">
                     <span>SIGNATURE PLACEHOLDER</span>
                     <button id="closeSigBtn" style="position: absolute; top: 4px; right: 4px; width: 18px; height: 18px; background: #ef4444; color: white; border: none; border-radius: 50%; font-size: 11px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 9999; line-height: 1; pointer-events: auto;">×</button>
                 </div>
-            </div> <!-- Closes #workspace-scaler cleanly -->
+            </div> 
             
-            <!-- Your floating zoom panel controls go here natively -->
-        </div> <!-- 🌟 FIXED: Closes #dropzone / .preview-area div box wrapper safely -->
-    </div> <!-- 🌟 FIXED: Closes .main-layout grid structural parent safely -->
-</div> <!-- 🌟 FIXED: Closes the main parent .container layout safely -->
+        </div> 
+    </div> 
+</div> 
 
 <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/easyqrcodejs@4.6.2/dist/easy.qrcode.min.js"></script>
 <script>
-    // --- 🌟 RESTORED: Unified Global Architecture State Variables ---
-       const currentZoomScale = 1.0; // Hardened locked baseline ratio mapping multiplier
+
+       const currentZoomScale = 1.0; 
     let originalBytes = null;
     let productsList = [];
     
-    // Core placement interaction coordinate states (QR Code Engine)
     let posX = 100, posY = 100, isQrPlaced = false, isDragging = false;
     let isQrLocked = false;
     let offsetX = 0, offsetY = 0;
     let currentActivePageIndex = 0;
 
-    // Core placement interaction coordinate states (Digital Stamp Engine)
     let stampPosX = 250, stampPosY = 100, isStampPlaced = false, isStampDragging = false;
     let stampImgDataUrl = null, isStampLocked = false;
     let stampOffsetX = 0, stampOffsetY = 0;
 
-    // 🌟 SEPARATED INDEPENDENT TRACKING VARIABLES FOR SIGNATURE ENGINE 🌟
     let sigPosX = 80, sigPosY = 200, isSigPlaced = false, isSigDragging = false;
     let sigImgDataUrl = null, isSigLocked = false;
     let sigOffsetX = 0, sigOffsetY = 0;
 
-    // Element Target Caches
     const gearIcon = document.getElementById('gearIcon');
     const settingsPanel = document.getElementById('settingsPanel');
     const stampOptionMenu = document.getElementById('digitalStampOptionMenu');
@@ -429,7 +419,6 @@
     const signatureMarker = document.getElementById('signature-marker'); // 🌟 Added cache node
     const note = document.getElementById('on-screen-note');
 
-    // --- System-Wide Local Initialization Lifecycle Sync ---
        window.onload = () => {
         const todayObj = new Date();
         const yyyy = todayObj.getFullYear();
@@ -459,26 +448,21 @@
             }
         });
 
-        // 🌟 ADDED: Map central panel workspace container natively to activate your hidden file explorer input
                 const uploadPlaceholderPrompt = document.getElementById('upload-placeholder-prompt');
         if (uploadPlaceholderPrompt) {
-            uploadPlaceholderPrompt.style.cursor = 'pointer';      // Changes cursor arrow to hand pointer on hover
-            uploadPlaceholderPrompt.style.pointerEvents = 'auto';  // Unlocks mouse interactions safely
+            uploadPlaceholderPrompt.style.cursor = 'pointer';     
+            uploadPlaceholderPrompt.style.pointerEvents = 'auto';  
             
             uploadPlaceholderPrompt.onclick = () => {
                 const fileInputNode = document.getElementById('fileInput');
-                if (fileInputNode) fileInputNode.click();           // Dispatches native operating system file explorer
+                if (fileInputNode) fileInputNode.click();          
             };
         }
-    }; // Closes your window.onload wrapper routine perfectly
+    }; 
 
-    /* ==========================================================================
-       🏵️ RESTORED: DIGITAL INK STAMP CONFIGURATION & GENERATION MODULE
-       ========================================================================== */
     lockStampBtn.onclick = () => {
         if (!originalBytes) return alert("Select or Generate PDF First");
         
-        // Fix Scope: Safely isolate localized format calculations inside the click thread
         const todayObj = new Date();
         const yyyy = todayObj.getFullYear();
         const mm = String(todayObj.getMonth() + 1).padStart(2, '0');
@@ -514,7 +498,6 @@
         stampGraphicBufferCanvas.height = 480;
         const bufferCtx = stampGraphicBufferCanvas.getContext('2d');
 
-        // Execute drawing operations onto your workspace canvas layout substrate safely...
         for (let idx = 0; idx < 450; idx++) {
             const randomSpreadX = Math.random() * 480;
             const randomSpreadY = Math.random() * 480;
@@ -527,7 +510,6 @@
 
         stampImgDataUrl = stampGraphicBufferCanvas.toDataURL('image/png');
 
-        // Embedded close option button overlay inside the template string context
         stampMarker.innerHTML = `
             <img src="${stampImgDataUrl}" style="width:100%; height:100%; pointer-events:none;" />
             <button id="closeStampBtn" style="position: absolute; top: 4px; right: 4px; width: 18px; height: 18px; background: #ef4444; color: white; border: 2px solid white; border-radius: 50%; font-size: 11px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 99999; line-height: 1; pointer-events: auto; padding: 0; margin: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.35);">×</button>
@@ -542,7 +524,7 @@
         const closeStampBtn = document.getElementById('closeStampBtn');
         if (closeStampBtn) {
             closeStampBtn.onclick = (e) => {
-                e.stopPropagation(); // Safeguard override blocks background movement glitches
+                e.stopPropagation();
                 stampMarker.style.display = 'none';
                 isStampPlaced = false;
                 isStampLocked = false;
@@ -550,9 +532,6 @@
         }
     };
 
-    /* ==========================================================================
-       🌟 UNTOUCHED UTILITY HANDLERS & INPUT EVENT TUNNELS RE-CONNECTED
-       ========================================================================== */
     document.getElementById('fileInput').onchange = async (e) => {
         const file = e.target.files[0];
         if (!file) return;
@@ -569,22 +548,17 @@
         document.getElementById('click-overlay').onclick = (e) => {
         const rect = document.getElementById('workspace-scaler').getBoundingClientRect();
         
-        // Get raw coordinates relative to the full scrolling viewport frame
         let rawPosX = (e.clientX - rect.left); 
         let rawPosY = (e.clientY - rect.top);
         
-        // ⚠️ 🌟 HIGH-PRECISION FIX: Reset vertical coordinate layout relative to clicked page 🌟 ⚠️
         if (typeof pdfDoc !== 'undefined' && pdfDoc.getPages) {
             const documentTotalPagesList = pdfDoc.getPages();
             if (documentTotalPagesList.length > 1) {
-                // Determine the physical pixel height of a single page container
                 const singlePageHeight = rect.height / documentTotalPagesList.length;
                 
-                // Track exactly which page index was selected under the mouse click pointer
                 currentActivePageIndex = Math.floor(rawPosY / singlePageHeight);
                 currentActivePageIndex = Math.max(0, Math.min(documentTotalPagesList.length - 1, currentActivePageIndex));
                 
-                // Subtract the heights of all previous pages to make positioning relative to current page top edge
                 posX = rawPosX;
                 posY = rawPosY - (currentActivePageIndex * singlePageHeight);
                 console.log("🎯 QR Anchor Locked - Target Page:", currentActivePageIndex + 1, "Page-Relative posY:", posY);
@@ -602,7 +576,6 @@
         const halfMarkerWidth = marker.clientWidth / 2 || 40;
         const halfMarkerHeight = marker.clientHeight / 2 || 40;
         
-        // Retain original onscreen visual positioning rules matching user view tracking precisely
         marker.style.left = (rawPosX - halfMarkerWidth) + 'px'; 
         marker.style.top = (rawPosY - halfMarkerHeight) + 'px';
         marker.style.display = 'flex';
@@ -646,22 +619,17 @@
     document.getElementById('click-overlay-stamp').onclick = (e) => {
         const rect = document.getElementById('workspace-scaler').getBoundingClientRect();
         
-        // Get raw coordinates relative to the full scrolling viewport frame
         let rawStampPosX = (e.clientX - rect.left); 
         let rawStampPosY = (e.clientY - rect.top);
 
-        // ⚠️ 🌟 HIGH-PRECISION FIX: Reset vertical coordinate layout relative to clicked page 🌟 ⚠️
         if (typeof pdfDoc !== 'undefined' && pdfDoc.getPages) {
             const documentTotalPagesList = pdfDoc.getPages();
             if (documentTotalPagesList.length > 1) {
-                // Determine the physical pixel height of a single page container
                 const singlePageHeight = rect.height / documentTotalPagesList.length;
                 
-                // Track exactly which page index was selected under the mouse click pointer
                 currentActivePageIndex = Math.floor(rawStampPosY / singlePageHeight);
                 currentActivePageIndex = Math.max(0, Math.min(documentTotalPagesList.length - 1, currentActivePageIndex));
                 
-                // Subtract the heights of all previous pages to make positioning relative to current page top edge
                 stampPosX = rawStampPosX;
                 stampPosY = rawStampPosY - (currentActivePageIndex * singlePageHeight);
                 console.log("🎯 Stamp Anchor Locked - Target Page:", currentActivePageIndex + 1, "Page-Relative stampPosY:", stampPosY);
@@ -676,7 +644,6 @@
             stampPosY = rawStampPosY;
         }
         
-        // Retain original onscreen visual positioning rules matching user view tracking precisely
         stampMarker.style.left = (rawStampPosX - 60) + 'px';
         stampMarker.style.top = (rawStampPosY - 60) + 'px';
         stampMarker.style.display = 'flex';
@@ -691,9 +658,7 @@
         if (note) note.style.display = 'none';
     };
 
-// =========================================================================
 
-    // ... Your restored marker.onmousedown and drag tracking functions live right below this ...
     marker.onmousedown = (e) => { 
         if (isQrLocked) return; 
         // ...
@@ -704,13 +669,10 @@
         }
     };
 
-            /* ==========================================================================
-       🌟 DETACHED INFRASTRUCTURE: INDEPENDENT MOUSE DOWN CLICK HOOKS
-       ========================================================================== */
+
         stampMarker.onmousedown = (e) => { 
         if (isStampLocked) return; 
         
-        // 🌟 SAFETY TRAP: If user clicks the close '×' button circle, exit drag code immediately!
         if (e.target.tagName === 'BUTTON') return;
 
         if (e.offsetX < stampMarker.clientWidth - 15 && e.offsetY < stampMarker.clientHeight - 15) {
@@ -723,7 +685,6 @@
     signatureMarker.onmousedown = (e) => { 
         if (isSigLocked) return; 
         
-        // 🌟 SAFETY TRAP: If user clicks the close '×' button circle, exit drag code immediately!
         if (e.target.tagName === 'BUTTON') return;
 
         if (e.offsetX < signatureMarker.clientWidth - 15 && e.offsetY < signatureMarker.clientHeight - 15) {
@@ -733,9 +694,7 @@
         }
     };
 
-    /* ==========================================================================
-       🌟 DETACHED INFRASTRUCTURE: INDEPENDENT MOUSE MOVEMENT LOOPS
-       ========================================================================== */
+
     window.onmousemove = (e) => {
         const rect = document.getElementById('workspace-scaler').getBoundingClientRect();
         if (isDragging && !isQrLocked) {
@@ -758,7 +717,6 @@
             stampMarker.style.left = stampPosX + 'px';
             stampMarker.style.top = stampPosY + 'px';
         }
-        // 🌟 FIXED: Tracks signature drag calculations without interfering with other variables
         if (isSigDragging && !isSigLocked) {
             sigPosX = (e.clientX - rect.left) - sigOffsetX;
             sigPosY = (e.clientY - rect.top) - sigOffsetY;
@@ -777,9 +735,6 @@
         isSigDragging = false; 
     };
 
-    /* ==========================================================================
-       🌟 DETACHED INFRASTRUCTURE: INDEPENDENT MOBILE TOUCH GENERATORS
-       ========================================================================== */
     signatureMarker.ontouchstart = (e) => {
         if (isSigLocked) return;
         isSigDragging = true;
@@ -810,7 +765,6 @@
             stampMarker.style.top = stampPosY + 'px';
         }
 
-        // 🌟 FIXED: Handles mobile finger movements uniquely for your signature pad layers
         if (signatureMarker.style.display === 'flex' && !isSigLocked && isSigDragging) {
             sigPosX = (touch.clientX - rect.left) - sigOffsetX;
             sigPosY = (touch.clientY - rect.top) - sigOffsetY;
@@ -828,9 +782,7 @@
         isStampDragging = false;
         isSigDragging = false;
     });
-    // =========================================================================
-    // 🌟 RESTORED: Untouched Keyboard Event Listeners for Object Locking
-    // =========================================================================
+   
     window.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
             if (!originalBytes) return;
@@ -883,12 +835,7 @@
         }
     });
 
-    /* ==========================================================================
-       ⚡ DOWNLOAD CORE: RESTORED ORIGINAL PROPORTIONAL SQUARE MATH FOR ALL
-       ========================================================================== */
-        /* ==========================================================================
-       ⚡ DOWNLOAD CORE: RESTORED ORIGINAL PROPORTIONAL SQUARE MATH FOR ALL
-       ========================================================================== */
+
         document.getElementById('downloadBtn').onclick = async () => {
         try {
             const name = document.getElementById('payeeName').value;
@@ -910,7 +857,6 @@
             const pdfDoc = await PDFLib.PDFDocument.load(originalBytes);
             
             const pagesCollection = pdfDoc.getPages();
-            // ⚠️ 🌟 CRITICAL FIX: Safe integer evaluation captures multi-page tracking cleanly!
             const safePageIndex = (typeof currentActivePageIndex === 'number') ? currentActivePageIndex : 0;
             const targetExportPage = pagesCollection[safePageIndex] || pagesCollection[0];
 
@@ -936,11 +882,9 @@
                 actualWorkspaceHeight = preview.offsetHeight;
             }
 
-            // original scaling factor calculations (untouched)
             const currentResponsiveLayoutScaleFactorX = imgFrameNode.offsetWidth / actualWorkspaceWidth || 1;
             const currentResponsiveLayoutScaleFactorY = imgFrameNode.offsetHeight / actualWorkspaceHeight || 1;
 
-            /* ─── BLOCK 1: INJECT THE REAL-TIME UPI QR CODE (UNTOUCHED ORIGINAL LOGIC) ─── */
             const finalLeftPos = (isQrLocked ? (posX - 40) : (parseFloat(marker.style.left) || (posX - 40))) / currentResponsiveLayoutScaleFactorX;
             const finalTopPos = (isQrLocked ? (posY - 40) : (parseFloat(marker.style.top) || (posY - 40))) / currentResponsiveLayoutScaleFactorY;
 
@@ -958,14 +902,12 @@
                 height: finalSquareSize
             });
             
-            /* ─── BLOCK 2: INJECT THE DIGITAL INK STAMP (CLONED UNIFORM SQUARE MATH) ─── */
             if (isStampPlaced && stampImgDataUrl) {
                 const stampImageObject = await pdfDoc.embedPng(stampImgDataUrl);
 
                 const finalStampLeft = (isStampLocked ? (stampPosX - 60) : (parseFloat(stampMarker.style.left) || (stampPosX - 60))) / currentResponsiveLayoutScaleFactorX;
                 const finalStampTop = (isStampLocked ? (stampPosY - 60) : (parseFloat(stampMarker.style.top) || (stampPosY - 60))) / currentResponsiveLayoutScaleFactorY;
 
-                // ⚠️ UNTOUCHED LOGIC: Uses your exact Math.max logic to make it a perfect circle
                 let stampWidthCalc = (stampMarker.clientWidth / actualWorkspaceWidth) * width;
                 let stampHeightCalc = (stampMarker.clientHeight / actualWorkspaceHeight) * height;
                 let uniformStampSize = Math.max(stampWidthCalc, stampHeightCalc);
@@ -981,7 +923,6 @@
                 });
             }
 
-            /* ─── BLOCK 3: INJECT THE ELECTRONIC SIGNATURE (PRESERVE NATURAL SHAPE RECTANGLE) ─── */
             if (isSigPlaced && sigImgDataUrl && signatureMarker) {
                 const sigImageObject = await pdfDoc.embedPng(sigImgDataUrl);
 
@@ -1073,21 +1014,15 @@
         productsList = [];
         renderProductsPreviewWorkspace();
     };
-    /* ==========================================================================
-       📑 FIXED: MULTI-PAGE VIEWPORT NAVIGATION STATE ENGINE
-       ========================================================================== */
-    
-    // 1. Locate your "Next Page" button click handler and update it to this:
-    const nextPageBtn = document.getElementById('nextPageBtn') || document.getElementById('nextPage');
+
+        const nextPageBtn = document.getElementById('nextPageBtn') || document.getElementById('nextPage');
     if (nextPageBtn) {
         const originalNextPageClick = nextPageBtn.onclick;
         nextPageBtn.onclick = (e) => {
             if (typeof originalNextPageClick === 'function') {
                 originalNextPageClick(e);
             }
-            // ⚠️ CRITICAL FIX: Track the active index value when page moves forward
             if (typeof currentActivePageIndex !== 'undefined') {
-                // Ensure page calculation index stays within total document page boundaries
                 if (pagesCollection && currentActivePageIndex < pagesCollection.length - 1) {
                     currentActivePageIndex++;
                 } else if (typeof pdfDoc !== 'undefined' && pdfDoc.getPages) {
@@ -1099,7 +1034,6 @@
         };
     }
 
-    // 2. Locate your "Previous Page" button click handler and update it to this:
     const prevPageBtn = document.getElementById('prevPageBtn') || document.getElementById('prevPage');
     if (prevPageBtn) {
         const originalPrevPageClick = prevPageBtn.onclick;
@@ -1107,7 +1041,6 @@
             if (typeof originalPrevPageClick === 'function') {
                 originalPrevPageClick(e);
             }
-            // ⚠️ CRITICAL FIX: Track the active index value when page moves backward
             if (typeof currentActivePageIndex !== 'undefined' && currentActivePageIndex > 0) {
                 currentActivePageIndex--;
             }
@@ -1180,7 +1113,6 @@
                 rightSideTextY -= 14;
             }
 
-                        // --- FIXED: Combines both mobile numbers horizontally onto one clean line ---
             if (bMob1 !== "") {
                 let combinedMobileText = `Mo. ${bMob1}`;
                 if (bMob2 !== "") {
@@ -1192,10 +1124,9 @@
                     size: 10, 
                     font: boldFont 
                 });
-                rightSideTextY -= 12; // Shift coordinate down precisely by one line height
+                rightSideTextY -= 12; 
             }
 
-            // --- Email configuration block sits cleanly right underneath ---
             if (bEmail !== "") {
                 targetPage.drawText(bEmail, { 
                     x: width - 180, 
@@ -1205,8 +1136,6 @@
                 });
             }
 
-
-            // --- Unified Company Business Name Header ---
             if (bName !== "") {
                 targetPage.drawText(bName, { x: 40, y: height - 95, size: 24, font: boldFont });
             }
@@ -1223,16 +1152,12 @@
                 targetPage.drawText(`Date:  __ / __ / 20__`, { x: width - 150, y: subHeaderY, size: 10, font: boldFont });
             }
 
-            // Solid horizontal boundary line break below the header data blocks
-            // Solid horizontal boundary line break below the header data blocks
 targetPage.drawLine({ start: { x: 40, y: height - 122 }, end: { x: width - 40, y: height - 122 }, strokeWidth: 1.5 });
 let clientY = height - 150;
 
-// Dynamic customer metrics rendering strings
 targetPage.drawText(`Mr./Mrs. ${cName}`, { x: 40, y: clientY, size: 11, font: boldFont });
 targetPage.drawText(`Mo. ${cMob}`, { x: width - 220, y: clientY, size: 11, font: boldFont });
 
-// Draw structural baseline underlines under dynamic values for a clean look
 targetPage.drawLine({ start: { x: 90, y: clientY - 3 }, end: { x: width - 250, y: clientY - 3 }, strokeWidth: 1 });
 targetPage.drawLine({ start: { x: width - 195, y: clientY - 3 }, end: { x: width - 40, y: clientY - 3 }, strokeWidth: 1 });
 
@@ -1255,8 +1180,6 @@ targetPage.drawLine({ start: { x: 95, y: clientY - 3 }, end: { x: width - 40, y:
             targetPage.drawLine({ start: { x: colX.part, y: tableTopY }, end: { x: colX.part, y: tableBottomY }, strokeWidth: 1 });
             targetPage.drawLine({ start: { x: colX.qty, y: tableTopY }, end: { x: colX.qty, y: tableBottomY }, strokeWidth: 1 });
             
-            // 🌟 FIXED: Vertical column separation bars extend cleanly straight to the baseline grid boundaries
-            // Extends the vertical division bars all the way to tableBottomY - 80 so they seal the outer boxes completely
 targetPage.drawLine({ start: { x: tableLeftX, y: tableTopY }, end: { x: tableLeftX, y: tableBottomY - 80 }, strokeWidth: 1 });
 targetPage.drawLine({ start: { x: colX.rate, y: tableTopY }, end: { x: colX.rate, y: tableBottomY - 80 }, strokeWidth: 1 }); 
 targetPage.drawLine({ start: { x: colX.amt, y: tableTopY }, end: { x: colX.amt, y: tableBottomY - 80 }, strokeWidth: 1 }); 
@@ -1289,7 +1212,6 @@ targetPage.drawLine({ start: { x: colX.end, y: tableTopY }, end: { x: colX.end, 
 
             const cgstValue = subTotalCost * 0.09;
 const sgstValue = subTotalCost * 0.09;
-// Round up or down to the nearest clean whole number
 const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
 
 
@@ -1305,32 +1227,23 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
             targetPage.drawText("CGST  9%", { x: colX.rate + 6, y: tableBottomY - 34, size: 10, font: regularFont });
             targetPage.drawText(cgstValue.toFixed(2), { x: colX.amt + 15, y: tableBottomY - 34, size: 11, font: regularFont });
 
-                        // ... [Your existing CGST and SGST text values are printed right above this] ...
             targetPage.drawText("SGST  9%", { x: colX.rate + 6, y: tableBottomY - 54, size: 10, font: regularFont });
             targetPage.drawText(sgstValue.toFixed(2), { x: colX.amt + 15, y: tableBottomY - 54, size: 11, font: regularFont });
 
-            // =========================================================================
-            // 📥 REMOVE YOUR OLD TOTALS & WORDS BLOCK AND PASTE THIS NEW SNIPPET HERE:
-            // =========================================================================
-            // --- 5. Amount To Words Calculation String Call (Auto-Scaling) ---
+
             const wordsTranslationString = `In words:  ${convertAmountToWords(absoluteGrandTotal)}`;
             
-            // Default base font size configuration
             let wordsFontSize = 10; 
             
-            // Define your maximum safe drawing boundary line width (Left table column box width)
             const maxAllowedTextWidth = colX.rate - tableLeftX - 15; 
             
-            // Calculate actual text width dynamically based on font metric systems
             let currentWordsWidth = boldFont.widthOfTextAtSize(wordsTranslationString, wordsFontSize);
             
-            // Loop to dynamically shrink font size downward if text overflows the border width limit
             while (currentWordsWidth > maxAllowedTextWidth && wordsFontSize > 6) {
                 wordsFontSize -= 0.5;
                 currentWordsWidth = boldFont.widthOfTextAtSize(wordsTranslationString, wordsFontSize);
             }
 
-            // Draw the string using the dynamically computed safe font scale factor bounds
             targetPage.drawText(wordsTranslationString, { 
                 x: tableLeftX + 5, 
                 y: tableBottomY - 74, 
@@ -1338,16 +1251,12 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
                 font: boldFont 
             });
             
-            // --- 7. Render Final Summary Calculation Labels Safely ---
             targetPage.drawText("Total", { x: colX.rate + 6, y: tableBottomY - 74, size: 12, font: boldFont });
             targetPage.drawText(absoluteGrandTotal.toFixed(0), { x: colX.amt + 15, y: tableBottomY - 74, size: 12, font: boldFont });
-            // =========================================================================
 
-            // Your existing signature setup or file generation lines continue right below it:
             targetPage.drawText("Signature or Stamp", { x: width - 140, y: tableBottomY - 120, size: 10, font: boldFont });
             
             const amountInput = document.getElementById('amount');
-            // ...
 
             amountInput.value = absoluteGrandTotal.toFixed(2);
             amountInput.dispatchEvent(new Event('input'));
@@ -1381,13 +1290,10 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
     businessOptionMenu.onclick = () => {
         businessFormArea.style.display = businessFormArea.style.display === 'block' ? 'none' : 'block';
     };
-    // ------------------------------------
-
-    // 🌟 ADDED: Draggable Overlays Manual Close Button Functionality Channels
         const closeStampBtn = document.getElementById('closeStampBtn');
     if (closeStampBtn) {
         closeStampBtn.onclick = (e) => {
-            e.stopPropagation(); // Stops event bubbling to prevent dragging glitches
+            e.stopPropagation(); 
             if (stampMarker) {
                 stampMarker.style.display = 'none';
                 isStampPlaced = false; 
@@ -1399,7 +1305,7 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
     const closeSigBtn = document.getElementById('closeSigBtn');
     if (closeSigBtn) {
         closeSigBtn.onclick = (e) => {
-            e.stopPropagation(); // Stops event bubbling to prevent dragging glitches
+            e.stopPropagation(); 
             if (signatureMarker) {
                 signatureMarker.style.display = 'none';
                 isSigPlaced = false; 
@@ -1408,14 +1314,13 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
         };
     }
 
-    // 🌟 ADDED: Direct event portal channel to hide the QR Code container layout safely
     const closeQrBtn = document.getElementById('closeQrBtn');
     if (closeQrBtn) {
         closeQrBtn.onclick = (e) => {
-            e.stopPropagation(); // Prevents click gesture event from leaking into the drag engine
+            e.stopPropagation();
             if (marker) {
                 marker.style.display = 'none';
-                isQrPlaced = false; // Prevents downline compilers from rendering the graphic row
+                isQrPlaced = false;
                 isQrLocked = false;
                 
                 const qrTarget = document.getElementById('qr-graphic-target');
@@ -1423,7 +1328,6 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
             }
         };
     }
-    // ------------------------------------
 
     const eSignOptionMenu = document.getElementById('eSignOptionMenu');
     const eSignFormArea = document.getElementById('eSignFormArea');
@@ -1434,7 +1338,6 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
         };
     }
 
-    // Advanced High-Resolution Signature Capture Setup
     const signCanvas = document.getElementById('signatureCanvas');
     let signCtx = null;
     let isDrawingSignature = false;
@@ -1442,22 +1345,19 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
     if (signCanvas) {
         signCtx = signCanvas.getContext('2d');
         
-        // Advanced Hi-DPI Retina Scaling Factor Engine (4x crisp resolution map)
         const scalingUpscaleFactor = 4;
         signCanvas.width = 240 * scalingUpscaleFactor;
         signCanvas.height = 120 * scalingUpscaleFactor;
         
         signCtx.scale(scalingUpscaleFactor, scalingUpscaleFactor);
         
-        signCtx.strokeStyle = "#1d4ed8"; // Rich royal blue fountain pen ink
+        signCtx.strokeStyle = "#1d4ed8";
         signCtx.lineWidth = 2.5;
         signCtx.lineCap = "round";
         signCtx.lineJoin = "round";
 
-        // Get highly precise relative pointer placement coordinates
         const getCanvasPointerPos = (canvasElement, eventTrigger) => {
             const rect = canvasElement.getBoundingClientRect();
-            // Unified touch fallback extraction targeting touch arrays correctly on mobile engines
             const touchSource = eventTrigger.touches && eventTrigger.touches.length > 0 ? eventTrigger.touches[0] : eventTrigger;
             return {
                 x: (touchSource.clientX - rect.left) * (240 / rect.width),
@@ -1465,7 +1365,6 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
             };
         };
 
-        // Stroke event mappings (Mouse and Mobile Touch pointers)
         const startStroke = (e) => {
             isDrawingSignature = true;
             const pos = getCanvasPointerPos(signCanvas, e);
@@ -1490,28 +1389,23 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
         window.addEventListener('touchend', stopStroke);
     }
 
-    // Action Channels: Clear Pad logic
     const clearSignBtn = document.getElementById('clearSignBtn');
     if (clearSignBtn) {
         clearSignBtn.onclick = () => {
             if (signCtx && signCanvas) {
                 signCtx.clearRect(0, 0, signCanvas.width, signCanvas.height);
-                localStorage.removeItem('cachedESignatureDataUrl'); // Clear persistent storage states
+                localStorage.removeItem('cachedESignatureDataUrl');
             }
         };
     }
-
-            // Action Channels: Place Signature on Workspace
     const lockSignBtn = document.getElementById('lockSignBtn');
     if (lockSignBtn) {
         lockSignBtn.onclick = () => {
             if (!originalBytes) return alert("Select or Generate PDF First");
             if (!signCanvas) return;
             
-            // 🌟 FIXED: Convert drawing to its own independent signature variable
             sigImgDataUrl = signCanvas.toDataURL('image/png', 1.0);
             
-            // Save signature persistently to local storage state
             localStorage.setItem('cachedESignatureDataUrl', sigImgDataUrl);
             
             renderSignatureToWorkspace(sigImgDataUrl);
@@ -1521,13 +1415,9 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
         };
     }
 
-    // Isolated render function used on initial loads and button clicks alike
-       // Isolated render function used on initial loads and button clicks alike
     function renderSignatureToWorkspace(imgDataStr) {
-        // Target the unique signature HTML element container instead of stampMarker
         if (!signatureMarker) return;
 
-        // 🌟 FIXED: Embedded button inside your innerHTML string so it stays on screen
         signatureMarker.innerHTML = `
             <img src="${imgDataStr}" style="width:100%; height:100%; object-fit:contain; pointer-events:none;" alt="High Resolution E-Sign" />
             <button id="closeSigBtn" style="position: absolute; top: 4px; right: 4px; width: 18px; height: 18px; background: #ef4444; color: white; border: 2px solid white; border-radius: 50%; font-size: 11px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 99999; line-height: 1; pointer-events: auto; padding: 0; margin: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.35);">×</button>
@@ -1538,7 +1428,6 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
         signatureMarker.style.borderRadius = '0px';
         signatureMarker.style.border = "2px dashed #1d4ed8";
         
-        // Read saved structural layout tracking offsets if they exist
         signatureMarker.style.left = localStorage.getItem('signatureLeftPos') || '80px';
         signatureMarker.style.top = localStorage.getItem('signatureTopPos') || '200px';
         signatureMarker.style.display = 'flex';
@@ -1546,11 +1435,10 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
         isSigPlaced = true;
         isSigLocked = false;
 
-        // 🌟 FIXED: Closes and hides signature when the red × button is clicked
         const closeSigBtn = document.getElementById('closeSigBtn');
         if (closeSigBtn) {
             closeSigBtn.onclick = (e) => {
-                e.stopPropagation(); // Stops drag engine stutters
+                e.stopPropagation();
                 signatureMarker.style.display = 'none';
                 isSigPlaced = false;
                 isSigLocked = false;
@@ -1562,18 +1450,10 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
         setTimeout(() => { note.style.display = 'none'; }, 4000);
     }
 
-    /* ==========================================================================
-       🌟 RETINA PERSISTENT CACHE REHYDRATION ENGINE 🌟
-       ========================================================================== */
-            /* ==========================================================================
-       🌟 RETINA PERSISTENT CACHE REHYDRATION ENGINE 🌟
-       ========================================================================== */
     const savedSignatureCache = localStorage.getItem('cachedESignatureDataUrl');
     if (savedSignatureCache && signatureMarker) {
-        // 🌟 FIXED: Map the cached data string safely to your unique signature variable
         sigImgDataUrl = savedSignatureCache;
         
-        // Force-render signature nodes immediately into its own dedicated element frame layout
         signatureMarker.innerHTML = `<img src="${savedSignatureCache}" style="width:100%; height:100%; object-fit:contain; pointer-events:none;" alt="High Resolution E-Sign" />`;
         signatureMarker.style.width = '140px';
         signatureMarker.style.height = '70px';
@@ -1582,16 +1462,13 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
         signatureMarker.style.left = localStorage.getItem('signatureLeftPos') || '80px';
         signatureMarker.style.top = localStorage.getItem('signatureTopPos') || '200px';
         
-        // Keep it hidden initially so it never pops up automatically on document load
         signatureMarker.style.display = 'none'; 
         isSigPlaced = false;
 
-        // Instantly redraw the saved signature back into the settings pad box canvas upon page refresh
         if (signCanvas && signCtx) {
             const signatureTemplateImage = new Image();
             signatureTemplateImage.src = savedSignatureCache;
             signatureTemplateImage.onload = () => {
-                // Temporarily normalize canvas matrix coordinates to scale the cache layout correctly
                 signCtx.save();
                 signCtx.setTransform(1, 0, 0, 1, 0, 0);
                 signCtx.drawImage(signatureTemplateImage, 0, 0, signCanvas.width, signCanvas.height);
@@ -1600,15 +1477,12 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
         }
     }
 
-    // 🌟 CLEANED: Restored your file selector to its original behavior without forcing signatures automatically
-       // 🌟 CLEANED: Restored your file selector to its original behavior and isolated signature states
     const originalFileInputChangeHandler = document.getElementById('fileInput').onchange;
     document.getElementById('fileInput').onchange = async (e) => {
         if (typeof originalFileInputChangeHandler === 'function') {
             await originalFileInputChangeHandler(e);
         }
         
-        // Reset signature display bounds exactly like the QR code and stamp markers
         if (signatureMarker) {
             signatureMarker.style.display = 'none'; 
             signatureMarker.style.borderColor = "#1d4ed8";
@@ -1618,7 +1492,6 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
         }
     };
 
-    // 🌟 CLEANED: Restored your template generator to its original behavior and isolated signature states
     const originalMakePdfClickHandler = document.getElementById('makePdfBtn').onclick;
     if (document.getElementById('makePdfBtn')) {
         document.getElementById('makePdfBtn').onclick = async () => {
@@ -1626,7 +1499,6 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
                 await originalMakePdfClickHandler();
             }
             
-            // Reset signature display bounds exactly like the QR code and stamp markers
             if (signatureMarker) {
                 signatureMarker.style.display = 'none'; 
                 signatureMarker.style.borderColor = "#1d4ed8";
@@ -1637,24 +1509,20 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
         };
     }
 
-    // 🌟 SEPARATED: Global mouse release positional coordinate tracker caches
     const originalMouseUpHandler = window.onmouseup;
     window.onmouseup = () => {
         if (typeof originalMouseUpHandler === 'function') originalMouseUpHandler();
         
-        // Store stamp positioning layout offsets
         if (isStampPlaced && stampMarker && stampMarker.style.display === 'flex') {
             localStorage.setItem('stampLeftPos', stampMarker.style.left);
             localStorage.setItem('stampTopPos', stampMarker.style.top);
         }
         
-        // Store signature positioning layout offsets completely separately
         if (isSigPlaced && signatureMarker && signatureMarker.style.display === 'flex') {
             localStorage.setItem('signatureLeftPos', signatureMarker.style.left);
             localStorage.setItem('signatureTopPos', signatureMarker.style.top);
         }
     };
-    // ------------------------------------
 
     lockStampBtn.onclick = () => {
 
@@ -1768,7 +1636,6 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
 
         stampImgDataUrl = stampGraphicBufferCanvas.toDataURL('image/png');
 
-        // 🌟 FIXED: Embedded button inside your innerHTML template string so it remains visible over the raw image frame
         stampMarker.innerHTML = `
             <img src="${stampImgDataUrl}" style="width:100%; height:100%; pointer-events:none;" />
             <button id="closeStampBtn" style="position: absolute; top: 4px; right: 4px; width: 18px; height: 18px; background: #ef4444; color: white; border: 2px solid white; border-radius: 50%; font-size: 11px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 99999; line-height: 1; pointer-events: auto; padding: 0; margin: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.35);">×</button>
@@ -1780,11 +1647,10 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
         note.style.display = 'block';
         document.getElementById('click-overlay-stamp').style.display = 'block';
         
-        // 🌟 FIXED: Attached dynamic button dismiss handler immediately following node creation
         const closeStampBtn = document.getElementById('closeStampBtn');
         if (closeStampBtn) {
             closeStampBtn.onclick = (e) => {
-                e.stopPropagation(); // Web Dev Safeguard: Stop gesture from firing background drag triggers
+                e.stopPropagation(); 
                 stampMarker.style.display = 'none';
                 isStampPlaced = false;
                 isStampLocked = false;
@@ -1798,16 +1664,12 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
         stampPosX = (e.clientX - rect.left); 
         stampPosY = (e.clientY - rect.top);
 
-        // ⚠️ 🌟 CRITICAL MULTI-PAGE FIX: Dynamic Geometric Page Resolver Math 🌟 ⚠️
-        // Automatically calculates the exact target page row based on your vertical click coordinates!
         if (typeof pdfDoc !== 'undefined' && pdfDoc.getPages) {
             const documentTotalPagesList = pdfDoc.getPages();
             if (documentTotalPagesList.length > 1) {
-                // Divide the full screen container height by total pages to get a single page height segment
                 const calculatedSinglePageHeightIndex = rect.height / documentTotalPagesList.length;
                 currentActivePageIndex = Math.floor(stampPosY / calculatedSinglePageHeightIndex);
                 
-                // Clamp index safely inside total document boundaries to prevent array limits errors
                 currentActivePageIndex = Math.max(0, Math.min(documentTotalPagesList.length - 1, currentActivePageIndex));
                 console.log("🎯 Geometric Context Sync: Auto-Calculated Target Stamp Page Index:", currentActivePageIndex);
             }
@@ -1830,7 +1692,6 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
 
     stampMarker.onmousedown = (e) => { 
         if (isStampLocked) return; 
-        // 🌟 FIXED: Drop drag computations immediately if cursor selects the deletion node
         if (e.target.id === 'closeStampBtn') return;
         
         if (e.offsetX < stampMarker.clientWidth - 15 && e.offsetY < stampMarker.clientHeight - 15) {
@@ -1875,9 +1736,7 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
         
         document.getElementById('previewBtn').style.display = 'block';
         document.getElementById('downloadBtn').style.display = 'block';
-    }    /* ==========================================================================
-       👁️ PREVIEW CORE: RESTORED ORIGINAL PROPORTIONAL SQUARE MATH FOR ALL
-       ========================================================================== */
+    }    
     document.getElementById('previewBtn').onclick = async () => {
         try {
             if (!originalBytes) return alert("Select or Generate PDF First");
@@ -1959,7 +1818,6 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
                 const pdfDoc = await PDFLib.PDFDocument.load(originalBytes);
                 
                 const pagesCollection = pdfDoc.getPages();
-                // ⚠️ 🌟 CRITICAL FIX: Safe integer evaluation captures multi-page tracking cleanly inside your real-time preview matrix!
                 const safePageIndex = (typeof currentActivePageIndex === 'number') ? currentActivePageIndex : 0;
                 const targetExportPage = pagesCollection[safePageIndex] || pagesCollection;
                 
@@ -2067,12 +1925,10 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
         }
     }
 
-    // Intercept broad-spectrum button gestures across your user interface elements
     document.addEventListener('click', (e) => {
         const targetElement = e.target;
         if (!targetElement) return;
 
-        // Automatically captures actions from common pagination button IDs or class frameworks
         if (targetElement.id === 'nextPageBtn' || targetElement.id === 'nextPage' || targetElement.classList.contains('next-page-btn')) {
             setTimeout(() => {
                 const el = document.getElementById('page_num') || document.getElementById('pageNum') || document.getElementById('pageNumberDisplay');
@@ -2087,7 +1943,6 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
         }
     });
 
-    // Intercept active scroll toggles or page selection drop-down events
     document.addEventListener('change', (e) => {
         const target = e.target;
         if (target && (target.id === 'pageSelect' || target.id === 'pageDropdown' || target.id === 'page_num' || target.classList.contains('page-selector'))) {
@@ -2095,7 +1950,6 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
         }
     });
 
-    // Fallback Mutation Observer targeting raw text changes inside the viewer layouts
     const pageNumDisplayTracker = document.getElementById('page_num') || document.getElementById('pageNum') || document.getElementById('pageNumberDisplay');
     if (pageNumDisplayTracker) {
         const pageTextObserver = new MutationObserver(() => {
@@ -2104,7 +1958,6 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
         pageTextObserver.observe(pageNumDisplayTracker, { childList: true, characterData: true, subtree: true });
     }
 
-    // Additional Fallback Dropdown Listener
     const dynamicPageSelectorDropdown = document.getElementById('pageSelect') || document.getElementById('pageDropdown');
     if (dynamicPageSelectorDropdown) {
         dynamicPageSelectorDropdown.addEventListener('change', (e) => {
@@ -2114,19 +1967,11 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
             }
         });
     }
-    // ------------------------------------
 
-    /* ==========================================================================
-       🚀 ENTERPRISE MULTI-PAGE DESCRIPTOR INTERSECTION ENGINE (WORLD-CLASS FIX)
-       ========================================================================== */
-    // Automatically watches visible page nodes on your screen and syncs background memory
     const initializeWorldClassPageObserver = () => {
-        // Target individual page container classes inside your PDF scrolling viewer container
-        // Matches standard wrappers like .page, [data-page-number], .pdf-page, or canvas frames
         const scrollPageNodes = document.querySelectorAll('.page, [data-page-number], .pdf-page, #workspace-scaler canvas');
         
         if (scrollPageNodes.length === 0) {
-            // Fallback: If no sub-pages are rendered yet, look for a standard container viewport scroll
             const fallbackScaler = document.getElementById('workspace-scaler');
             if (fallbackScaler) {
                 fallbackScaler.addEventListener('scroll', () => {
@@ -2141,19 +1986,17 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
         }
 
         const pageViewSettings = {
-            root: document.getElementById('workspace-scaler') || null, // Watches view viewport scrolling frame bounding box
+            root: document.getElementById('workspace-scaler') || null, 
             rootMargin: '0px',
-            threshold: 0.55 // Triggers instantly when 55% of a page sheet area occupies the viewport screen center
+            threshold: 0.55 
         };
 
         const activePageObserver = new IntersectionObserver((entriesCollection) => {
             entriesCollection.forEach((entryElement) => {
                 if (entryElement.isIntersecting) {
-                    // Extract page numerical values dynamically from standard native attributes or loop indexes
                     let detectedPageNumber = parseInt(entryElement.target.getAttribute('data-page-number') || entryElement.target.getAttribute('id'), 10);
                     
                     if (isNaN(detectedPageNumber)) {
-                        // Backup fallback mapping: Match order position arrays index inside parent container nodes
                         const pagesArrayElementsList = Array.from(scrollPageNodes);
                         detectedPageNumber = pagesArrayElementsList.indexOf(entryElement.target) + 1;
                     }
@@ -2166,25 +2009,18 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
             });
         }, pageViewSettings);
 
-        // Bind intersection listener directly across every single sheet page container element node
         scrollPageNodes.forEach(pageNode => activePageObserver.observe(pageNode));
     };
 
-    // Re-trigger the page observer whenever a new document file buffer changes or initializes onto screen
     const fileInputElementTarget = document.getElementById('fileInput');
     if (fileInputElementTarget) {
         fileInputElementTarget.addEventListener('change', () => {
-            setTimeout(initializeWorldClassPageObserver, 800); // Gives document graphics time to render onto screen arrays
+            setTimeout(initializeWorldClassPageObserver, 800); 
         });
     }
 
-    // Auto-boot observer hook once document initializes window viewports
     setTimeout(initializeWorldClassPageObserver, 1500);
-    // ------------------------------------
 
-    /* ==========================================================================
-       🔢 UNTOUCHED NUMERIC STRING TO INDIAN RUPEE FORMAT TRANSLATION LOGIC
-       ========================================================================== */
     function convertAmountToWords(amount) {
         const sglDigit = ["Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"],
             dblDigit = ["Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"],
