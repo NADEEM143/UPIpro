@@ -361,22 +361,19 @@
                     </div>
                 </div>
 
-                                               <iframe id="pdf-frame"></iframe>
+                               <iframe id="pdf-frame"></iframe>
                 <img id="image-frame" alt="Invoice Preview Surface Substrate Layer">
-                
-                <!-- 🌟 FIXED: Embedded pointer-events: none inside both templates for world-class page alignment -->
-                <div id="click-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1005; display: none; background: rgba(0,0,0,0.01); pointer-events: none;"></div>
-                <div id="click-overlay-stamp" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1005; display: none; background: rgba(0,0,0,0.01); pointer-events: none;"></div>
+                <div id="click-overlay"></div>
+                <div id="click-overlay-stamp" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1005; display: none; background: rgba(0,0,0,0.01);"></div>
                 
                 <!-- Interactive Asset Placement Holders Matrix -->
-                <div id="qr-marker" style="position: absolute;">
+                                                                <div id="qr-marker" style="position: absolute;">
                     <div style="font-size:18px;">🎯</div>
                     <span>DRAG & RESIZE</span>
                     <div id="qr-graphic-target" style="width: 100%; height: 100%; position: absolute; top:0; left:0; background:white; display:none;"></div>
                     <!-- 🌟 ADDED: Embedded absolute close option button for QR Code -->
                     <button id="closeQrBtn" style="position: absolute; top: 4px; right: 4px; width: 18px; height: 18px; background: #ef4444; color: white; border: 2px solid white; border-radius: 50%; font-size: 11px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 99999; line-height: 1; pointer-events: auto; padding: 0; margin: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.35);">×</button>
                 </div>
-
 
                 
                 <!-- 🌟 STAMP CONTAINER WITH EMBEDDED ABSOLUTE CLOSE OPTION BUTTON -->
@@ -562,130 +559,89 @@
         await handleIncomingDocumentBufferChannels(file);
     };
 
-        document.getElementById('lockBtn').onclick = () => {
+    document.getElementById('lockBtn').onclick = () => {
         if(!originalBytes) return alert("Select or Generate PDF First");
         note.innerText = "📍 Click on the document to place your QR";
         note.style.display = 'block';
         document.getElementById('click-overlay').style.display = 'block';
         setTimeout(() => { note.style.display = 'none'; }, 4000);
     };
-
-    /* ==========================================================================
-       🚀 ENTERPRISE BROAD-SPECTRUM PAGE INTERACTION EVENT ROUTING PORTAL
-       ========================================================================== */
-    const workspaceScalerFrameNode = document.getElementById('workspace-scaler');
-
-    if (workspaceScalerFrameNode) {
-        workspaceScalerFrameNode.style.pointerEvents = 'auto'; // Unlock child event registration channels natively
-
-        workspaceScalerFrameNode.onclick = (e) => {
-            const clickOverlayNode = document.getElementById('click-overlay');
-            const clickOverlayStampNode = document.getElementById('click-overlay-stamp');
-            
-            // State Filter Check: Only capture clicks if a user is actively placing a QR code or a Stamp
-            const isPlacingQrCodeActiveState = clickOverlayNode && window.getComputedStyle(clickOverlayNode).display === 'block';
-            const isPlacingStampActiveState = clickOverlayStampNode && window.getComputedStyle(clickOverlayStampNode).display === 'block';
-            
-            if (!isPlacingQrCodeActiveState && !isPlacingStampActiveState) return;
-
-            // ⚠️ THE WORLD-CLASS ROOT FIX: Identify the exact individual page wrapper node clicked underneath the cursor
-            // Target elements matching common PDF renderer page structures (canvas, .page, .pdf-page, .pdfViewer > div)
-            const targetClickedPageBoxNode = e.target.closest('canvas, .page, .pdf-page, [data-page-number]');
-            if (!targetClickedPageBoxNode) return;
-
-            // Stop click event from leaking and triggering unintended menu shifts down the line
-            e.stopPropagation();
-
-            // Locate the shared outer workspace container block bounding box limits
-            const fullWorkspaceBoundingRect = workspaceScalerFrameNode.getBoundingClientRect();
-            
-            // Calculate raw screen placement tracking dimensions for onscreen display rendering markers
-            const rawVisualDisplayPosX = e.clientX - fullWorkspaceBoundingRect.left;
-            const rawVisualDisplayPosY = e.clientY - fullWorkspaceBoundingRect.top;
-
-            // ⚠️ ENFORCE PERFECT MULTI-PAGE PARITY: Pull index directly from page node counts or element sequence orders
-            const totalRenderedPageNodesList = Array.from(workspaceScalerFrameNode.querySelectorAll('canvas, .page, .pdf-page, [data-page-number]'));
-            const exactlyIdentifiedPageIndex = totalRenderedPageNodesList.indexOf(targetClickedPageBoxNode);
-            
-            if (exactlyIdentifiedPageIndex !== -1 && typeof currentActivePageIndex !== 'undefined') {
-                currentActivePageIndex = exactlyIdentifiedPageIndex;
-                console.log("🎯 Premium Target Mapping Sync: Locked onto Page Index:", currentActivePageIndex);
+        document.getElementById('click-overlay').onclick = (e) => {
+        const rect = document.getElementById('workspace-scaler').getBoundingClientRect();
+        
+        // Get raw coordinates relative to the full scrolling viewport frame
+        let rawPosX = (e.clientX - rect.left); 
+        let rawPosY = (e.clientY - rect.top);
+        
+        // ⚠️ 🌟 HIGH-PRECISION FIX: Reset vertical coordinate layout relative to clicked page 🌟 ⚠️
+        if (typeof pdfDoc !== 'undefined' && pdfDoc.getPages) {
+            const documentTotalPagesList = pdfDoc.getPages();
+            if (documentTotalPagesList.length > 1) {
+                // Determine the physical pixel height of a single page container
+                const singlePageHeight = rect.height / documentTotalPagesList.length;
+                
+                // Track exactly which page index was selected under the mouse click pointer
+                currentActivePageIndex = Math.floor(rawPosY / singlePageHeight);
+                currentActivePageIndex = Math.max(0, Math.min(documentTotalPagesList.length - 1, currentActivePageIndex));
+                
+                // Subtract the heights of all previous pages to make positioning relative to current page top edge
+                posX = rawPosX;
+                posY = rawPosY - (currentActivePageIndex * singlePageHeight);
+                console.log("🎯 QR Anchor Locked - Target Page:", currentActivePageIndex + 1, "Page-Relative posY:", posY);
+            } else {
+                currentActivePageIndex = 0;
+                posX = rawPosX;
+                posY = rawPosY;
             }
-
-            // ⚠️ COMPUTE TRUE LOCAL PAGE-RELATIVE OFFSETS FOR THE SEAMLESS INJECTION ENGINES
-            const specificPageBoxBoundingRect = targetClickedPageBoxNode.getBoundingClientRect();
-            const localizedPageRelativeX = e.clientX - specificPageBoxBoundingRect.left;
-            const localizedPageRelativeY = e.clientY - specificPageBoxBoundingRect.top;
-
-            /* ─── CASE A: USER GESTURE IS PLACING A QR CODE VECTOR BLOCK ─── */
-            if (isPlacingQrCodeActiveState) {
-                // Bind coordinates relative to the clicked page boundaries cleanly
-                posX = localizedPageRelativeX;
-                posY = localizedPageRelativeY;
-
-                const halfMarkerWidth = marker.clientWidth / 2 || 40;
-                const halfMarkerHeight = marker.clientHeight / 2 || 40;
-                
-                // Position visual tracking marker cleanly onto viewport screen layers relative to full canvas container bounds
-                marker.style.left = (rawVisualDisplayPosX - halfMarkerWidth) + 'px'; 
-                marker.style.top = (rawVisualDisplayPosY - halfMarkerHeight) + 'px';
-                marker.style.display = 'flex';
-                
-                // Parse merchant strings safely
-                const name = document.getElementById('payeeName').value || "Merchant";
-                const vpa = document.getElementById('vpa').value || "merchant@upi";
-                const amt = document.getElementById('amount').value || "0";
-                
-                const uniqueTxnRefId = "INV" + Date.now(); 
-                let upiString = `upi://pay?pa=${vpa}&pn=${encodeURIComponent(name)}&cu=INR&tr=${uniqueTxnRefId}&mc=0000&mode=02&purpose=00`;
-                if (parseFloat(amt) > 0) { upiString += `&am=${parseFloat(amt).toFixed(2)}`; }
-                
-                const liveTarget = document.getElementById('qr-graphic-target');
-                if (liveTarget) {
-                    liveTarget.innerHTML = ""; 
-                    liveTarget.style.display = "block"; liveTarget.style.position = "absolute";
-                    liveTarget.style.top = "0"; liveTarget.style.left = "0";
-                    liveTarget.style.width = "100%"; liveTarget.style.height = "100%";
-                    liveTarget.style.boxSizing = "border-box";
-                    try {
-                        if (typeof EasyQRCode !== 'undefined') {
-                            new EasyQRCode(liveTarget, { text: upiString, width: 240, height: 240, colorDark: "#000000", colorLight: "#ffffff", correctLevel: EasyQRCode.CorrectLevel.H });
-                            setTimeout(() => {
-                                const internalSvgImg = liveTarget.querySelector('img, canvas, svg');
-                                if (internalSvgImg) { internalSvgImg.style.width = "100%"; internalSvgImg.style.height = "100%"; internalSvgImg.style.objectFit = "contain"; internalSvgImg.style.display = "block"; }
-                            }, 20);
-                        } else if (typeof QRCode !== 'undefined') {
-                            new QRCode(liveTarget, { text: upiString, width: 120, height: 120 });
-                            setTimeout(() => { const internalImg = liveTarget.querySelector('img, canvas'); if (internalImg) { internalImg.style.width = "100%"; internalImg.style.height = "100%"; } }, 20);
-                        } else { liveTarget.innerText = "QR Engine Error"; }
-                    } catch (err) { console.error("QR drawing processing exception:", err); }
-                }
-
-                clickOverlayNode.style.display = 'none';
-            }
-
-            /* ─── CASE B: USER GESTURE IS PLACING A DIGITAL INK STAMP BADGE ─── */
-            if (isPlacingStampActiveState) {
-                // Bind coordinates relative to the clicked page boundaries cleanly
-                stampPosX = localizedPageRelativeX;
-                stampPosY = localizedPageRelativeY;
-
-                stampMarker.style.left = (rawVisualDisplayPosX - 60) + 'px';
-                stampMarker.style.top = (rawVisualDisplayPosY - 60) + 'px';
-                stampMarker.style.display = 'flex';
-                
-                isStampPlaced = true;
-                clickOverlayStampNode.style.display = 'none';
-            }
-
-            // Sync structural global display buttons smoothly
-            const previewBtn = document.getElementById('previewBtn');
-            const downloadBtn = document.getElementById('downloadBtn');
-            if (previewBtn) previewBtn.style.display = 'block';
-            if (downloadBtn) downloadBtn.style.display = 'block';
-            if (note) note.style.display = 'none';
-        };
-    }
+        } else {
+            currentActivePageIndex = 0;
+            posX = rawPosX;
+            posY = rawPosY;
+        }
+        
+        const halfMarkerWidth = marker.clientWidth / 2 || 40;
+        const halfMarkerHeight = marker.clientHeight / 2 || 40;
+        
+        // Retain original onscreen visual positioning rules matching user view tracking precisely
+        marker.style.left = (rawPosX - halfMarkerWidth) + 'px'; 
+        marker.style.top = (rawPosY - halfMarkerHeight) + 'px';
+        marker.style.display = 'flex';
+        
+        const name = document.getElementById('payeeName').value || "Merchant";
+        const vpa = document.getElementById('vpa').value || "merchant@upi";
+        const amt = document.getElementById('amount').value || "0";
+        
+        const uniqueTxnRefId = "INV" + Date.now(); 
+        let upiString = `upi://pay?pa=${vpa}&pn=${encodeURIComponent(name)}&cu=INR&tr=${uniqueTxnRefId}&mc=0000&mode=02&purpose=00`;
+        if (parseFloat(amt) > 0) { upiString += `&am=${parseFloat(amt).toFixed(2)}`; }
+        
+        const liveTarget = document.getElementById('qr-graphic-target');
+        if (liveTarget) {
+            liveTarget.innerHTML = ""; 
+            liveTarget.style.display = "block"; liveTarget.style.position = "absolute";
+            liveTarget.style.top = "0"; liveTarget.style.left = "0";
+            liveTarget.style.width = "100%"; liveTarget.style.height = "100%";
+            liveTarget.style.boxSizing = "border-box";
+            try {
+                if (typeof EasyQRCode !== 'undefined') {
+                    new EasyQRCode(liveTarget, { text: upiString, width: 240, height: 240, colorDark: "#000000", colorLight: "#ffffff", correctLevel: EasyQRCode.CorrectLevel.H });
+                    setTimeout(() => {
+                        const internalSvgImg = liveTarget.querySelector('img, canvas, svg');
+                        if (internalSvgImg) { internalSvgImg.style.width = "100%"; internalSvgImg.style.height = "100%"; internalSvgImg.style.objectFit = "contain"; internalSvgImg.style.display = "block"; }
+                    }, 20);
+                } else if (typeof QRCode !== 'undefined') {
+                    new QRCode(liveTarget, { text: upiString, width: 120, height: 120 });
+                    setTimeout(() => { const internalImg = liveTarget.querySelector('img, canvas'); if (internalImg) { internalImg.style.width = "100%"; internalImg.style.height = "100%"; } }, 20);
+                } else { liveTarget.innerText = "QR Engine Error"; }
+            } catch (err) { console.error("QR drawing processing exception:", err); }
+        }
+        document.getElementById('click-overlay').style.display = 'none';
+        const previewBtn = document.getElementById('previewBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        if (previewBtn) previewBtn.style.display = 'block';
+        if (downloadBtn) downloadBtn.style.display = 'block';
+        if (note) note.style.display = 'none';
+    };
 
     document.getElementById('click-overlay-stamp').onclick = (e) => {
         const rect = document.getElementById('workspace-scaler').getBoundingClientRect();
@@ -1999,104 +1955,83 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
                 stampMarker.style.display = 'none';
                 signatureMarker.style.display = 'none';
 
-                                 } else {
+                       } else {
                 const pdfDoc = await PDFLib.PDFDocument.load(originalBytes);
+                
                 const pagesCollection = pdfDoc.getPages();
+                // ⚠️ 🌟 CRITICAL FIX: Safe integer evaluation captures multi-page tracking cleanly inside your real-time preview matrix!
+                const safePageIndex = (typeof currentActivePageIndex === 'number') ? currentActivePageIndex : 0;
+                const targetExportPage = pagesCollection[safePageIndex] || pagesCollection;
                 
-                const preview = document.getElementById('workspace-scaler');
-                const pdfFrameNode = document.getElementById('pdf-frame');
-                const imgFrameNode = document.getElementById('image-frame');
-                
-                let actualWorkspaceWidth = preview.offsetWidth;
-                let actualWorkspaceHeight = preview.offsetHeight;
-                
-                if (pdfFrameNode && window.getComputedStyle(pdfFrameNode).display === 'block') {
-                    actualWorkspaceWidth = pdfFrameNode.offsetWidth;
-                    actualWorkspaceHeight = pdfFrameNode.offsetHeight;
-                } else if (imgFrameNode && window.getComputedStyle(imgFrameNode).display === 'block') {
-                    actualWorkspaceWidth = imgFrameNode.offsetWidth;
-                    actualWorkspaceHeight = imgFrameNode.offsetHeight;
-                }
+                const { width, height } = targetExportPage.getSize();
 
-                // ⚠️ ENTERPRISE RENDERING LAYER: Compute single page height blocks accurately
-                const singlePageContainerHeight = actualWorkspaceHeight / pagesCollection.length;
+                let actualWorkspaceWidth = pdfFrameNode.offsetWidth || preview.offsetWidth;
+                let actualWorkspaceHeight = pdfFrameNode.offsetHeight || preview.offsetHeight;
 
-                /* ─── BLOCK 1: PREVIEW INJECT THE REAL-TIME UPI QR CODE ─── */
-                if (liveQrContainer && liveQrContainer.style.display === "block" && marker && window.getComputedStyle(marker).display !== 'none') {
+                if (liveQrContainer && liveQrContainer.style.display === "block") {
                     const liveCanvasElement = liveQrContainer.querySelector('canvas');
                     if (liveCanvasElement) {
                         const qrImgDataUrl = liveCanvasElement.toDataURL('image/png');
                         const qrImage = await pdfDoc.embedPng(qrImgDataUrl);
 
-                        const markerLeft = parseFloat(marker.style.left) || 0;
-                        const markerTop = parseFloat(marker.style.top) || 0;
+                        const markerLeftStyle = isQrLocked ? (posX - 40) : (parseFloat(marker.style.left) || (posX - 40));
+                        const markerTopStyle = isQrLocked ? (posY - 40) : (parseFloat(marker.style.top) || (posY - 40));
 
-                        // 🌟 ENTERPRISE AUTO-DETECT: Find target page from marker screen boundary
-                        let qrTargetIdx = Math.floor((markerTop + (marker.clientHeight / 2)) / singlePageContainerHeight);
-                        qrTargetIdx = Math.max(0, Math.min(pagesCollection.length - 1, qrTargetIdx));
-                        const qrPage = pagesCollection[qrTargetIdx];
-                        const { width: pW, height: pH } = qrPage.getSize();
+                        const finalQrWidth = (marker.clientWidth / actualWorkspaceWidth) * width;
+                        const finalQrHeight = (marker.clientHeight / actualWorkspaceHeight) * height;
+                        const finalSquareSize = Math.max(finalQrWidth, finalQrHeight);
 
-                        // Force relative layout offset reset
-                        const relativeTop = markerTop - (qrTargetIdx * singlePageContainerHeight);
+                        const pdfX = (markerLeftStyle / actualWorkspaceWidth) * width;
+                        const pdfY = height - (markerTopStyle / actualWorkspaceHeight) * height - finalSquareSize;
 
-                        const finalQrWidth = (marker.clientWidth / actualWorkspaceWidth) * pW;
-                        const finalSquareSize = finalQrWidth;
-
-                        const pdfX = (markerLeft / actualWorkspaceWidth) * pW;
-                        const pdfY = pH - ((relativeTop / singlePageContainerHeight) * pH) - finalSquareSize;
-
-                        qrPage.drawImage(qrImage, { x: pdfX, y: pdfY, width: finalSquareSize, height: finalSquareSize });
+                        targetExportPage.drawImage(qrImage, {
+                            x: pdfX,
+                            y: pdfY,
+                            width: finalSquareSize,
+                            height: finalSquareSize
+                        });
                     }
                 }
 
-                /* ─── BLOCK 2: PREVIEW INJECT THE DIGITAL INK STAMP ─── */
-                if (isStampPlaced && stampImgDataUrl && stampMarker && window.getComputedStyle(stampMarker).display !== 'none') {
+                if (isStampPlaced && stampImgDataUrl) {
                     const stampImageObject = await pdfDoc.embedPng(stampImgDataUrl);
-                    const stampLeft = parseFloat(stampMarker.style.left) || 0;
-                    const stampTop = parseFloat(stampMarker.style.top) || 0;
 
-                    // 🌟 ENTERPRISE AUTO-DETECT: Find target page from marker screen boundary
-                    let stampTargetIdx = Math.floor((stampTop + (stampMarker.clientHeight / 2)) / singlePageContainerHeight);
-                    stampTargetIdx = Math.max(0, Math.min(pagesCollection.length - 1, stampTargetIdx));
-                    const stampPage = pagesCollection[stampTargetIdx];
-                    const { width: pW, height: pH } = stampPage.getSize();
+                    const stampLeftStyle = isStampLocked ? (stampPosX - 60) : (parseFloat(stampMarker.style.left) || (stampPosX - 60));
+                    const stampTopStyle = isStampLocked ? (stampPosY - 60) : (parseFloat(stampMarker.style.top) || (stampPosY - 60));
 
-                    // Force relative layout offset reset
-                    const relativeTop = stampTop - (stampTargetIdx * singlePageContainerHeight);
-
-                    let docStampW = (stampMarker.clientWidth / actualWorkspaceWidth) * pW;
-                    let docStampH = (stampMarker.clientHeight / actualWorkspaceHeight) * pH * pagesCollection.length;
+                    let docStampW = (stampMarker.clientWidth / actualWorkspaceWidth) * width;
+                    let docStampH = (stampMarker.clientHeight / actualWorkspaceHeight) * height;
                     const uniformStampSize = Math.max(docStampW, docStampH);
 
-                    const docStampX = (stampLeft / actualWorkspaceWidth) * pW;
-                    const docStampY = pH - ((relativeTop / singlePageContainerHeight) * pH) - uniformStampSize;
+                    const docStampX = (stampLeftStyle / actualWorkspaceWidth) * width;
+                    const docStampY = height - (stampTopStyle / actualWorkspaceHeight) * height - uniformStampSize;
 
-                    stampPage.drawImage(stampImageObject, { x: docStampX, y: docStampY, width: uniformStampSize, height: uniformStampSize });
+                    targetExportPage.drawImage(stampImageObject, {
+                        x: docStampX,
+                        y: docStampY,
+                        width: uniformStampSize,
+                        height: uniformStampSize
+                    });
                 }
 
-                /* ─── BLOCK 3: PREVIEW INJECT THE ELECTRONIC SIGNATURE ─── */
-                if (isSigPlaced && sigImgDataUrl && signatureMarker && window.getComputedStyle(signatureMarker).display !== 'none') {
+                if (isSigPlaced && sigImgDataUrl && signatureMarker) {
                     const sigImageObject = await pdfDoc.embedPng(sigImgDataUrl);
-                    const sigLeft = parseFloat(signatureMarker.style.left) || 0;
-                    const sigTop = parseFloat(signatureMarker.style.top) || 0;
 
-                    // 🌟 ENTERPRISE AUTO-DETECT: Find target page from marker screen boundary
-                    let sigTargetIdx = Math.floor((sigTop + (signatureMarker.clientHeight / 2)) / singlePageContainerHeight);
-                    sigTargetIdx = Math.max(0, Math.min(pagesCollection.length - 1, sigTargetIdx));
-                    const sigPage = pagesCollection[sigTargetIdx];
-                    const { width: pW, height: pH } = sigPage.getSize();
+                    const sigLeftStyle = isSigLocked ? (sigPosX - 70) : (parseFloat(signatureMarker.style.left) || (sigPosX - 70));
+                    const sigTopStyle = isSigLocked ? (sigPosY - 70) : (parseFloat(signatureMarker.style.top) || (sigPosY - 70));
 
-                    // Force relative layout offset reset
-                    const relativeTop = sigTop - (sigTargetIdx * singlePageContainerHeight);
+                    let docSigW = (signatureMarker.clientWidth / actualWorkspaceWidth) * width;
+                    let docSigH = (signatureMarker.clientHeight / actualWorkspaceHeight) * height;
 
-                    let docSigW = (signatureMarker.clientWidth / actualWorkspaceWidth) * pW;
-                    let docSigH = (signatureMarker.clientHeight / actualWorkspaceHeight) * pH * pagesCollection.length;
+                    const docSigX = (sigLeftStyle / actualWorkspaceWidth) * width;
+                    const docSigY = height - (sigTopStyle / actualWorkspaceHeight) * height - docSigH;
 
-                    const docSigX = (sigLeft / actualWorkspaceWidth) * pW;
-                    const docSigY = pH - ((relativeTop / singlePageContainerHeight) * pH) - docSigH;
-
-                    sigPage.drawImage(sigImageObject, { x: docSigX, y: docSigY, width: docSigW, height: docSigH });
+                    targetExportPage.drawImage(sigImageObject, {
+                        x: docSigX,
+                        y: docSigY,
+                        width: docSigW,
+                        height: docSigH
+                    });
                 }
 
                 const previewPdfBytes = await pdfDoc.save();
