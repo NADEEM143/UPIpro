@@ -951,7 +951,7 @@
             const pdfX = (finalLeftPos / actualWorkspaceWidth) * width;
             const pdfY = height - (finalTopPos / actualWorkspaceHeight) * height - finalSquareSize;
 
-                        targetExportPage.drawImage(qrImage, {
+            targetExportPage.drawImage(qrImage, {
                 x: pdfX,
                 y: pdfY,
                 width: finalSquareSize,
@@ -959,62 +959,48 @@
             });
             
             /* ─── BLOCK 2: INJECT THE DIGITAL INK STAMP (CLONED UNIFORM SQUARE MATH) ─── */
-            if (isStampPlaced && stampImgDataUrl && stampMarker && window.getComputedStyle(stampMarker).display !== 'none') {
+            if (isStampPlaced && stampImgDataUrl) {
                 const stampImageObject = await pdfDoc.embedPng(stampImgDataUrl);
-                const stampLeft = parseFloat(stampMarker.style.left) || 0;
-                const stampTop = parseFloat(stampMarker.style.top) || 0;
 
-                // 🌟 ENTERPRISE AUTO-DETECT: Find target page from stamp marker screen boundary coordinates
-                let stampTargetIdx = Math.floor((stampTop + (stampMarker.clientHeight / 2)) / singlePageContainerHeight);
-                stampTargetIdx = Math.max(0, Math.min(pagesCollection.length - 1, stampTargetIdx));
-                const stampPage = pagesCollection[stampTargetIdx] || targetExportPage;
-                const { width: pW, height: pH } = stampPage.getSize();
+                const finalStampLeft = (isStampLocked ? (stampPosX - 60) : (parseFloat(stampMarker.style.left) || (stampPosX - 60))) / currentResponsiveLayoutScaleFactorX;
+                const finalStampTop = (isStampLocked ? (stampPosY - 60) : (parseFloat(stampMarker.style.top) || (stampPosY - 60))) / currentResponsiveLayoutScaleFactorY;
 
-                // Force relative layout offset reset
-                const relativeTop = stampTop - (stampTargetIdx * singlePageContainerHeight);
+                // ⚠️ UNTOUCHED LOGIC: Uses your exact Math.max logic to make it a perfect circle
+                let stampWidthCalc = (stampMarker.clientWidth / actualWorkspaceWidth) * width;
+                let stampHeightCalc = (stampMarker.clientHeight / actualWorkspaceHeight) * height;
+                let uniformStampSize = Math.max(stampWidthCalc, stampHeightCalc);
 
-                // ⚠️ WORLD-CLASS SIZING RESTORED: Scales cleanly relative to a single page segment height block to fix magnification completely
-                let docStampW = (stampMarker.clientWidth / actualWorkspaceWidth) * pW;
-                let docStampH = (stampMarker.clientHeight / singlePageContainerHeight) * pH;
+                const docStampX = (finalStampLeft / actualWorkspaceWidth) * width;
+                const docStampY = height - (finalStampTop / actualWorkspaceHeight) * height - uniformStampSize;
                 
-                const currentSelectedShapeType = document.getElementById('stampShape').value;
-                if (currentSelectedShapeType === 'circle' || currentSelectedShapeType === 'square') {
-                    const unifiedSquareDimensionValue = Math.max(docStampW, docStampH);
-                    docStampW = unifiedSquareDimensionValue;
-                    docStampH = unifiedSquareDimensionValue;
-                }
-
-                const docStampX = (stampLeft / actualWorkspaceWidth) * pW;
-                // ⚠️ CALCULATION FIX: Multiplied by singlePageContainerHeight ratio for precision alignment mapping
-                const docStampY = pH - ((relativeTop / singlePageContainerHeight) * pH) - docStampH;
-                
-                stampPage.drawImage(stampImageObject, { x: docStampX, y: docStampY, width: docStampW, height: docStampH });
+                targetExportPage.drawImage(stampImageObject, {
+                    x: docStampX,
+                    y: docStampY,
+                    width: uniformStampSize,
+                    height: uniformStampSize
+                });
             }
 
             /* ─── BLOCK 3: INJECT THE ELECTRONIC SIGNATURE (PRESERVE NATURAL SHAPE RECTANGLE) ─── */
-            if (isSigPlaced && sigImgDataUrl && signatureMarker && window.getComputedStyle(signatureMarker).display !== 'none') {
+            if (isSigPlaced && sigImgDataUrl && signatureMarker) {
                 const sigImageObject = await pdfDoc.embedPng(sigImgDataUrl);
-                const sigLeft = parseFloat(signatureMarker.style.left) || 0;
-                const sigTop = parseFloat(signatureMarker.style.top) || 0;
 
-                // 🌟 ENTERPRISE AUTO-DETECT: Find target page from signature marker screen boundary coordinates
-                let sigTargetIdx = Math.floor((sigTop + (signatureMarker.clientHeight / 2)) / singlePageContainerHeight);
-                sigTargetIdx = Math.max(0, Math.min(pagesCollection.length - 1, sigTargetIdx));
-                const sigPage = pagesCollection[sigTargetIdx] || targetExportPage;
-                const { width: pW, height: pH } = sigPage.getSize();
+                const finalSigLeft = (isSigLocked ? (sigPosX - 70) : (parseFloat(signatureMarker.style.left) || (sigPosX - 70))) / currentResponsiveLayoutScaleFactorX;
+                const finalSigTop = (isSigLocked ? (sigPosY - 70) : (parseFloat(signatureMarker.style.top) || (sigPosY - 70))) / currentResponsiveLayoutScaleFactorY;
 
-                // Force relative layout offset reset
-                const relativeTop = sigTop - (sigTargetIdx * singlePageContainerHeight);
+                // ⚠️ FIXED LOGIC: Kept width and height completely natural to protect the widescreen signature look
+                let docSigW = (signatureMarker.clientWidth / actualWorkspaceWidth) * width;
+                let docSigH = (signatureMarker.clientHeight / actualWorkspaceHeight) * height;
 
-                // ⚠️ WORLD-CLASS SIZING RESTORED: Scales cleanly relative to a single page segment height block to fix magnification completely
-                let docSigW = (signatureMarker.clientWidth / actualWorkspaceWidth) * pW;
-                let docSigH = (signatureMarker.clientHeight / singlePageContainerHeight) * pH;
-
-                const docSigX = (sigLeft / actualWorkspaceWidth) * pW;
-                // ⚠️ CALCULATION FIX: Multiplied by singlePageContainerHeight ratio for precision alignment mapping
-                const docSigY = pH - ((relativeTop / singlePageContainerHeight) * pH) - docSigH;
+                const docSigX = (finalSigLeft / actualWorkspaceWidth) * width;
+                const docSigY = height - (finalSigTop / actualWorkspaceHeight) * height - docSigH;
                 
-                sigPage.drawImage(sigImageObject, { x: docSigX, y: docSigY, width: docSigW, height: docSigH });
+                targetExportPage.drawImage(sigImageObject, {
+                    x: docSigX,
+                    y: docSigY,
+                    width: docSigW,
+                    height: docSigH
+                });
             }
 
             const pdfData = await pdfDoc.save();
@@ -1969,7 +1955,7 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
                 stampMarker.style.display = 'none';
                 signatureMarker.style.display = 'none';
 
-                                               } else {
+                       } else {
                 const pdfDoc = await PDFLib.PDFDocument.load(originalBytes);
                 
                 const pagesCollection = pdfDoc.getPages();
@@ -1982,9 +1968,6 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
                 let actualWorkspaceWidth = pdfFrameNode.offsetWidth || preview.offsetWidth;
                 let actualWorkspaceHeight = pdfFrameNode.offsetHeight || preview.offsetHeight;
 
-                // ⚠️ DYNAMIC SCALE FIX: Compute single page height blocks accurately matching download logic exactly!
-                const singlePageContainerHeight = actualWorkspaceHeight / pagesCollection.length;
-
                 if (liveQrContainer && liveQrContainer.style.display === "block") {
                     const liveCanvasElement = liveQrContainer.querySelector('canvas');
                     if (liveCanvasElement) {
@@ -1994,24 +1977,14 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
                         const markerLeftStyle = isQrLocked ? (posX - 40) : (parseFloat(marker.style.left) || (posX - 40));
                         const markerTopStyle = isQrLocked ? (posY - 40) : (parseFloat(marker.style.top) || (posY - 40));
 
-                        // 🌟 ENTERPRISE AUTO-DETECT: Find target page from marker screen boundary coordinates
-                        let qrTargetIdx = Math.floor((markerTopStyle + (marker.clientHeight / 2)) / singlePageContainerHeight);
-                        qrTargetIdx = Math.max(0, Math.min(pagesCollection.length - 1, qrTargetIdx));
-                        const qrPage = pagesCollection[qrTargetIdx] || targetExportPage;
-                        const { width: pW, height: pH } = qrPage.getSize();
-
-                        // Force relative layout offset reset
-                        const relativeTop = markerTopStyle - (qrTargetIdx * singlePageContainerHeight);
-
-                        const finalQrWidth = (marker.clientWidth / actualWorkspaceWidth) * pW;
-                        const finalQrHeight = (marker.clientHeight / singlePageContainerHeight) * pH;
+                        const finalQrWidth = (marker.clientWidth / actualWorkspaceWidth) * width;
+                        const finalQrHeight = (marker.clientHeight / actualWorkspaceHeight) * height;
                         const finalSquareSize = Math.max(finalQrWidth, finalQrHeight);
 
-                        const pdfX = (markerLeftStyle / actualWorkspaceWidth) * pW;
-                        // ⚠️ CALCULATION FIX: Multiplied by singlePageContainerHeight ratio for precision alignment mapping
-                        const pdfY = pH - ((relativeTop / singlePageContainerHeight) * pH) - finalSquareSize;
+                        const pdfX = (markerLeftStyle / actualWorkspaceWidth) * width;
+                        const pdfY = height - (markerTopStyle / actualWorkspaceHeight) * height - finalSquareSize;
 
-                        qrPage.drawImage(qrImage, {
+                        targetExportPage.drawImage(qrImage, {
                             x: pdfX,
                             y: pdfY,
                             width: finalSquareSize,
@@ -2026,25 +1999,14 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
                     const stampLeftStyle = isStampLocked ? (stampPosX - 60) : (parseFloat(stampMarker.style.left) || (stampPosX - 60));
                     const stampTopStyle = isStampLocked ? (stampPosY - 60) : (parseFloat(stampMarker.style.top) || (stampPosY - 60));
 
-                    // 🌟 ENTERPRISE AUTO-DETECT: Find target page from stamp marker screen boundary coordinates
-                    let stampTargetIdx = Math.floor((stampTopStyle + (stampMarker.clientHeight / 2)) / singlePageContainerHeight);
-                    stampTargetIdx = Math.max(0, Math.min(pagesCollection.length - 1, stampTargetIdx));
-                    const stampPage = pagesCollection[stampTargetIdx] || targetExportPage;
-                    const { width: pW, height: pH } = stampPage.getSize();
-
-                    // Force relative layout offset reset
-                    const relativeTop = stampTopStyle - (stampTargetIdx * singlePageContainerHeight);
-
-                    // ⚠️ WORLD-CLASS SIZING RESTORED: Scales cleanly relative to a single page segment height block to fix magnification completely
-                    let docStampW = (stampMarker.clientWidth / actualWorkspaceWidth) * pW;
-                    let docStampH = (stampMarker.clientHeight / singlePageContainerHeight) * pH;
+                    let docStampW = (stampMarker.clientWidth / actualWorkspaceWidth) * width;
+                    let docStampH = (stampMarker.clientHeight / actualWorkspaceHeight) * height;
                     const uniformStampSize = Math.max(docStampW, docStampH);
 
-                    const docStampX = (stampLeftStyle / actualWorkspaceWidth) * pW;
-                    // ⚠️ CALCULATION FIX: Multiplied by singlePageContainerHeight ratio for precision alignment mapping
-                    const docStampY = pH - ((relativeTop / singlePageContainerHeight) * pH) - uniformStampSize;
+                    const docStampX = (stampLeftStyle / actualWorkspaceWidth) * width;
+                    const docStampY = height - (stampTopStyle / actualWorkspaceHeight) * height - uniformStampSize;
 
-                    stampPage.drawImage(stampImageObject, {
+                    targetExportPage.drawImage(stampImageObject, {
                         x: docStampX,
                         y: docStampY,
                         width: uniformStampSize,
@@ -2058,24 +2020,13 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
                     const sigLeftStyle = isSigLocked ? (sigPosX - 70) : (parseFloat(signatureMarker.style.left) || (sigPosX - 70));
                     const sigTopStyle = isSigLocked ? (sigPosY - 70) : (parseFloat(signatureMarker.style.top) || (sigPosY - 70));
 
-                    // 🌟 ENTERPRISE AUTO-DETECT: Find target page from signature marker screen boundary coordinates
-                    let sigTargetIdx = Math.floor((sigTopStyle + (signatureMarker.clientHeight / 2)) / singlePageContainerHeight);
-                    sigTargetIdx = Math.max(0, Math.min(pagesCollection.length - 1, sigTargetIdx));
-                    const sigPage = pagesCollection[sigTargetIdx] || targetExportPage;
-                    const { width: pW, height: pH } = sigPage.getSize();
+                    let docSigW = (signatureMarker.clientWidth / actualWorkspaceWidth) * width;
+                    let docSigH = (signatureMarker.clientHeight / actualWorkspaceHeight) * height;
 
-                    // Force relative layout offset reset
-                    const relativeTop = sigTopStyle - (sigTargetIdx * singlePageContainerHeight);
+                    const docSigX = (sigLeftStyle / actualWorkspaceWidth) * width;
+                    const docSigY = height - (sigTopStyle / actualWorkspaceHeight) * height - docSigH;
 
-                    // ⚠️ WORLD-CLASS SIZING RESTORED: Scales cleanly relative to a single page segment height block to fix magnification completely
-                    let docSigW = (signatureMarker.clientWidth / actualWorkspaceWidth) * pW;
-                    let docSigH = (signatureMarker.clientHeight / singlePageContainerHeight) * pH;
-
-                    const docSigX = (sigLeftStyle / actualWorkspaceWidth) * pW;
-                    // ⚠️ CALCULATION FIX: Multiplied by singlePageContainerHeight ratio for precision alignment mapping
-                    const docSigY = pH - ((relativeTop / singlePageContainerHeight) * pH) - docSigH;
-
-                    sigPage.drawImage(sigImageObject, {
+                    targetExportPage.drawImage(sigImageObject, {
                         x: docSigX,
                         y: docSigY,
                         width: docSigW,
@@ -2106,6 +2057,7 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
             alert("Preview Canvas Render Failure: " + previewError.message);
         }
     };
+
        
     function syncActivePageTrackIndex(pageNum) {
         const parsed = parseInt(pageNum, 10);
@@ -2162,71 +2114,53 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
             }
         });
     }
-    
-        /* ==========================================================================
-       🚀 ENTERPRISE SCROLL-SENSORY PAGE INTERSECTION ENGINE (WORLD-CLASS FIX)
+    // ------------------------------------
+
+    /* ==========================================================================
+       🚀 ENTERPRISE MULTI-PAGE DESCRIPTOR INTERSECTION ENGINE (WORLD-CLASS FIX)
        ========================================================================== */
+    // Automatically watches visible page nodes on your screen and syncs background memory
     const initializeWorldClassPageObserver = () => {
-        // Automatically discover standard child page wrappers or page canvas elements rendered on screen
+        // Target individual page container classes inside your PDF scrolling viewer container
+        // Matches standard wrappers like .page, [data-page-number], .pdf-page, or canvas frames
         const scrollPageNodes = document.querySelectorAll('.page, [data-page-number], .pdf-page, #workspace-scaler canvas');
         
         if (scrollPageNodes.length === 0) {
-            // Fallback: If elements are still loading, monitor standard viewport scroll frames in a background thread loop
+            // Fallback: If no sub-pages are rendered yet, look for a standard container viewport scroll
             const fallbackScaler = document.getElementById('workspace-scaler');
             if (fallbackScaler) {
-                fallbackScaler.onscroll = () => {
+                fallbackScaler.addEventListener('scroll', () => {
                     if (typeof pdfDoc !== 'undefined' && pdfDoc.getPages) {
                         const totalCount = pdfDoc.getPages().length;
-                        const scrollPct = fallbackScaler.scrollTop / (fallbackScaler.scrollHeight - fallbackScaler.clientHeight || 1);
+                        const scrollPct = fallbackScaler.scrollTop / (fallbackScaler.scrollHeight - fallbackScaler.clientHeight);
                         currentActivePageIndex = Math.max(0, Math.min(totalCount - 1, Math.floor(scrollPct * totalCount)));
-                        
-                        // Auto-Correct: Isolate vertical drift parameters relative strictly to the active page window height
-                        const singlePageVisualHeight = fallbackScaler.scrollHeight / totalCount;
-                        if (typeof posY !== 'undefined') posY = posY % singlePageVisualHeight;
-                        if (typeof stampPosY !== 'undefined') stampPosY = stampPosY % singlePageVisualHeight;
-                        if (typeof sigPosY !== 'undefined') sigPosY = sigPosY % singlePageVisualHeight;
                     }
-                };
+                });
             }
             return;
         }
 
-        // Hardware sensory thresholds: Triggers when 52% of a page sheet area occupies the viewport screen center
         const pageViewSettings = {
-            root: document.getElementById('workspace-scaler') || null,
+            root: document.getElementById('workspace-scaler') || null, // Watches view viewport scrolling frame bounding box
             rootMargin: '0px',
-            threshold: 0.52
+            threshold: 0.55 // Triggers instantly when 55% of a page sheet area occupies the viewport screen center
         };
 
         const activePageObserver = new IntersectionObserver((entriesCollection) => {
             entriesCollection.forEach((entryElement) => {
                 if (entryElement.isIntersecting) {
-                    const pagesArrayElementsList = Array.from(scrollPageNodes);
-                    const detectedPageNumber = pagesArrayElementsList.indexOf(entryElement.target) + 1;
+                    // Extract page numerical values dynamically from standard native attributes or loop indexes
+                    let detectedPageNumber = parseInt(entryElement.target.getAttribute('data-page-number') || entryElement.target.getAttribute('id'), 10);
+                    
+                    if (isNaN(detectedPageNumber)) {
+                        // Backup fallback mapping: Match order position arrays index inside parent container nodes
+                        const pagesArrayElementsList = Array.from(scrollPageNodes);
+                        detectedPageNumber = pagesArrayElementsList.indexOf(entryElement.target) + 1;
+                    }
 
                     if (detectedPageNumber > 0) {
-                        // 1. Instantly update and sync the core active index tracking variable in memory
                         currentActivePageIndex = detectedPageNumber - 1;
-                        console.log("🎯 World-Class Sync: Calculation matrix successfully locked to Page Index:", currentActivePageIndex);
-
-                        // 2. 🌟 WORLD-CLASS AUTO-CORRECT FILTER (Leaves original code completely untouched!)
-                        // Pull the exact physical element borders to subtract preceding page heights with zero guesswork
-                        const individualPageBoundingRect = entryElement.target.getBoundingClientRect();
-                        const sharedWorkspaceBoundingRect = document.getElementById('workspace-scaler').getBoundingClientRect();
-                        
-                        const calculatedVerticalOffsetTop = (individualPageBoundingRect.top - sharedWorkspaceBoundingRect.top) + document.getElementById('workspace-scaler').scrollTop;
-                        const pageUnitPixelHeight = individualPageBoundingRect.height;
-
-                        // Cleanse vertical coordinate parameters instantly relative to current target page top edge
-                        if (typeof posY !== 'undefined' && posY >= calculatedVerticalOffsetTop) {
-                            posY = (posY - calculatedVerticalOffsetTop) % pageUnitPixelHeight;
-                        }
-                        if (typeof stampPosY !== 'undefined' && stampPosY >= calculatedVerticalOffsetTop) {
-                            stampPosY = (stampPosY - calculatedVerticalOffsetTop) % pageUnitPixelHeight;
-                        }
-                        if (typeof sigPosY !== 'undefined' && sigPosY >= calculatedVerticalOffsetTop) {
-                            sigPosY = (sigPosY - calculatedVerticalOffsetTop) % pageUnitPixelHeight;
-                        }
+                        console.log("Aura Tracking Portal Locked Context Page Index:", currentActivePageIndex);
                     }
                 }
             });
@@ -2236,50 +2170,16 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
         scrollPageNodes.forEach(pageNode => activePageObserver.observe(pageNode));
     };
 
-    // Re-trigger the page observer whenever a new document template file changes or initializes onto screen
+    // Re-trigger the page observer whenever a new document file buffer changes or initializes onto screen
     const fileInputElementTarget = document.getElementById('fileInput');
     if (fileInputElementTarget) {
         fileInputElementTarget.addEventListener('change', () => {
-            setTimeout(initializeWorldClassPageObserver, 850); // Grants operating systems buffer space to render structures
+            setTimeout(initializeWorldClassPageObserver, 800); // Gives document graphics time to render onto screen arrays
         });
     }
 
     // Auto-boot observer hook once document initializes window viewports
     setTimeout(initializeWorldClassPageObserver, 1500);
-
-    /* ==========================================================================
-       📑 WORLD-CLASS INDEPENDENT BACKGROUND MULTI-PAGE VARIABLE TRACKER
-       ========================================================================== */
-    const globalPageTextNode = document.getElementById('page_num') || document.getElementById('pageNum') || document.getElementById('pageNumberDisplay');
-    if (globalPageTextNode) {
-        const pageChangeObserverInstance = new MutationObserver(() => {
-            const currentVisiblePageNumber = parseInt(globalPageTextNode.innerText || globalPageTextNode.value, 10);
-            if (!isNaN(currentVisiblePageNumber) && currentVisiblePageNumber > 0) {
-                
-                currentActivePageIndex = currentVisiblePageNumber - 1;
-                console.log("📑 System Memory Page Index Updated To:", currentActivePageIndex);
-
-                const workspaceScalerBox = document.getElementById('workspace-scaler');
-                if (workspaceScalerBox && typeof pdfDoc !== 'undefined' && pdfDoc.getPages) {
-                    const totalPageCount = pdfDoc.getPages().length;
-                    if (totalPageCount > 1) {
-                        const singlePageVisualHeight = workspaceScalerBox.scrollHeight / totalPageCount;
-                        
-                        if (typeof posY !== 'undefined' && posY > singlePageVisualHeight) {
-                            posY = posY % singlePageVisualHeight;
-                        }
-                        if (typeof stampPosY !== 'undefined' && stampPosY > singlePageVisualHeight) {
-                            stampPosY = stampPosY % singlePageVisualHeight;
-                        }
-                        if (typeof sigPosY !== 'undefined' && sigPosY > singlePageVisualHeight) {
-                            sigPosY = sigPosY % singlePageVisualHeight;
-                        }
-                    }
-                }
-            }
-        });
-        pageChangeObserverInstance.observe(globalPageTextNode, { childList: true, characterData: true, subtree: true });
-    }
     // ------------------------------------
 
     /* ==========================================================================
