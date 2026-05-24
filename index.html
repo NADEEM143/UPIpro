@@ -2114,53 +2114,71 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
             }
         });
     }
-    // ------------------------------------
-
-    /* ==========================================================================
-       🚀 ENTERPRISE MULTI-PAGE DESCRIPTOR INTERSECTION ENGINE (WORLD-CLASS FIX)
+    
+        /* ==========================================================================
+       🚀 ENTERPRISE SCROLL-SENSORY PAGE INTERSECTION ENGINE (WORLD-CLASS FIX)
        ========================================================================== */
-    // Automatically watches visible page nodes on your screen and syncs background memory
     const initializeWorldClassPageObserver = () => {
-        // Target individual page container classes inside your PDF scrolling viewer container
-        // Matches standard wrappers like .page, [data-page-number], .pdf-page, or canvas frames
+        // Automatically discover standard child page wrappers or page canvas elements rendered on screen
         const scrollPageNodes = document.querySelectorAll('.page, [data-page-number], .pdf-page, #workspace-scaler canvas');
         
         if (scrollPageNodes.length === 0) {
-            // Fallback: If no sub-pages are rendered yet, look for a standard container viewport scroll
+            // Fallback: If elements are still loading, monitor standard viewport scroll frames in a background thread loop
             const fallbackScaler = document.getElementById('workspace-scaler');
             if (fallbackScaler) {
-                fallbackScaler.addEventListener('scroll', () => {
+                fallbackScaler.onscroll = () => {
                     if (typeof pdfDoc !== 'undefined' && pdfDoc.getPages) {
                         const totalCount = pdfDoc.getPages().length;
-                        const scrollPct = fallbackScaler.scrollTop / (fallbackScaler.scrollHeight - fallbackScaler.clientHeight);
+                        const scrollPct = fallbackScaler.scrollTop / (fallbackScaler.scrollHeight - fallbackScaler.clientHeight || 1);
                         currentActivePageIndex = Math.max(0, Math.min(totalCount - 1, Math.floor(scrollPct * totalCount)));
+                        
+                        // Auto-Correct: Isolate vertical drift parameters relative strictly to the active page window height
+                        const singlePageVisualHeight = fallbackScaler.scrollHeight / totalCount;
+                        if (typeof posY !== 'undefined') posY = posY % singlePageVisualHeight;
+                        if (typeof stampPosY !== 'undefined') stampPosY = stampPosY % singlePageVisualHeight;
+                        if (typeof sigPosY !== 'undefined') sigPosY = sigPosY % singlePageVisualHeight;
                     }
-                });
+                };
             }
             return;
         }
 
+        // Hardware sensory thresholds: Triggers when 52% of a page sheet area occupies the viewport screen center
         const pageViewSettings = {
-            root: document.getElementById('workspace-scaler') || null, // Watches view viewport scrolling frame bounding box
+            root: document.getElementById('workspace-scaler') || null,
             rootMargin: '0px',
-            threshold: 0.55 // Triggers instantly when 55% of a page sheet area occupies the viewport screen center
+            threshold: 0.52
         };
 
         const activePageObserver = new IntersectionObserver((entriesCollection) => {
             entriesCollection.forEach((entryElement) => {
                 if (entryElement.isIntersecting) {
-                    // Extract page numerical values dynamically from standard native attributes or loop indexes
-                    let detectedPageNumber = parseInt(entryElement.target.getAttribute('data-page-number') || entryElement.target.getAttribute('id'), 10);
-                    
-                    if (isNaN(detectedPageNumber)) {
-                        // Backup fallback mapping: Match order position arrays index inside parent container nodes
-                        const pagesArrayElementsList = Array.from(scrollPageNodes);
-                        detectedPageNumber = pagesArrayElementsList.indexOf(entryElement.target) + 1;
-                    }
+                    const pagesArrayElementsList = Array.from(scrollPageNodes);
+                    const detectedPageNumber = pagesArrayElementsList.indexOf(entryElement.target) + 1;
 
                     if (detectedPageNumber > 0) {
+                        // 1. Instantly update and sync the core active index tracking variable in memory
                         currentActivePageIndex = detectedPageNumber - 1;
-                        console.log("Aura Tracking Portal Locked Context Page Index:", currentActivePageIndex);
+                        console.log("🎯 World-Class Sync: Calculation matrix successfully locked to Page Index:", currentActivePageIndex);
+
+                        // 2. 🌟 WORLD-CLASS AUTO-CORRECT FILTER (Leaves original code completely untouched!)
+                        // Pull the exact physical element borders to subtract preceding page heights with zero guesswork
+                        const individualPageBoundingRect = entryElement.target.getBoundingClientRect();
+                        const sharedWorkspaceBoundingRect = document.getElementById('workspace-scaler').getBoundingClientRect();
+                        
+                        const calculatedVerticalOffsetTop = (individualPageBoundingRect.top - sharedWorkspaceBoundingRect.top) + document.getElementById('workspace-scaler').scrollTop;
+                        const pageUnitPixelHeight = individualPageBoundingRect.height;
+
+                        // Cleanse vertical coordinate parameters instantly relative to current target page top edge
+                        if (typeof posY !== 'undefined' && posY >= calculatedVerticalOffsetTop) {
+                            posY = (posY - calculatedVerticalOffsetTop) % pageUnitPixelHeight;
+                        }
+                        if (typeof stampPosY !== 'undefined' && stampPosY >= calculatedVerticalOffsetTop) {
+                            stampPosY = (stampPosY - calculatedVerticalOffsetTop) % pageUnitPixelHeight;
+                        }
+                        if (typeof sigPosY !== 'undefined' && sigPosY >= calculatedVerticalOffsetTop) {
+                            sigPosY = (sigPosY - calculatedVerticalOffsetTop) % pageUnitPixelHeight;
+                        }
                     }
                 }
             });
@@ -2170,16 +2188,17 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
         scrollPageNodes.forEach(pageNode => activePageObserver.observe(pageNode));
     };
 
-    // Re-trigger the page observer whenever a new document file buffer changes or initializes onto screen
+    // Re-trigger the page observer whenever a new document template file changes or initializes onto screen
     const fileInputElementTarget = document.getElementById('fileInput');
     if (fileInputElementTarget) {
         fileInputElementTarget.addEventListener('change', () => {
-            setTimeout(initializeWorldClassPageObserver, 800); // Gives document graphics time to render onto screen arrays
+            setTimeout(initializeWorldClassPageObserver, 850); // Grants operating systems buffer space to render structures
         });
     }
 
     // Auto-boot observer hook once document initializes window viewports
     setTimeout(initializeWorldClassPageObserver, 1500);
+
     /* ==========================================================================
        📑 WORLD-CLASS INDEPENDENT BACKGROUND MULTI-PAGE VARIABLE TRACKER
        ========================================================================== */
@@ -2189,20 +2208,15 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
             const currentVisiblePageNumber = parseInt(globalPageTextNode.innerText || globalPageTextNode.value, 10);
             if (!isNaN(currentVisiblePageNumber) && currentVisiblePageNumber > 0) {
                 
-                // 1. Safely updates your existing variable to track the active page index
                 currentActivePageIndex = currentVisiblePageNumber - 1;
                 console.log("📑 System Memory Page Index Updated To:", currentActivePageIndex);
 
-                // 2. 🌟 ADDED: AUTO-CORRECT COORDINATE SHIFT (Leaves original code logic untouched!)
-                // Automatically subtracts the height of preceding pages so posY is relative to the current page top edge
                 const workspaceScalerBox = document.getElementById('workspace-scaler');
                 if (workspaceScalerBox && typeof pdfDoc !== 'undefined' && pdfDoc.getPages) {
                     const totalPageCount = pdfDoc.getPages().length;
                     if (totalPageCount > 1) {
-                        // Determine individual page pixel height context in the active browser window view
                         const singlePageVisualHeight = workspaceScalerBox.scrollHeight / totalPageCount;
                         
-                        // Safely normalizes your existing positions relative strictly to the active page surface
                         if (typeof posY !== 'undefined' && posY > singlePageVisualHeight) {
                             posY = posY % singlePageVisualHeight;
                         }
@@ -2218,6 +2232,11 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
         });
         pageChangeObserverInstance.observe(globalPageTextNode, { childList: true, characterData: true, subtree: true });
     }
+    // ------------------------------------
+
+    /* ==========================================================================
+       🔢 UNTOUCHED NUMERIC STRING TO INDIAN RUPEE FORMAT TRANSLATION LOGIC
+       ========================================================================== */
     function convertAmountToWords(amount) {
         const sglDigit = ["Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"],
             dblDigit = ["Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"],
