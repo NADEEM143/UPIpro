@@ -951,7 +951,7 @@
             const pdfX = (finalLeftPos / actualWorkspaceWidth) * width;
             const pdfY = height - (finalTopPos / actualWorkspaceHeight) * height - finalSquareSize;
 
-            targetExportPage.drawImage(qrImage, {
+                        targetExportPage.drawImage(qrImage, {
                 x: pdfX,
                 y: pdfY,
                 width: finalSquareSize,
@@ -959,48 +959,62 @@
             });
             
             /* ─── BLOCK 2: INJECT THE DIGITAL INK STAMP (CLONED UNIFORM SQUARE MATH) ─── */
-            if (isStampPlaced && stampImgDataUrl) {
+            if (isStampPlaced && stampImgDataUrl && stampMarker && window.getComputedStyle(stampMarker).display !== 'none') {
                 const stampImageObject = await pdfDoc.embedPng(stampImgDataUrl);
+                const stampLeft = parseFloat(stampMarker.style.left) || 0;
+                const stampTop = parseFloat(stampMarker.style.top) || 0;
 
-                const finalStampLeft = (isStampLocked ? (stampPosX - 60) : (parseFloat(stampMarker.style.left) || (stampPosX - 60))) / currentResponsiveLayoutScaleFactorX;
-                const finalStampTop = (isStampLocked ? (stampPosY - 60) : (parseFloat(stampMarker.style.top) || (stampPosY - 60))) / currentResponsiveLayoutScaleFactorY;
+                // 🌟 ENTERPRISE AUTO-DETECT: Find target page from stamp marker screen boundary coordinates
+                let stampTargetIdx = Math.floor((stampTop + (stampMarker.clientHeight / 2)) / singlePageContainerHeight);
+                stampTargetIdx = Math.max(0, Math.min(pagesCollection.length - 1, stampTargetIdx));
+                const stampPage = pagesCollection[stampTargetIdx] || targetExportPage;
+                const { width: pW, height: pH } = stampPage.getSize();
 
-                // ⚠️ UNTOUCHED LOGIC: Uses your exact Math.max logic to make it a perfect circle
-                let stampWidthCalc = (stampMarker.clientWidth / actualWorkspaceWidth) * width;
-                let stampHeightCalc = (stampMarker.clientHeight / actualWorkspaceHeight) * height;
-                let uniformStampSize = Math.max(stampWidthCalc, stampHeightCalc);
+                // Force relative layout offset reset
+                const relativeTop = stampTop - (stampTargetIdx * singlePageContainerHeight);
 
-                const docStampX = (finalStampLeft / actualWorkspaceWidth) * width;
-                const docStampY = height - (finalStampTop / actualWorkspaceHeight) * height - uniformStampSize;
+                // ⚠️ WORLD-CLASS SIZING RESTORED: Scales cleanly relative to a single page segment height block to fix magnification completely
+                let docStampW = (stampMarker.clientWidth / actualWorkspaceWidth) * pW;
+                let docStampH = (stampMarker.clientHeight / singlePageContainerHeight) * pH;
                 
-                targetExportPage.drawImage(stampImageObject, {
-                    x: docStampX,
-                    y: docStampY,
-                    width: uniformStampSize,
-                    height: uniformStampSize
-                });
+                const currentSelectedShapeType = document.getElementById('stampShape').value;
+                if (currentSelectedShapeType === 'circle' || currentSelectedShapeType === 'square') {
+                    const unifiedSquareDimensionValue = Math.max(docStampW, docStampH);
+                    docStampW = unifiedSquareDimensionValue;
+                    docStampH = unifiedSquareDimensionValue;
+                }
+
+                const docStampX = (stampLeft / actualWorkspaceWidth) * pW;
+                // ⚠️ CALCULATION FIX: Multiplied by singlePageContainerHeight ratio for precision alignment mapping
+                const docStampY = pH - ((relativeTop / singlePageContainerHeight) * pH) - docStampH;
+                
+                stampPage.drawImage(stampImageObject, { x: docStampX, y: docStampY, width: docStampW, height: docStampH });
             }
 
             /* ─── BLOCK 3: INJECT THE ELECTRONIC SIGNATURE (PRESERVE NATURAL SHAPE RECTANGLE) ─── */
-            if (isSigPlaced && sigImgDataUrl && signatureMarker) {
+            if (isSigPlaced && sigImgDataUrl && signatureMarker && window.getComputedStyle(signatureMarker).display !== 'none') {
                 const sigImageObject = await pdfDoc.embedPng(sigImgDataUrl);
+                const sigLeft = parseFloat(signatureMarker.style.left) || 0;
+                const sigTop = parseFloat(signatureMarker.style.top) || 0;
 
-                const finalSigLeft = (isSigLocked ? (sigPosX - 70) : (parseFloat(signatureMarker.style.left) || (sigPosX - 70))) / currentResponsiveLayoutScaleFactorX;
-                const finalSigTop = (isSigLocked ? (sigPosY - 70) : (parseFloat(signatureMarker.style.top) || (sigPosY - 70))) / currentResponsiveLayoutScaleFactorY;
+                // 🌟 ENTERPRISE AUTO-DETECT: Find target page from signature marker screen boundary coordinates
+                let sigTargetIdx = Math.floor((sigTop + (signatureMarker.clientHeight / 2)) / singlePageContainerHeight);
+                sigTargetIdx = Math.max(0, Math.min(pagesCollection.length - 1, sigTargetIdx));
+                const sigPage = pagesCollection[sigTargetIdx] || targetExportPage;
+                const { width: pW, height: pH } = sigPage.getSize();
 
-                // ⚠️ FIXED LOGIC: Kept width and height completely natural to protect the widescreen signature look
-                let docSigW = (signatureMarker.clientWidth / actualWorkspaceWidth) * width;
-                let docSigH = (signatureMarker.clientHeight / actualWorkspaceHeight) * height;
+                // Force relative layout offset reset
+                const relativeTop = sigTop - (sigTargetIdx * singlePageContainerHeight);
 
-                const docSigX = (finalSigLeft / actualWorkspaceWidth) * width;
-                const docSigY = height - (finalSigTop / actualWorkspaceHeight) * height - docSigH;
+                // ⚠️ WORLD-CLASS SIZING RESTORED: Scales cleanly relative to a single page segment height block to fix magnification completely
+                let docSigW = (signatureMarker.clientWidth / actualWorkspaceWidth) * pW;
+                let docSigH = (signatureMarker.clientHeight / singlePageContainerHeight) * pH;
+
+                const docSigX = (sigLeft / actualWorkspaceWidth) * pW;
+                // ⚠️ CALCULATION FIX: Multiplied by singlePageContainerHeight ratio for precision alignment mapping
+                const docSigY = pH - ((relativeTop / singlePageContainerHeight) * pH) - docSigH;
                 
-                targetExportPage.drawImage(sigImageObject, {
-                    x: docSigX,
-                    y: docSigY,
-                    width: docSigW,
-                    height: docSigH
-                });
+                sigPage.drawImage(sigImageObject, { x: docSigX, y: docSigY, width: docSigW, height: docSigH });
             }
 
             const pdfData = await pdfDoc.save();
@@ -1955,7 +1969,7 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
                 stampMarker.style.display = 'none';
                 signatureMarker.style.display = 'none';
 
-                                   } else {
+                                               } else {
                 const pdfDoc = await PDFLib.PDFDocument.load(originalBytes);
                 
                 const pagesCollection = pdfDoc.getPages();
@@ -2021,8 +2035,9 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
                     // Force relative layout offset reset
                     const relativeTop = stampTopStyle - (stampTargetIdx * singlePageContainerHeight);
 
+                    // ⚠️ WORLD-CLASS SIZING RESTORED: Scales cleanly relative to a single page segment height block to fix magnification completely
                     let docStampW = (stampMarker.clientWidth / actualWorkspaceWidth) * pW;
-                    let docStampH = (stampMarker.clientHeight / actualWorkspaceHeight) * pH * pagesCollection.length;
+                    let docStampH = (stampMarker.clientHeight / singlePageContainerHeight) * pH;
                     const uniformStampSize = Math.max(docStampW, docStampH);
 
                     const docStampX = (stampLeftStyle / actualWorkspaceWidth) * pW;
@@ -2052,8 +2067,9 @@ const absoluteGrandTotal = Math.round(subTotalCost + cgstValue + sgstValue);
                     // Force relative layout offset reset
                     const relativeTop = sigTopStyle - (sigTargetIdx * singlePageContainerHeight);
 
+                    // ⚠️ WORLD-CLASS SIZING RESTORED: Scales cleanly relative to a single page segment height block to fix magnification completely
                     let docSigW = (signatureMarker.clientWidth / actualWorkspaceWidth) * pW;
-                    let docSigH = (signatureMarker.clientHeight / actualWorkspaceHeight) * pH * pagesCollection.length;
+                    let docSigH = (signatureMarker.clientHeight / singlePageContainerHeight) * pH;
 
                     const docSigX = (sigLeftStyle / actualWorkspaceWidth) * pW;
                     // ⚠️ CALCULATION FIX: Multiplied by singlePageContainerHeight ratio for precision alignment mapping
